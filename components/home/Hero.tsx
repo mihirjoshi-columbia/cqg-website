@@ -2,13 +2,19 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import Crown3D from "./Crown3D";
 
 export default function Hero() {
     const text = "Columbia Quant Group";
     const letters = Array.from(text);
 
     // Math symbols for background
-    const mathSymbols = ["∑", "∫", "∂", "π", "∆", "∇", "∞", "≈", "≠", "≤"];
+    const mathSymbols = [
+        "∑", "∫", "∂", "π", "∆", "∇", "∞", "≈", "≠", "≤",
+        "≥", "±", "√", "µ", "Ω", "θ", "λ", "β", "α", "σ",
+        "ε", "Φ", "Ψ", "ξ", "ζ", "ρ", "τ", "ω", "Γ", "Δ"
+    ];
     const [symbolStyles, setSymbolStyles] = useState<Array<{ x: number, y: number, scale: number, rotate: number, duration: number, fontSize: number }>>([]);
 
     useEffect(() => {
@@ -59,11 +65,20 @@ export default function Hero() {
             {/* Grid Background */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
+            {/* 3D Crown Background */}
+            <div className="absolute inset-0 z-0 opacity-50">
+                <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
+                    <ambientLight intensity={0.5} />
+                    <pointLight position={[10, 10, 10]} />
+                    <Crown3D />
+                </Canvas>
+            </div>
+
             {/* Floating Math Symbols */}
             {symbolStyles.map((style, i) => (
                 <motion.div
                     key={i}
-                    className="absolute text-columbia-blue/20 font-serif font-bold select-none pointer-events-none"
+                    className="absolute text-columbia-blue/20 font-serif font-bold select-none pointer-events-none z-0"
                     initial={{
                         x: style.x,
                         y: style.y,
