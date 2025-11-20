@@ -6,18 +6,21 @@ import { useEffect, useState } from "react";
 export default function Hero() {
     const text = "Columbia Quant Group";
     const letters = Array.from(text);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+    // Math symbols for background
+    const mathSymbols = ["∑", "∫", "∂", "π", "∆", "∇", "∞", "≈", "≠", "≤"];
+    const [symbolStyles, setSymbolStyles] = useState<Array<{ x: number, y: number, scale: number, rotate: number, duration: number, fontSize: number }>>([]);
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({
-                x: e.clientX,
-                y: e.clientY,
-            });
-        };
-
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
+        const styles = mathSymbols.map(() => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            scale: 0.5 + Math.random() * 1.5,
+            rotate: Math.random() * 360,
+            duration: 10 + Math.random() * 20,
+            fontSize: 2 + Math.random() * 4
+        }));
+        setSymbolStyles(styles);
     }, []);
 
     const container = {
@@ -50,22 +53,6 @@ export default function Hero() {
             } as any,
         },
     };
-
-    // Math symbols for background
-    const mathSymbols = ["∑", "∫", "∂", "π", "∆", "∇", "∞", "≈", "≠", "≤"];
-    const [symbolStyles, setSymbolStyles] = useState<Array<{ x: number, y: number, scale: number, rotate: number, duration: number, fontSize: number }>>([]);
-
-    useEffect(() => {
-        const styles = mathSymbols.map(() => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            scale: 0.5 + Math.random() * 1.5,
-            rotate: Math.random() * 360,
-            duration: 10 + Math.random() * 20,
-            fontSize: 2 + Math.random() * 4
-        }));
-        setSymbolStyles(styles);
-    }, []);
 
     return (
         <section className="h-screen flex flex-col items-center justify-center bg-white overflow-hidden relative">
@@ -100,17 +87,6 @@ export default function Hero() {
                     {mathSymbols[i]}
                 </motion.div>
             ))}
-
-            {/* Interactive Gradient Blob */}
-            <motion.div
-                className="absolute bg-columbia-blue/30 rounded-full blur-3xl pointer-events-none"
-                animate={{
-                    x: mousePosition.x - 200,
-                    y: mousePosition.y - 200,
-                }}
-                transition={{ type: "spring", damping: 30, stiffness: 200 }}
-                style={{ width: 400, height: 400, zIndex: 0 }}
-            />
 
             <motion.div
                 className="z-10 flex overflow-hidden relative"
