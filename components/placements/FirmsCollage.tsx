@@ -19,7 +19,8 @@ export default function FirmsCollage() {
         { name: "J.P. Morgan", logo: "/logos/j-p--morgan.png" },
         { name: "BlackRock", logo: "/logos/blackrock.png" },
         { name: "Point72", logo: "/logos/point72.png" },
-        { name: "Millennium", logo: "/logos/millennium.png" },
+        { name: "CTC", logo: "/logos/ctc.png" },
+        { name: "SIG", logo: "/logos/sig.png" },
         { name: "Bridgewater", logo: "/logos/bridgewater.png" },
         { name: "AQR", logo: "/logos/aqr.png" },
         { name: "Man Group", logo: "/logos/man-group.png" }
