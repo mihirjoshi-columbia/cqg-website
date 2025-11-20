@@ -2,14 +2,29 @@
 
 import { motion } from "framer-motion";
 
-const firms = [
-    "Jane Street", "Citadel", "Two Sigma", "D.E. Shaw", "Hudson River Trading",
-    "Jump Trading", "Five Rings", "Tower Research", "Optiver", "IMC",
-    "Goldman Sachs", "Morgan Stanley", "J.P. Morgan", "BlackRock",
-    "Point72", "Millennium", "Bridgewater", "AQR", "Man Group"
-];
-
 export default function FirmsCollage() {
+    const firms = [
+        { name: "Jane Street", logo: "/logos/jane-street.png" },
+        { name: "Citadel", logo: "/logos/citadel.png" },
+        { name: "Two Sigma", logo: "/logos/two-sigma.png" },
+        { name: "D.E. Shaw", logo: "/logos/d-e--shaw.png" },
+        { name: "Hudson River Trading", logo: "/logos/hudson-river-trading.png" },
+        { name: "Jump Trading", logo: "/logos/jump-trading.png" },
+        { name: "Five Rings", logo: "/logos/five-rings.png" },
+        { name: "Tower Research", logo: "/logos/tower-research.png" },
+        { name: "Optiver", logo: "/logos/optiver.png" },
+        { name: "IMC", logo: "/logos/imc.png" },
+        { name: "Goldman Sachs", logo: "/logos/goldman-sachs.png" },
+        { name: "Morgan Stanley", logo: "/logos/morgan-stanley.png" },
+        { name: "J.P. Morgan", logo: "/logos/j-p--morgan.png" },
+        { name: "BlackRock", logo: "/logos/blackrock.png" },
+        { name: "Point72", logo: "/logos/point72.png" },
+        { name: "Millennium", logo: "/logos/millennium.png" },
+        { name: "Bridgewater", logo: "/logos/bridgewater.png" },
+        { name: "AQR", logo: "/logos/aqr.png" },
+        { name: "Man Group", logo: "/logos/man-group.png" }
+    ];
+
     return (
         <section className="py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +37,7 @@ export default function FirmsCollage() {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center justify-items-center">
                     {firms.map((firm, index) => (
                         <motion.div
                             key={index}
@@ -30,9 +45,13 @@ export default function FirmsCollage() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.05, duration: 0.4 }}
-                            className="bg-gray-50 px-6 py-4 rounded-lg border border-gray-100 hover:shadow-md transition-shadow"
+                            className="w-40 h-24 flex items-center justify-center p-4 grayscale hover:grayscale-0 transition-all duration-300 hover:scale-110"
                         >
-                            <span className="text-lg font-semibold text-columbia-dark">{firm}</span>
+                            <img
+                                src={firm.logo}
+                                alt={`${firm.name} logo`}
+                                className="max-w-full max-h-full object-contain"
+                            />
                         </motion.div>
                     ))}
                 </div>
