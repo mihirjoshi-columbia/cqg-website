@@ -4,26 +4,26 @@ import { motion } from "framer-motion";
 
 export default function FirmsCollage() {
     const firms = [
-        { name: "Jane Street", logo: "/logos/jane-street.png" },
-        { name: "Citadel", logo: "/logos/citadel.png" },
-        { name: "Two Sigma", logo: "/logos/two-sigma.png" },
-        { name: "D.E. Shaw", logo: "/logos/d-e--shaw.png" },
-        { name: "Hudson River Trading", logo: "/logos/hudson-river-trading.png" },
-        { name: "Jump Trading", logo: "/logos/jump-trading.png" },
-        { name: "Five Rings", logo: "/logos/five-rings.png" },
-        { name: "Tower Research", logo: "/logos/tower-research.png" },
-        { name: "Optiver", logo: "/logos/optiver.png" },
-        { name: "IMC", logo: "/logos/imc.png" },
-        { name: "Goldman Sachs", logo: "/logos/goldman-sachs.png" },
-        { name: "Morgan Stanley", logo: "/logos/morgan-stanley.png" },
-        { name: "J.P. Morgan", logo: "/logos/j-p--morgan.png" },
-        { name: "BlackRock", logo: "/logos/blackrock.png" },
-        { name: "Point72", logo: "/logos/point72.png" },
-        { name: "CTC", logo: "/logos/ctc.png" },
-        { name: "SIG", logo: "/logos/sig.png" },
-        { name: "Bridgewater", logo: "/logos/bridgewater.png" },
-        { name: "AQR", logo: "/logos/aqr.png" },
-        { name: "Man Group", logo: "/logos/man-group.png" }
+        { name: "Jane Street", logo: "/logos/jane-street.png", url: "https://www.janestreet.com" },
+        { name: "Citadel", logo: "/logos/citadel.png", url: "https://www.citadel.com" },
+        { name: "Two Sigma", logo: "/logos/two-sigma.png", url: "https://www.twosigma.com" },
+        { name: "D.E. Shaw", logo: "/logos/d-e--shaw.png", url: "https://www.deshaw.com" },
+        { name: "Hudson River Trading", logo: "/logos/hudson-river-trading.png", url: "https://www.hudsonrivertrading.com" },
+        { name: "Jump Trading", logo: "/logos/jump-trading.svg", url: "https://www.jumptrading.com" },
+        { name: "Five Rings", logo: "/logos/five-rings.png", url: "https://fiverings.com" },
+        { name: "Flow Traders", logo: "/logos/flow-traders.png", url: "https://www.flowtraders.com" },
+        { name: "Optiver", logo: "/logos/optiver.png", url: "https://www.optiver.com" },
+        { name: "IMC", logo: "/logos/imc.png", url: "https://www.imc.com" },
+        { name: "Goldman Sachs", logo: "/logos/goldman-sachs.png", url: "https://www.goldmansachs.com" },
+        { name: "Morgan Stanley", logo: "/logos/morgan-stanley.png", url: "https://www.morganstanley.com" },
+        { name: "J.P. Morgan", logo: "/logos/j-p--morgan.png", url: "https://www.jpmorgan.com" },
+        { name: "BlackRock", logo: "/logos/blackrock.png", url: "https://www.blackrock.com" },
+        { name: "Point72", logo: "/logos/point72.png", url: "https://www.point72.com" },
+        { name: "CTC", logo: "/logos/ctc.png", url: "https://www.chicagotrading.com" },
+        { name: "SIG", logo: "/logos/sig.png", url: "https://www.sig.com" },
+        { name: "Bridgewater", logo: "/logos/bridgewater.png", url: "https://www.bridgewater.com" },
+        { name: "AQR", logo: "/logos/aqr.png", url: "https://www.aqr.com" },
+        { name: "Man Group", logo: "/logos/man-group.png", url: "https://www.man.com" }
     ];
 
     return (
@@ -38,22 +38,23 @@ export default function FirmsCollage() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center justify-items-center">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {firms.map((firm, index) => (
-                        <motion.div
+                        <a
                             key={index}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.05, duration: 0.4 }}
-                            className="w-40 h-24 flex items-center justify-center p-4 grayscale hover:grayscale-0 transition-all duration-300 hover:scale-110"
+                            href={firm.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center h-32 group"
                         >
-                            <img
-                                src={firm.logo}
-                                alt={`${firm.name} logo`}
-                                className="max-w-full max-h-full object-contain"
-                            />
-                        </motion.div>
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <img
+                                    src={firm.logo}
+                                    alt={`${firm.name} logo`}
+                                    className="max-w-[90%] max-h-[90%] object-contain filter grayscale opacity-70 group-hover:filter-none group-hover:opacity-100 transition-all duration-300"
+                                />
+                            </div>
+                        </a>
                     ))}
                 </div>
             </div>
