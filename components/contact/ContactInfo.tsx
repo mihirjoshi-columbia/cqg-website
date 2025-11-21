@@ -28,7 +28,7 @@ export default function ContactInfo() {
                         <div>
                             <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold mb-1">President</p>
                             <a href="mailto:president@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
-                                president@columbia.edu
+                                columbia.quant.group [at] columbia [dot] edu
                             </a>
                         </div>
                     </div>
