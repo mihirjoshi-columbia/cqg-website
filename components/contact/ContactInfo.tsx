@@ -18,8 +18,8 @@ export default function ContactInfo() {
                     <div className="space-y-6">
                         <div>
                             <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold mb-1">General Inquiries</p>
-                            <a href="mailto:cqg@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
-                                cqg@columbia.edu
+                            <a href="mailto:columbia.quant.group@gmail.com" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
+                                columbia [dot] quant [dot] group [at] gmail [dot] com
                             </a>
                         </div>
 
@@ -27,8 +27,8 @@ export default function ContactInfo() {
 
                         <div>
                             <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold mb-1">President</p>
-                            <a href="mailto:president@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
-                                columbia [dot] quant [dot] group [at] columbia [dot] edu
+                            <a href="mailto:bp2715@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
+                                bp2715 [at] columbia [dot] edu
                             </a>
                         </div>
                     </div>
