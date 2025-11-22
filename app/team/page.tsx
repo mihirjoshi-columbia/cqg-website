@@ -2,12 +2,7 @@ import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
 
 const currentMembers = [
-    { name: "Member 1", linkedin: "https://linkedin.com" },
-    { name: "Member 2", linkedin: "https://linkedin.com" },
-    { name: "Member 3", linkedin: "https://linkedin.com" },
-    { name: "Member 4", linkedin: "https://linkedin.com" },
-    { name: "Member 5", linkedin: "https://linkedin.com" },
-    { name: "Member 6", linkedin: "https://linkedin.com" },
+    { name: "TBA", linkedin: "https://linkedin.com" },
 ];
 
 const alumni = [
