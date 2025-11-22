@@ -15,7 +15,7 @@ export default function Footer() {
                         <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                             Contact
                         </Link>
-                        <Link href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                        <Link href="https://www.linkedin.com/company/columbia-quant-group/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
                             LinkedIn
                         </Link>
                     </div>
