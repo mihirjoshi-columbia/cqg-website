@@ -19,6 +19,16 @@ const alumni = [
     { name: "Alumni 6", linkedin: "https://linkedin.com" },
 ];
 
+const seniorAdvisors = [
+    { name: "Mihir Joshi (CTC)", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
+    { name: "Nicole Pi (DRW)", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Arjun Parthasarathy (Jump Trading)", linkedin: "https://www.linkedin.com/in/arjun-parthasarathy-276408224/" },
+    { name: "Derek Che (Citadel Securities)", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Brianna Wang (Datadog)", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
+    { name: "Luke Freed (Bridgewater)", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Harris Chen (Optiver)", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+];
+
 export default function TeamPage() {
     return (
         <div className="min-h-screen bg-white pt-12 pb-24">
@@ -34,6 +44,7 @@ export default function TeamPage() {
             <ExecBoard />
 
             <div className="space-y-16 mt-8">
+                <TeamList title="Senior Advisors" members={seniorAdvisors} />
                 <TeamList title="Current Members" members={currentMembers} />
                 <TeamList title="Alumni" members={alumni} />
             </div>
