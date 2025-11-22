@@ -45,8 +45,7 @@ export default function TeamPage() {
 
             <div className="space-y-16 mt-8">
                 <TeamList title="Senior Advisors" members={seniorAdvisors} />
-                <TeamList title="Current Members" members={currentMembers} />
-                <TeamList title="Alumni" members={alumni} />
+                <TeamList title="Current Members (TBA)" members={currentMembers} />
             </div>
         </div>
     );
