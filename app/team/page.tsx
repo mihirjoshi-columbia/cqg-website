@@ -1,8 +1,22 @@
+import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
 
 const currentMembers = [
-    { name: "TBA", linkedin: "https://linkedin.com" },
+    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257" },
+    { name: "Michelle Zhou", linkedin: "https://www.linkedin.com/in/michelle-zhou-252119348" },
+    { name: "Zachary Jeon", linkedin: "https://www.linkedin.com/in/zachary-jeon/" },
+    { name: "Ethan Badner", linkedin: "https://www.linkedin.com/in/ethan-badner-133a29321" },
+    { name: "Anay Garodia", linkedin: "https://www.linkedin.com/in/anay-garodia-a863a6257/" },
+    { name: "Dylan Fei", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
+    { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
+    { name: "Keona Tang", linkedin: "https://www.linkedin.com/in/keonatang/" },
+    { name: "Evelyn Li", linkedin: "https://www.linkedin.com/in/evelynlicolumbia" },
+    { name: "Olivia Huang", linkedin: "https://www.linkedin.com/in/olivia-huang-a13690244/" },
+    { name: "Siddharth Rout", linkedin: "https://www.linkedin.com/in/siddharth-rout-69a0191b9" },
+    { name: "Ivy Hu", linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/" },
+    { name: "Ethan Schales", linkedin: "https://www.linkedin.com/in/ethan41sch" },
+    { name: "Cathy Deng", linkedin: "https://www.linkedin.com/in/cathy-deng/" },
 ];
 
 const alumni = [
@@ -15,13 +29,13 @@ const alumni = [
 ];
 
 const seniorAdvisors = [
-    { name: "Mihir Joshi (CTC)", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
-    { name: "Nicole Pi (DRW)", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
-    { name: "Arjun Parthasarathy (Jump Trading)", linkedin: "https://www.linkedin.com/in/arjun-parthasarathy-276408224/" },
-    { name: "Derek Che (Citadel Securities)", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
-    { name: "Brianna Wang (Datadog)", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
-    { name: "Luke Freed (Bridgewater)", linkedin: "https://www.linkedin.com/in/lukefreed/" },
-    { name: "Harris Chen (Optiver)", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Mihir Joshi", company: "CTC", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
+    { name: "Nicole Pi", company: "DRW", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Arjun Parthasarathy", company: "Jump Trading", linkedin: "https://www.linkedin.com/in/arjun-parthasarathy-276408224/" },
+    { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
+    { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
 ];
 
 export default function TeamPage() {
@@ -39,8 +53,8 @@ export default function TeamPage() {
             <ExecBoard />
 
             <div className="space-y-16 mt-8">
-                <TeamList title="Senior Advisors" members={seniorAdvisors} />
-                <TeamList title="Current Members (TBA)" members={currentMembers} />
+                <AdvisorList title="Senior Advisors" advisors={seniorAdvisors} />
+                <TeamList title="Current Members" members={currentMembers} />
             </div>
         </div>
     );
