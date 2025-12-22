@@ -9,7 +9,7 @@ import clsx from "clsx";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Placements", href: "/placements" },
-  { name: "Our Team", href: "/team" },
+  { name: "Columbia Team", href: "/team" },
   { name: "Recruitment", href: "/recruitment" },
   { name: "Education", href: "/education" },
   { name: "Contact", href: "/contact" },
@@ -27,7 +27,7 @@ export default function Navbar() {
               CQG
             </Link>
           </div>
-          
+
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
             {navLinks.map((link) => (
