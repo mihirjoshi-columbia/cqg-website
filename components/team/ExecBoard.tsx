@@ -7,11 +7,11 @@ import { Linkedin } from "lucide-react";
 
 const execBoard = [
     {
-        name: "Benjamin Proothi",
+        name: "Aurora Wang",
         role: "President",
-        image: "/team/ben.jpeg",
-        linkedin: "https://www.linkedin.com/in/benjamin-proothi/",
-        bio: "Applied Physics @ Columbia University | Egleston Scholar | FDE @ Palantir. Upcoming Forward Deployed Software Engineer Intern at Palantir Technologies."
+        image: "/team/aurora.jpeg",
+        linkedin: "https://www.linkedin.com/in/aurorawang15/",
+        bio: "CS + Statistics @ Columbia University. Incoming QT intern @ IMC"
     },
     {
         name: "Aryaman Rakhecha",
@@ -28,11 +28,11 @@ const execBoard = [
         bio: "CS, Applied Math @ Columbia University. Incoming SWE intern @ Databricks. Interested in Quantitative Finance, ML, and Synthetic Biology."
     },
     {
-        name: "Aurora Wang",
-        role: "Co-Head of Education",
-        image: "/team/aurora.jpeg",
-        linkedin: "https://www.linkedin.com/in/aurorawang15/",
-        bio: "CS + Statistics @ Columbia University. Incoming QT intern @ IMC"
+        name: "Mihir Joshi",
+        role: "Co-Head of Education", // Inherited role from Aurora's slot
+        image: "", // No photo requested
+        linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/",
+        bio: "" // Blank bio requested
     },
     {
         name: "Nikhil Mudumbi",
@@ -68,13 +68,19 @@ export default function ExecBoard() {
                         >
                             <Link href={exec.linkedin} target="_blank" rel="noopener noreferrer" className="block relative">
                                 <div className="aspect-square relative bg-gray-200 overflow-hidden">
-                                    <Image
-                                        src={exec.image}
-                                        alt={exec.name}
-                                        fill
-                                        unoptimized
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                    />
+                                    {exec.image ? (
+                                        <Image
+                                            src={exec.image}
+                                            alt={exec.name}
+                                            fill
+                                            unoptimized
+                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            {/* Placeholder or just empty grey background */}
+                                        </div>
+                                    )}
                                     <div className="absolute inset-0 bg-columbia-dark/0 group-hover:bg-columbia-dark/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <Linkedin className="text-white w-8 h-8" />
                                     </div>
