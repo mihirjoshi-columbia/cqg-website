@@ -42,11 +42,11 @@ const execBoard = [
         bio: "Nikhil is a Math major at Columbia College. He’s extremely interested in analysis and probability, from stochastics/financial modeling to integrable and combinatorial probability. Outside of CQG, he is one of the presidents of the Hindu Students Organization on campus and is a TA for Machine Learning. He’s interned at Jane Street as a trading intern and will spend the upcoming summer conducting math research at Columbia. In this free time, Nikhil enjoys running, drinking coffee, and watching football."
     },
     {
-        name: "Alison Wu",
-        role: "Head of Marketing",
-        image: "/team/alison.jpeg",
-        linkedin: "https://www.linkedin.com/in/alison-wu-8387961b5/",
-        bio: "FE + CS @ Columbia. Incoming Quant Summer Analyst @ Goldman Sachs. Former INSIGHT Program Participant at Jane Street."
+        name: "Ivy Hu",
+        role: "Marketing & Communications Chair",
+        image: "",
+        linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/",
+        bio: ""
     },
 ];
 
