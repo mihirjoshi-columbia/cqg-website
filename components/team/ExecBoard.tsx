@@ -11,7 +11,7 @@ const execBoard = [
         role: "President",
         image: "/team/aurora.jpeg",
         linkedin: "https://www.linkedin.com/in/aurorawang15/",
-        bio: "CS + Statistics @ Columbia University. Incoming QT intern @ IMC"
+        bio: "Aurora is a CS major in the School of Engineering and Applied Sciences. She is interested in quantitative modeling for market execution and fixed income investment, with additional interests in economic policy and NLP. Outside of CQG, Aurora plays piano extensively, in part through Columbia’s Music Performance Program. She will be interning at IMC this summer as a Quantitative Trading intern, and she previously interned at Weiss Asset Management on the Risk, Treasury, and Trading teams. In her free time, Aurora enjoys cafe hopping, playing the NYT Mini, and watching films."
     },
     {
         name: "Nicole Pi",
@@ -30,16 +30,16 @@ const execBoard = [
     {
         name: "Mihir Joshi",
         role: "Co-Head of Education", // Inherited role from Aurora's slot
-        image: "", // No photo requested
+        image: "/team/mihir.jpeg",
         linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/",
-        bio: "" // Blank bio requested
+        bio: "Mihir is a CS major in the School of Engineering and Applied Sciences. He is interested in low-latency, high-performance systems and computer architecture, but also has a passion for portfolio management and fundamental investing. He serves as the CFO of Lion Fund, LLC (the oldest student-run hedge fund at Columbia) and also TAs for Operating Systems and Fundamentals of Computer Systems. He will be interning at Chicago Trading Company next summer as a Quantitative Trading intern. In his free time, Mihir enjoys dancing with Columbia Bhangra, playing poker, and eating ramen at various restaurants in NYC."
     },
     {
         name: "Nikhil Mudumbi",
         role: "Co-Head of Education",
         image: "/team/nikhil.jpeg",
         linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/",
-        bio: "Math + CS @ Columbia University. Prev QT intern @ Jane Street. Selected as one of ~10 Science Research Fellows amongst the entire incoming class."
+        bio: "Nikhil is a Math major at Columbia College. He’s extremely interested in analysis and probability, from stochastics/financial modeling to integrable and combinatorial probability. Outside of CQG, he is one of the presidents of the Hindu Students Organization on campus and is a TA for Machine Learning. He’s interned at Jane Street as a trading intern and will spend the upcoming summer conducting math research at Columbia. In this free time, Nikhil enjoys running, drinking coffee, and watching football."
     },
     {
         name: "Alison Wu",
