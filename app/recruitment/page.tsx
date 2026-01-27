@@ -1,0 +1,7 @@
+export default function RecruitmentPage() {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <h1 className="text-4xl font-bold text-columbia-dark">Recruitment</h1>
+        </div>
+    );
+}
