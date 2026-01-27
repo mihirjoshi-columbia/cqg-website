@@ -21,15 +21,15 @@ const execBoard = [
         bio: "Nicole is a CS major in the School of Engineering and Applied Sciences. She is interested in statistical modeling and machine learning for financial markets, responsible AI, and building systems that are safe, reliable, and scalable. Nicole also serves as a committee leader for Columbia Organization for Rising Entrepreneurs (CORE), facilitates reading groups for Columbia AI Alignment (CAIAC), and is a TA for Introduction to Databases. She will be interning at DRW this summer as a quantitative trading intern, and she has previously interned at SpaceX and Goldman Sachs as a software engineer intern. In her free time, Nicole enjoys running, playing poker, and indulging her sweet tooth."
     },
     {
-        name: "Srirag Tatavarti",
-        role: "Head of Outreach",
-        image: "/team/srirag.jpeg",
-        linkedin: "https://www.linkedin.com/in/srirag-tatavarti/",
-        bio: "CS, Applied Math @ Columbia University. Incoming SWE intern @ Databricks. Interested in Quantitative Finance, ML, and Synthetic Biology."
+        name: "Victor Robila",
+        role: "Internal VP",
+        image: "/team/victor.jpeg",
+        linkedin: "https://www.linkedin.com/in/victor-robila/",
+        bio: "Victor is a CS and Math major in Columbia College. He likes using systematic methods to identify inconsistently priced opportunities. Victor will be interning at Bridgewater this summer as a Investment Engineer Intern and previously worked at a hedge fund (Gilder Gagnon Howe) and several private equity firms. Victor enjoys skiing as part of the Columbia Ski Team and trying new food."
     },
     {
         name: "Mihir Joshi",
-        role: "Co-Head of Education", // Inherited role from Aurora's slot
+        role: "Co-Head of Education",
         image: "/team/mihir.jpeg",
         linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/",
         bio: "Mihir is a CS major in the School of Engineering and Applied Sciences. He is interested in low-latency, high-performance systems and computer architecture, but also has a passion for portfolio management and fundamental investing. He serves as the CFO of Lion Fund, LLC (the oldest student-run hedge fund at Columbia) and also TAs for Operating Systems and Fundamentals of Computer Systems. He will be interning at Chicago Trading Company next summer as a Quantitative Trading intern. In his free time, Mihir enjoys dancing with Columbia Bhangra, playing poker, and eating ramen at various restaurants in NYC."
