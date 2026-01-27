@@ -27,13 +27,8 @@ export default function ContactInfo() {
 
                         <div>
                             <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold mb-1">President</p>
-<<<<<<< HEAD
                             <a href="mailto:aurora.wang@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
                                 aurora [dot] wang [at] columbia [dot] edu
-=======
-                            <a href="mailto:bp2715@columbia.edu" className="text-xl text-columbia-dark hover:text-columbia-secondary transition-colors font-medium">
-                                bp2715 [at] columbia [dot] edu
->>>>>>> main
                             </a>
                         </div>
                     </div>
