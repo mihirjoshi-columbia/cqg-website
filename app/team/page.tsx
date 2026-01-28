@@ -14,7 +14,6 @@ const currentMembers = [
     { name: "Evelyn Li", linkedin: "https://www.linkedin.com/in/evelynlicolumbia" },
     { name: "Olivia Huang", linkedin: "https://www.linkedin.com/in/olivia-huang-a13690244/" },
     { name: "Siddharth Rout", linkedin: "https://www.linkedin.com/in/siddharth-rout-69a0191b9" },
-    { name: "Ivy Hu", linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/" },
     { name: "Ethan Schales", linkedin: "https://www.linkedin.com/in/ethan41sch" },
     { name: "Cathy Deng", linkedin: "https://www.linkedin.com/in/cathy-deng/" },
 ];
@@ -29,8 +28,6 @@ const alumni = [
 ];
 
 const seniorAdvisors = [
-    { name: "Mihir Joshi", company: "CTC", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
-    { name: "Nicole Pi", company: "DRW", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
     { name: "Arjun Parthasarathy", company: "Jump Trading", linkedin: "https://www.linkedin.com/in/arjun-parthasarathy-276408224/" },
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
     { name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
