@@ -44,7 +44,7 @@ const execBoard = [
     {
         name: "Ivy Hu",
         role: "Marketing & Communications Chair",
-        image: "",
+        image: "/team/ivy.jpg",
         linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/",
         bio: ""
     },
