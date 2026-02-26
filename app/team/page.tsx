@@ -28,6 +28,8 @@ const alumni = [
 ];
 
 const seniorAdvisors = [
+    { name: "Ben Proothi", company: "Palantir", linkedin: "https://www.linkedin.com/in/benjamin-proothi/" },
+    { name: "Aryaman Rakhecha", company: "Avendus", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
     { name: "Arjun Parthasarathy", company: "Jump Trading", linkedin: "https://www.linkedin.com/in/arjun-parthasarathy-276408224/" },
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
     { name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
