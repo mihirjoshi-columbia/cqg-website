@@ -28,9 +28,13 @@ const alumni = [
 ];
 
 const seniorAdvisors = [
-    { name: "Ben Proothi", company: "Palantir", linkedin: "https://www.linkedin.com/in/benjamin-proothi/" },
-    { name: "Aryaman Rakhecha", company: "Avendus", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
-    { name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
+    //{ name: "Ben Proothi", company: "Palantir", linkedin: "https://www.linkedin.com/in/benjamin-proothi/" },
+    //{ name: "Aryaman Rakhecha", company: "Avendus", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
+    //{ name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
+    { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Kshitig Seth", company: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
+    { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
+    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
     { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
 ];
