@@ -34,7 +34,7 @@ const seniorAdvisors = [
     { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
     { name: "Kshitig Seth", company: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
     { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
-    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Steven Spasov", company: "", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
     { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
 ];
