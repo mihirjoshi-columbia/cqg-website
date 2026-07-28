@@ -12,12 +12,12 @@ export default function EventsPage() {
                     Events
                 </h1>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Check out our upcoming and past events, trading competitions, speaker panels, and firm information sessions.
+                    Check out our upcoming and past events, including trading & math competitions, speaker panels, trading games, and information sessions.
                 </p>
             </div>
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-2xl font-bold text-columbia-dark mb-6">Event Archives</h2>
+                <h2 className="text-2xl font-bold text-columbia-dark mb-6">Past Events</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <motion.div
                         whileHover={{ y: -4 }}
@@ -39,9 +39,6 @@ export default function EventsPage() {
                                 Spring 2026
                                 <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-columbia-dark group-hover:translate-x-1 transition-all" />
                             </h3>
-                            <p className="text-gray-600 text-sm">
-                                View the timeline for Spring 2026 trading games, competitions, research sessions, and speaker panels.
-                            </p>
                         </Link>
                     </motion.div>
                 </div>
