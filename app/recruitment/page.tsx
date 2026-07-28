@@ -4,7 +4,8 @@ export default function RecruitmentPage() {
             <h1 className="text-4xl font-bold text-columbia-dark mb-8">Recruitment</h1>
             <div className="max-w-3xl space-y-6 text-xl text-gray-600">
                 <p>
-                    We recruit members on a yearly basis in the fall semester. Detailed information for fall 2026 recruitment will be posted here later in the summer. Be sure to catch us at the activities fair on September 11, 2026!
+                    We recruit members on a yearly basis in the fall semester.
+                    Detailed information for fall 2026 recruitment will be posted here later in the summer. Be sure to catch us at the activities fair on September 11, 2026!
                 </p>
                 <p>
                     However, feel free to sign up for our general body at{" "}
