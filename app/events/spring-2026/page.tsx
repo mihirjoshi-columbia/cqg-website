@@ -1,52 +1,45 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, Trophy, Gamepad2, Users, Presentation, LineChart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const events = [
     {
         title: "The Future of Quant Investing",
-        type: "Speaker Series",
-        icon: Presentation,
-        description: "An insightful discussion featuring industry leaders on key trends, technological shifts, and algorithmic strategies shaping modern quantitative finance.",
+        image: "/events/future-of-quant-investing.jpg",
+        description: null,
     },
     {
         title: "HRT Algo Arena",
-        type: "Competition",
-        icon: Gamepad2,
-        description: "A fast-paced algorithmic trading tournament hosted in collaboration with Hudson River Trading.",
+        description: "A competition-style challenge that invites students to construct rules that predict returns from Bloomberg headline data, hosted with Hudson River Trading",
     },
     {
         title: "Intercollegiate Math Tournament",
-        type: "Competition",
-        icon: Trophy,
-        description: "A collegiate mathematics competition bringing together top quantitative problem solvers.",
+        description: "Hosted with ICMT, a collegiate mathematics competition bringing together top quantitative problem solvers.",
     },
     {
         title: "Two Sigma Quant Research Meet & Greet",
-        type: "Networking & Info Session",
-        icon: Users,
-        description: "An exclusive networking event with Two Sigma researchers and engineers discussing quantitative research opportunities.",
+        image: "/events/two-sigma-meet-and-greet.jpg",
+        description: null,
     },
     {
         title: "Five Rings Trading Game & Information Session",
-        type: "Interactive Workshop",
-        icon: LineChart,
-        description: "Hands-on trading simulation game and interactive information session led by Five Rings traders.",
+        image: "/events/five-rings-trading-game.png",
+        description: null,
     },
     {
         title: "Old Mission Market-Making Game & Information Session",
-        type: "Interactive Workshop",
-        icon: Calendar,
-        description: "Market-making simulation and career panel exploring liquidity provision with Old Mission Capital.",
+        image: "/events/old-mission.png",
+        description: null,
     },
 ];
 
 export default function Spring2026EventsPage() {
     return (
         <div className="min-h-screen bg-white pt-24 pb-24">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Back button & Breadcrumb */}
                 <div className="mb-8">
                     <Link
@@ -71,41 +64,57 @@ export default function Spring2026EventsPage() {
                     </p>
                 </div>
 
-                {/* Timeline */}
-                <div className="relative border-l-2 border-columbia-blue/40 ml-4 sm:ml-32 space-y-12 my-12">
-                    {events.map((event, index) => {
-                        const IconComponent = event.icon;
-                        return (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.1 }}
-                                className="relative pl-8 sm:pl-10"
-                            >
-                                {/* Timeline Dot / Node Icon */}
-                                <div className="absolute -left-[17px] top-1.5 w-8 h-8 rounded-full bg-columbia-dark text-white flex items-center justify-center shadow-md ring-4 ring-white">
-                                    <IconComponent className="w-4 h-4" />
-                                </div>
+                {/* Alternating Two-Sided Timeline */}
+                <div className="relative my-12">
+                    {/* Vertical Center Line (Desktop md:left-1/2, Mobile left-6) */}
+                    <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-columbia-blue/40 -translate-x-1/2" />
 
-                                {/* Event Card */}
-                                <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow group">
-                                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-gray-100 text-columbia-dark border border-gray-200">
-                                            {event.type}
-                                        </span>
+                    <div className="space-y-12">
+                        {events.map((event, index) => {
+                            const isEven = index % 2 === 0;
+
+                            return (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                                    className="relative flex flex-col md:flex-row items-center"
+                                >
+                                    {/* Timeline Node Plain Dot */}
+                                    <div className="absolute left-6 md:left-1/2 top-6 -translate-x-1/2 z-10 w-4 h-4 rounded-full bg-columbia-dark shadow-sm ring-4 ring-white" />
+
+                                    {/* Content Container */}
+                                    <div className={`w-full flex ${isEven ? 'md:justify-start' : 'md:justify-end'}`}>
+                                        <div className={`w-full md:w-[calc(50%-2.5rem)] pl-14 md:pl-0 ${isEven ? 'md:pr-4' : 'md:pl-4'}`}>
+                                            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+                                                <h3 className="text-xl font-bold text-columbia-dark group-hover:text-columbia-secondary transition-colors mb-3">
+                                                    {event.title}
+                                                </h3>
+
+                                                {event.image ? (
+                                                    <div className="mt-3 relative rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                                                        <Image
+                                                            src={event.image}
+                                                            alt={event.title}
+                                                            width={600}
+                                                            height={750}
+                                                            className="w-full h-auto object-cover rounded-lg hover:scale-102 transition-transform duration-300"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                                        {event.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-columbia-dark group-hover:text-columbia-secondary transition-colors mb-2">
-                                        {event.title}
-                                    </h3>
-                                    <p className="text-gray-600 text-sm leading-relaxed">
-                                        {event.description}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        );
-                    })}
+                                </motion.div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
