@@ -22,7 +22,7 @@ const events = [
         // date: "February 28, 2026",
         description: (
             <>
-                Link to ICMT&apos;s website{" "}
+                A collegiate mathematics tournament that brings together the top quantitative minds from across the country. Link to ICMT&apos;s website{" "}
                 <a
                     href="https://intercollegiatemathtournament.org/"
                     target="_blank"
