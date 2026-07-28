@@ -46,7 +46,7 @@ const execBoard = [
         role: "Marketing & Communications Chair",
         image: "/team/ivy.jpg",
         linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/",
-        bio: ""
+        bio: "Ivy is a Physics and Computer Science major in Columbia College. She loves producing quantitative models to understand the world, whether that be in physics or finance. Though she has research experience in plasma and astrophysics, she is also interested in quantum computing. She will be interning at NASA this summer as a Machine Learning Researcher on the Laser Interferometer Space Antenna (LISA) project. She is a huge NYT games sweat and also loves trying new food in the city."
     },
 ];
 
