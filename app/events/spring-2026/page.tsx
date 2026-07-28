@@ -8,29 +8,48 @@ import { ArrowLeft } from "lucide-react";
 const events = [
     {
         title: "The Future of Quant Investing",
+        date: "May 1, 2026",
         image: "/events/future-of-quant-investing.jpg",
         description: null,
     },
     {
         title: "HRT Algo Arena",
-        description: "A competition-style challenge that invites students to construct rules that predict returns from Bloomberg headline data, hosted with Hudson River Trading",
+        date: "April 21, 2026",
+        description: "A competition-style challenge that invites students to construct rules that predict returns from Bloomberg headline data, hosted with Hudson River Trading.",
     },
     {
         title: "Intercollegiate Math Tournament",
-        description: "Hosted with ICMT, a collegiate mathematics competition bringing together top quantitative problem solvers.",
+        date: "February 28, 2026",
+        description: (
+            <>
+                Link to ICMT&apos;s website{" "}
+                <a
+                    href="https://intercollegiatemathtournament.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-columbia-dark underline hover:opacity-80 transition-opacity font-medium"
+                >
+                    here.
+                </a>
+                .
+            </>
+        ),
     },
     {
         title: "Two Sigma Quant Research Meet & Greet",
+        date: "February 25, 2026",
         image: "/events/two-sigma-meet-and-greet.jpg",
         description: null,
     },
     {
         title: "Five Rings Trading Game & Information Session",
+        date: "February 18, 2026",
         image: "/events/five-rings-trading-game.png",
         description: null,
     },
     {
         title: "Old Mission Market-Making Game & Information Session",
+        date: "February 11, 2026",
         image: "/events/old-mission.png",
         description: null,
     },
@@ -53,14 +72,11 @@ export default function Spring2026EventsPage() {
 
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-columbia-dark bg-columbia-blue/30 rounded-full uppercase mb-3">
-                        Semester Schedule
-                    </span>
                     <h1 className="text-4xl md:text-5xl font-bold text-columbia-dark mb-4">
                         Spring 2026 Events
                     </h1>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Explore our lineup of speaker panels, trading games, competitions, and employer networking sessions for Spring 2026.
+                        Explore past events from spring 2026.
                     </p>
                 </div>
 
@@ -86,9 +102,13 @@ export default function Spring2026EventsPage() {
                                     <div className="absolute left-6 md:left-1/2 top-6 -translate-x-1/2 z-10 w-4 h-4 rounded-full bg-columbia-dark shadow-sm ring-4 ring-white" />
 
                                     {/* Content Container */}
-                                    <div className={`w-full flex ${isEven ? 'md:justify-start' : 'md:justify-end'}`}>
+                                    <div className={`w-full flex flex-col md:flex-row items-start ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                                        {/* Card Side */}
                                         <div className={`w-full md:w-[calc(50%-2.5rem)] pl-14 md:pl-0 ${isEven ? 'md:pr-4' : 'md:pl-4'}`}>
                                             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+                                                <span className="block md:hidden italic text-gray-500 text-sm mb-2">
+                                                    {event.date}
+                                                </span>
                                                 <h3 className="text-xl font-bold text-columbia-dark group-hover:text-columbia-secondary transition-colors mb-3">
                                                     {event.title}
                                                 </h3>
@@ -109,6 +129,13 @@ export default function Spring2026EventsPage() {
                                                     </p>
                                                 )}
                                             </div>
+                                        </div>
+
+                                        {/* Opposite Side Date for Desktop */}
+                                        <div className={`hidden md:flex md:w-[calc(50%-2.5rem)] pt-5 ${isEven ? 'md:pl-4 justify-start' : 'md:pr-4 justify-end text-right'}`}>
+                                            <span className="italic text-gray-500 font-medium text-lg">
+                                                {event.date}
+                                            </span>
                                         </div>
                                     </div>
                                 </motion.div>
