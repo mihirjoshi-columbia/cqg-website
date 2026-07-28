@@ -8,18 +8,18 @@ import { ArrowLeft } from "lucide-react";
 const events = [
     {
         title: "The Future of Quant Investing",
-        date: "May 1, 2026",
+        // date: "May 1, 2026",
         image: "/events/future-of-quant-investing.jpg",
         description: null,
     },
     {
         title: "HRT Algo Arena",
-        date: "April 21, 2026",
+        // date: "April 21, 2026",
         description: "A competition-style challenge that invites students to construct rules that predict returns from Bloomberg headline data, hosted with Hudson River Trading.",
     },
     {
         title: "Intercollegiate Math Tournament",
-        date: "February 28, 2026",
+        // date: "February 28, 2026",
         description: (
             <>
                 Link to ICMT&apos;s website{" "}
@@ -37,19 +37,19 @@ const events = [
     },
     {
         title: "Two Sigma Quant Research Meet & Greet",
-        date: "February 25, 2026",
+        // date: "February 25, 2026",
         image: "/events/two-sigma-meet-and-greet.jpg",
         description: null,
     },
     {
         title: "Five Rings Trading Game & Information Session",
-        date: "February 18, 2026",
+        // date: "February 18, 2026",
         image: "/events/five-rings-trading-game.png",
         description: null,
     },
     {
         title: "Old Mission Market-Making Game & Information Session",
-        date: "February 11, 2026",
+        // date: "February 11, 2026",
         image: "/events/old-mission.png",
         description: null,
     },
@@ -106,9 +106,9 @@ export default function Spring2026EventsPage() {
                                         {/* Card Side */}
                                         <div className={`w-full md:w-[calc(50%-2.5rem)] pl-14 md:pl-0 ${isEven ? 'md:pr-4' : 'md:pl-4'}`}>
                                             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
-                                                <span className="block md:hidden italic text-gray-500 text-sm mb-2">
+                                                {/* <span className="block md:hidden italic text-gray-500 text-sm mb-2">
                                                     {event.date}
-                                                </span>
+                                                </span> */}
                                                 <h3 className="text-xl font-bold text-columbia-dark group-hover:text-columbia-secondary transition-colors mb-3">
                                                     {event.title}
                                                 </h3>
@@ -132,11 +132,11 @@ export default function Spring2026EventsPage() {
                                         </div>
 
                                         {/* Opposite Side Date for Desktop */}
-                                        <div className={`hidden md:flex md:w-[calc(50%-2.5rem)] pt-5 ${isEven ? 'md:pl-4 justify-start' : 'md:pr-4 justify-end text-right'}`}>
+                                        {/* <div className={`hidden md:flex md:w-[calc(50%-2.5rem)] pt-5 ${isEven ? 'md:pl-4 justify-start' : 'md:pr-4 justify-end text-right'}`}>
                                             <span className="italic text-gray-500 font-medium text-lg">
                                                 {event.date}
                                             </span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </motion.div>
                             );
