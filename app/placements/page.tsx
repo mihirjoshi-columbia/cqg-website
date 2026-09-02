@@ -1,20 +1,18 @@
-import ScrollingLogos from "@/components/placements/ScrollingLogos";
 import FirmsCollage from "@/components/placements/FirmsCollage";
 
 export default function PlacementsPage() {
     return (
-        <div className="min-h-screen bg-white pt-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-columbia-dark mb-4">
-                    Placements
-                </h1>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Our members consistently secure top roles at leading quantitative finance firms,
-                    tech companies, and investment banks.
-                </p>
-            </div>
+        <div className="min-h-screen bg-white">
+            <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                    <div className="chevron chevron-sky mb-4">Placements</div>
+                    <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
+                        Our members consistently secure top roles at leading quantitative finance firms,
+                        tech companies, and investment banks.
+                    </p>
+                </div>
+            </section>
 
-            <ScrollingLogos />
             <FirmsCollage />
         </div>
     );
