@@ -113,16 +113,28 @@ h1, h2, h3, h4 {
 }
 
 /* ============ Angled (hexagon-cut) cards ============ */
+/* A plain `border` (or a mask-ring hugging the rectangular box) gets clipped away on the two
+   diagonal edges clip-path introduces, leaving them blank. Instead the outer element is filled
+   solid with the border color and clipped to the hexagon; a second, inset element re-clips its
+   OWN box to the same hexagon shape, so the 1px sliver of the outer fill shows through evenly on
+   all six edges, diagonals included. */
 .angle-card {
-  background: #fff;
-  border: 1px solid var(--line);
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
-  padding: 1.8rem;
+  --card-border: var(--line);
+  --card-cut: 22px;
+  align-self: start;
+  padding: 1px;
+  background: var(--card-border);
+  clip-path: polygon(0 0, calc(100% - var(--card-cut)) 0, 100% var(--card-cut), 100% 100%, var(--card-cut) 100%, 0 calc(100% - var(--card-cut)));
 }
-.angle-card-navy {
+.angle-card-body {
+  background: #fff;
+  padding: 1.8rem;
+  clip-path: polygon(0 0, calc(100% - var(--card-cut)) 0, 100% var(--card-cut), 100% 100%, var(--card-cut) 100%, 0 calc(100% - var(--card-cut)));
+}
+.angle-card-navy { --card-border: transparent; }
+.angle-card-navy .angle-card-body {
   background: var(--navy-mid);
   color: #fff;
-  border: none;
 }
 
 /* ============ Hex chips (What We Do / Education cards) ============ */
@@ -411,7 +423,7 @@ h1, h2, h3, h4 {
 }
 
 /* ============ Exec team flip cards ============ */
-.exec-card { perspective: 1600px; aspect-ratio: 0.82; cursor: pointer; container-type: inline-size; }
+.exec-card { perspective: 1600px; aspect-ratio: 0.66; cursor: pointer; container-type: inline-size; }
 .exec-card-inner {
   position: relative;
   width: 100%;
@@ -424,29 +436,36 @@ h1, h2, h3, h4 {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
-  border: 1px solid var(--line);
   background: #fff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .exec-face.front .exec-photo {
-  aspect-ratio: 4 / 3;
   background-color: var(--navy-mid);
   background-size: cover;
   background-position: center;
-  flex: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
-.exec-face.front .exec-info { padding: clamp(0.6rem, 3.5cqw, 1.1rem) clamp(0.65rem, 4cqw, 1.2rem); }
-.exec-face.front .name { font-weight: 700; font-size: clamp(0.78rem, 4.5cqw, 1rem); color: var(--navy); }
-.exec-face.front .role { font-family: var(--font-plex-mono), monospace; font-size: clamp(0.6rem, 3cqw, 0.72rem); color: var(--sky-deep); margin-top: 0.3rem; }
-.exec-face.front .hint {
-  margin-top: auto;
-  padding: 0 clamp(0.65rem, 4cqw, 1.2rem) 1rem;
+.exec-face.front .exec-info {
+  flex: none;
+  min-height: 4.6rem;
+  background: var(--navy);
+  padding: clamp(0.6rem, 3.5cqw, 1.1rem) clamp(0.65rem, 4cqw, 1.2rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.exec-face.front .name { font-weight: 700; font-size: clamp(0.78rem, 4.5cqw, 1rem); color: #fff; }
+.exec-face.front .role {
   font-family: var(--font-plex-mono), monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-faint);
+  font-size: clamp(0.56rem, 2.8cqw, 0.68rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-top: 0.3rem;
 }
 .exec-face.back {
   transform: rotateY(180deg);
@@ -514,36 +533,46 @@ h1, h2, h3, h4 {
 /* ============ Placements ============ */
 .firm-collage {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
 }
+@media (max-width: 900px) {
+  .firm-collage { grid-template-columns: repeat(4, 1fr); }
+}
 @media (max-width: 700px) {
-  .firm-collage { grid-template-columns: repeat(2, 1fr); }
+  .firm-collage { grid-template-columns: repeat(3, 1fr); }
 }
 .firm-tile {
   background: #fff;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.1rem;
+  padding: 0.55rem;
   transition: background 0.15s ease;
 }
 .firm-tile:hover { background: var(--paper-alt); }
-.firm-tile img { max-width: 82%; max-height: 58%; object-fit: contain; }
+.firm-tile img { max-width: 92%; max-height: 92%; object-fit: contain; }
 
 /* ============ Events ============ */
 .event-card {
+  --card-border: var(--line);
+  --card-cut: 22px;
+  align-self: start;
+  padding: 1px;
+  background: var(--card-border);
+  clip-path: polygon(0 0, calc(100% - var(--card-cut)) 0, 100% var(--card-cut), 100% 100%, var(--card-cut) 100%, 0 calc(100% - var(--card-cut)));
+  box-shadow: var(--shadow-card);
+}
+.event-card-body {
   background: #fff;
-  border: 1px solid var(--line);
   padding: 1.6rem;
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  clip-path: polygon(0 0, calc(100% - var(--card-cut)) 0, 100% var(--card-cut), 100% 100%, var(--card-cut) 100%, 0 calc(100% - var(--card-cut)));
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: var(--shadow-card);
 }
 .event-icon {
   width: 42px;

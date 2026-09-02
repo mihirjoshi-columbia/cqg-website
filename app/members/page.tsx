@@ -1,6 +1,7 @@
 import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
+import FirmsCollage from "@/components/placements/FirmsCollage";
 
 const currentMembers = [
     { name: "Michelle Zhou", linkedin: "https://www.linkedin.com/in/michelle-zhou-252119348" },
@@ -26,13 +27,13 @@ const seniorAdvisors = [
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
 ];
 
-export default function TeamPage() {
+export default function MembersPage() {
     return (
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <div className="chevron chevron-sky mb-4">Our Team</div>
-                    <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
+                    <div className="chevron chevron-sky mb-4">Members</div>
+                    <p className="text-[#C3D2EA] text-[1.05rem] lg:whitespace-nowrap">
                         Meet the dedicated students and alumni who make up the Columbia Quant Group.
                     </p>
                     <p className="text-[#9FB1CE] text-sm mt-2.5">
@@ -42,6 +43,7 @@ export default function TeamPage() {
                 </div>
             </section>
 
+            <FirmsCollage />
             <ExecBoard />
             <AdvisorList title="2025–2026 Senior Members" advisors={seniorAdvisors} />
             <TeamList title="2025–2026 Internal Members" members={currentMembers} />

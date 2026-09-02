@@ -32,7 +32,7 @@ export default function Hero() {
             <a href="/recruitment" className="btn-cqg btn-outline">
               Join our General Body
             </a>
-            <a href="/placements" className="btn-cqg btn-outline">
+            <a href="/members" className="btn-cqg btn-outline">
               See Our Placements
             </a>
             <a href="/contact" className="btn-cqg btn-outline">

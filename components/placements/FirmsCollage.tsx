@@ -1,8 +1,10 @@
 const firms = [
     { name: "AQR", logo: "/logos/aqr.png", url: "https://www.aqr.com" },
     { name: "BlackRock", logo: "/logos/blackrock.png", url: "https://www.blackrock.com" },
+    { name: "Bloomberg", logo: "/logos/bloomberg.png", url: "https://www.bloomberg.com" },
     { name: "Bridgewater", logo: "/logos/bridgewater.png", url: "https://www.bridgewater.com" },
     { name: "Citadel", logo: "/logos/citadel.png", url: "https://www.citadel.com" },
+    { name: "Citadel Securities", logo: "/logos/citadel-securities.png", url: "https://www.citadelsecurities.com" },
     { name: "CTC", logo: "/logos/ctc.png", url: "https://www.chicagotrading.com" },
     { name: "D.E. Shaw", logo: "/logos/d-e--shaw.png", url: "https://www.deshaw.com" },
     { name: "DRW", logo: "/logos/drw.png", url: "https://drw.com" },
@@ -25,18 +27,14 @@ const firms = [
 
 export default function FirmsCollage() {
     return (
-        <section className="py-16 sm:py-24">
+        <section className="py-12 sm:py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="chevron chevron-navy text-[1.4rem]">Where Our Members Land</div>
-                <div className="firm-collage mt-9">
+                <div className="firm-collage mt-7 mx-auto" style={{ maxWidth: "820px" }}>
                     {firms.map((firm) => (
                         <a key={firm.name} href={firm.url} target="_blank" rel="noopener noreferrer" className="firm-tile">
                             {/* eslint-disable-next-line @next/next/no-img-element -- static mixed-size logo grid */}
-                            <img
-                                src={firm.logo}
-                                alt={firm.name}
-                                className={firm.name === "DRW" ? "max-w-[46%] max-h-[34%] object-contain" : undefined}
-                            />
+                            <img src={firm.logo} alt={firm.name} />
                         </a>
                     ))}
                 </div>

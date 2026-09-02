@@ -12,6 +12,9 @@ interface Exec {
     interests: string;
     summer: string;
     previous: string;
+    /** Manual per-photo tuning so heads read at a roughly consistent size/position — source photos vary a lot in framing. */
+    photoPosition: string;
+    photoScale: number;
 }
 
 const execBoard: Exec[] = [
@@ -24,6 +27,8 @@ const execBoard: Exec[] = [
         interests: "Quant modeling, fixed income, econ policy, NLP",
         summer: "IMC — Quant Trading Intern",
         previous: "Weiss Asset Management",
+        photoPosition: "50% 18%",
+        photoScale: 1,
     },
     {
         name: "Nicole Pi",
@@ -34,6 +39,8 @@ const execBoard: Exec[] = [
         interests: "Statistical modeling & ML, responsible AI",
         summer: "DRW — Quant Trading Intern",
         previous: "SpaceX, Goldman Sachs",
+        photoPosition: "48% 4%",
+        photoScale: 1.15,
     },
     {
         name: "Victor Robila",
@@ -44,6 +51,8 @@ const execBoard: Exec[] = [
         interests: "Systematic strategies, mispricing",
         summer: "Bridgewater — Investment Engineer Intern",
         previous: "Gilder Gagnon Howe, private equity",
+        photoPosition: "48% 14%",
+        photoScale: 1.05,
     },
     {
         name: "Mihir Joshi",
@@ -54,6 +63,8 @@ const execBoard: Exec[] = [
         interests: "Low-latency systems, computer architecture",
         summer: "Chicago Trading Company — Quant Trading Intern",
         previous: "CFO, Lion Fund LLC",
+        photoPosition: "50% 8%",
+        photoScale: 1,
     },
     {
         name: "Nikhil Mudumbi",
@@ -64,6 +75,8 @@ const execBoard: Exec[] = [
         interests: "Analysis & probability, stochastics",
         summer: "Math research at Columbia",
         previous: "Jane Street — Trading Intern",
+        photoPosition: "50% 10%",
+        photoScale: 1.05,
     },
     {
         name: "Ivy Hu",
@@ -74,6 +87,8 @@ const execBoard: Exec[] = [
         interests: "Quantitative modeling, quantum computing",
         summer: "NASA — ML Researcher (LISA project)",
         previous: "Plasma & astrophysics research",
+        photoPosition: "50% 6%",
+        photoScale: 1,
     },
 ];
 
@@ -103,13 +118,22 @@ function ExecCard({ exec }: { exec: Exec }) {
             <div className="exec-card-inner">
                 <div className="exec-face front">
                     <div className="exec-photo relative">
-                        <Image src={exec.image} alt={exec.name} fill className="object-cover" unoptimized />
+                        <Image
+                            src={exec.image}
+                            alt={exec.name}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                            style={{
+                                objectPosition: exec.photoPosition,
+                                transform: exec.photoScale !== 1 ? `scale(${exec.photoScale})` : undefined,
+                            }}
+                        />
                     </div>
                     <div className="exec-info">
                         <div className="name">{exec.name}</div>
                         <div className="role">{exec.role}</div>
                     </div>
-                    <div className="hint">CLICK TO READ MORE →</div>
                 </div>
                 <div className="exec-face back">
                     <div className="name">{exec.name}</div>

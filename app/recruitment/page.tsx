@@ -46,25 +46,27 @@ export default function RecruitmentPage() {
                         ))}
                     </div>
 
-                    <div className="angle-card angle-card-navy mt-10 flex items-center justify-between gap-6 flex-wrap">
-                        <div>
-                            <h3 className="font-display font-bold text-[1.15rem]">
-                                Not ready to interview? Join the general body.
-                            </h3>
-                            <p className="text-[#C3D2EA] mt-2.5 text-sm max-w-md">
-                                All general body members receive emails about info sessions, trading &amp;
-                                market-making games, and Q&amp;As with firms and startups &mdash; open to
-                                undergrads and grad students alike.
-                            </p>
+                    <div className="angle-card angle-card-navy mt-10" style={{ maxWidth: "560px" }}>
+                        <div className="angle-card-body flex flex-col items-start gap-8">
+                            <div>
+                                <h3 className="font-display font-bold text-[1.15rem]">
+                                    Not ready to interview? Join the general body.
+                                </h3>
+                                <p className="text-[#C3D2EA] mt-2.5 text-sm">
+                                    All general body members receive emails about info sessions, trading &amp;
+                                    market-making games, and Q&amp;As with firms and startups &mdash; open to
+                                    undergrads and grad students alike.
+                                </p>
+                            </div>
+                            <a
+                                href="https://docs.google.com/forms/d/e/1FAIpQLSf40xbUhMYx8ELABAJccR5BftONiy-W5QZohLuGVV2pQAxf5A/viewform?usp=dialog"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-cqg btn-lime"
+                            >
+                                Sign Up →
+                            </a>
                         </div>
-                        <a
-                            href="https://docs.google.com/forms/d/e/1FAIpQLSf40xbUhMYx8ELABAJccR5BftONiy-W5QZohLuGVV2pQAxf5A/viewform?usp=dialog"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-cqg btn-lime"
-                        >
-                            Sign Up →
-                        </a>
                     </div>
                 </div>
             </section>
