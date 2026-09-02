@@ -1,9 +1,9 @@
 import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
+import FirmsCollage from "@/components/placements/FirmsCollage";
 
 const currentMembers = [
-    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257" },
     { name: "Michelle Zhou", linkedin: "https://www.linkedin.com/in/michelle-zhou-252119348" },
     { name: "Zachary Jeon", linkedin: "https://www.linkedin.com/in/zachary-jeon/" },
     { name: "Ethan Badner", linkedin: "https://www.linkedin.com/in/ethan-badner-133a29321" },
@@ -18,19 +18,7 @@ const currentMembers = [
     { name: "Cathy Deng", linkedin: "https://www.linkedin.com/in/cathy-deng/" },
 ];
 
-const alumni = [
-    { name: "Alumni 1", linkedin: "https://linkedin.com" },
-    { name: "Alumni 2", linkedin: "https://linkedin.com" },
-    { name: "Alumni 3", linkedin: "https://linkedin.com" },
-    { name: "Alumni 4", linkedin: "https://linkedin.com" },
-    { name: "Alumni 5", linkedin: "https://linkedin.com" },
-    { name: "Alumni 6", linkedin: "https://linkedin.com" },
-];
-
 const seniorAdvisors = [
-    //{ name: "Ben Proothi", company: "Palantir", linkedin: "https://www.linkedin.com/in/benjamin-proothi/" },
-    //{ name: "Aryaman Rakhecha", company: "Avendus", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
-    //{ name: "Brianna Wang", company: "Datadog", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
     { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
     { name: "Kshitig Seth", company: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
     { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
@@ -39,24 +27,26 @@ const seniorAdvisors = [
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
 ];
 
-export default function TeamPage() {
+export default function MembersPage() {
     return (
-        <div className="min-h-screen bg-white pt-12 pb-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-columbia-dark mb-4">
-                    Our Team
-                </h1>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Meet the dedicated students and alumni who make up the Columbia Quant Group.
-                </p>
-            </div>
+        <div className="min-h-screen bg-white">
+            <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                    <div className="chevron chevron-sky mb-4">Members</div>
+                    <p className="text-[#C3D2EA] text-[1.05rem] lg:whitespace-nowrap">
+                        Meet the dedicated students and alumni who make up the Columbia Quant Group.
+                    </p>
+                    <p className="text-[#9FB1CE] text-sm mt-2.5">
+                        Internal members are selected every school year; the executive board is elected to
+                        serve each calendar year.
+                    </p>
+                </div>
+            </section>
 
+            <FirmsCollage />
             <ExecBoard />
-
-            <div className="space-y-16 mt-8">
-                <AdvisorList title="Senior Advisors" advisors={seniorAdvisors} />
-                <TeamList title="Current Members" members={currentMembers} />
-            </div>
+            <AdvisorList title="2025–2026 Senior Members" advisors={seniorAdvisors} />
+            <TeamList title="2025–2026 Internal Members" members={currentMembers} />
         </div>
     );
 }

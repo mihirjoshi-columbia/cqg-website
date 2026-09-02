@@ -27,7 +27,7 @@ const events = [
                     href="https://intercollegiatemathtournament.org/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-columbia-dark underline hover:opacity-80 transition-opacity font-medium"
+                    className="text-navy underline hover:opacity-80 transition-opacity font-medium"
                 >
                     here.
                 </a>
@@ -63,7 +63,7 @@ export default function Spring2026EventsPage() {
                 <div className="mb-8">
                     <Link
                         href="/events"
-                        className="inline-flex items-center text-sm font-medium text-columbia-secondary hover:text-columbia-dark transition-colors"
+                        className="inline-flex items-center text-sm font-medium text-sky-deep hover:text-navy transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Back to Events
@@ -72,7 +72,7 @@ export default function Spring2026EventsPage() {
 
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-columbia-dark mb-4">
+                    <h1 className="text-4xl md:text-5xl font-bold text-navy mb-4">
                         Spring 2026 Events
                     </h1>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -83,7 +83,7 @@ export default function Spring2026EventsPage() {
                 {/* Alternating Two-Sided Timeline */}
                 <div className="relative my-12">
                     {/* Vertical Center Line (Desktop md:left-1/2, Mobile left-6) */}
-                    <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-columbia-blue/40 -translate-x-1/2" />
+                    <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-sky/40 -translate-x-1/2" />
 
                     <div className="space-y-12">
                         {events.map((event, index) => {
@@ -99,7 +99,7 @@ export default function Spring2026EventsPage() {
                                     className="relative flex flex-col md:flex-row items-center"
                                 >
                                     {/* Timeline Node Plain Dot */}
-                                    <div className="absolute left-6 md:left-1/2 top-6 -translate-x-1/2 z-10 w-4 h-4 rounded-full bg-columbia-dark shadow-sm ring-4 ring-white" />
+                                    <div className="absolute left-6 md:left-1/2 top-6 -translate-x-1/2 z-10 w-4 h-4 rounded-full bg-navy shadow-sm ring-4 ring-white" />
 
                                     {/* Content Container */}
                                     <div className={`w-full flex flex-col md:flex-row items-start ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
@@ -109,7 +109,7 @@ export default function Spring2026EventsPage() {
                                                 {/* <span className="block md:hidden italic text-gray-500 text-sm mb-2">
                                                     {event.date}
                                                 </span> */}
-                                                <h3 className="text-xl font-bold text-columbia-dark group-hover:text-columbia-secondary transition-colors mb-3">
+                                                <h3 className="text-xl font-bold text-navy group-hover:text-sky-deep transition-colors mb-3">
                                                     {event.title}
                                                 </h3>
 

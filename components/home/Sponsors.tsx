@@ -1,47 +1,50 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 const sponsors = [
-    { name: "Sponsor 1", logo: "/placeholder-logo.png" },
-    { name: "Sponsor 2", logo: "/placeholder-logo.png" },
-    { name: "Sponsor 3", logo: "/placeholder-logo.png" },
-    { name: "Sponsor 4", logo: "/placeholder-logo.png" },
+  { key: "jane-street-h-white", name: "Jane Street" },
+  { key: "walleye-white", name: "Walleye" },
+  { key: "five-rings-full-white", name: "Five Rings" },
+  { key: "hrt-h-white", name: "HRT" },
+  { key: "drw-white", name: "DRW" },
+  { key: "sig-h-white", name: "SIG" },
 ];
 
 export default function Sponsors() {
-    return (
-        <section className="py-24 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="text-center mb-16"
-                >
-                    <h2 className="text-3xl md:text-4xl font-bold text-columbia-dark">
-                        Our Sponsors
-                    </h2>
-                </motion.div>
+  const track = [...sponsors, ...sponsors];
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-                    {sponsors.map((sponsor, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            className="flex justify-center"
-                        >
-                            <div className="h-24 w-full bg-white rounded-lg shadow-sm flex items-center justify-center border border-gray-100">
-                                <span className="text-gray-400 font-medium">{sponsor.name}</span>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+  return (
+    <>
+      <section className="bg-navy-deep pt-8 pb-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="eyebrow eyebrow-plain justify-center text-[#7488A8]">
+            2026&ndash;2027 Academic Year Sponsors
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-navy-deep overflow-hidden py-6 pb-10">
+        <div className="marquee-track" style={{ animationDuration: "16s" }}>
+          {track.map((s, i) => (
+            <div key={`${s.key}-${i}`} className="firm-chip">
+              {/* eslint-disable-next-line @next/next/no-img-element -- varying aspect ratios, CSS-driven sizing in a marquee */}
+              <img src={`/logos/${s.key}.png`} alt={s.name} className="max-h-[85%] w-auto max-w-[190px] object-contain" />
             </div>
-        </section>
-    );
+          ))}
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-24 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="chevron chevron-lime mx-auto inline-flex">Ready to break in?</div>
+          <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mx-auto mt-6">
+            Sign up for the general body to get invites to info sessions, trading games, and Q&amp;As
+            &mdash; or apply when internal recruitment opens this fall.
+          </p>
+          <div className="flex justify-center mt-7">
+            <a href="/recruitment" className="btn-cqg btn-outline-navy">
+              Join General Body
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
