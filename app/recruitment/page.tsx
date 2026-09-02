@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const recruitmentSteps: { date: string; title: string; milestone?: boolean }[] = [
     { date: "Friday, Sept 4", title: "Recruitment information posted" },
     { date: "Friday, Sept 11", title: "Applications open" },
@@ -15,6 +17,7 @@ export default function RecruitmentPage() {
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                    <span className="tag tag-lime mb-2 block w-fit">Internal Membership &middot; Apply</span>
                     <div className="chevron chevron-sky mb-4">Recruitment</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
                         We recruit internal members once a year, every fall &mdash; but the general body
@@ -30,8 +33,14 @@ export default function RecruitmentPage() {
                         How &amp; when we&apos;re recruiting
                     </h2>
                     <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-xl mt-3.5">
-                        Internal membership is limited to a selective, technically-vetted undergraduate
-                        cohort.
+                        Internal membership is limited to a selective, technically-vetted cohort of
+                        Columbia undergraduates.
+                    </p>
+                    <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-xl mt-3">
+                        Members receive exclusive access to our education program &mdash;{" "}
+                        <Link href="/education" className="text-sky-deep font-semibold">
+                            see what it includes &rarr;
+                        </Link>
                     </p>
 
                     <div className="timeline mt-10">
@@ -53,9 +62,9 @@ export default function RecruitmentPage() {
                                     Not ready to interview? Join the general body.
                                 </h3>
                                 <p className="text-[#C3D2EA] mt-2.5 text-sm">
-                                    All general body members receive emails about info sessions, trading &amp;
-                                    market-making games, and Q&amp;As with firms and startups &mdash; open to
-                                    undergrads and grad students alike.
+                                    All general body members receive emails about firm info sessions,
+                                    firm-run trading challenges, and Q&amp;As with firms and startups
+                                    &mdash; open to undergrads and grad students alike.
                                 </p>
                             </div>
                             <a

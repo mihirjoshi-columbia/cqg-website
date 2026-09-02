@@ -32,7 +32,8 @@ export default function MembersPage() {
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <div className="chevron chevron-sky mb-4">Members</div>
+                    <span className="tag tag-lime mb-2 block w-fit">Internal Membership &middot; Current Members</span>
+                    <div className="chevron chevron-sky mb-4">Current Members</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] lg:whitespace-nowrap">
                         Meet the dedicated students and alumni who make up the Columbia Quant Group.
                     </p>
@@ -45,8 +46,15 @@ export default function MembersPage() {
 
             <FirmsCollage />
             <ExecBoard />
-            <AdvisorList title="2025–2026 Senior Members" advisors={seniorAdvisors} />
-            <TeamList title="2025–2026 Internal Members" members={currentMembers} />
+            <section className="py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2025–2026 Internal Members</h2>
+                    <div className="space-y-10">
+                        <AdvisorList title="Senior Members" advisors={seniorAdvisors} />
+                        <TeamList title="Underclassmen" members={currentMembers} />
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

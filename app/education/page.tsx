@@ -4,23 +4,17 @@ const pillars = [
     {
         icon: "📚",
         title: "Lecture Series",
-        body: "Weekly sessions on probability & trading strategy",
-        bg: "var(--lime-gradient)",
-        color: "var(--navy)",
+        body: "Student-run weekly sessions on probability & trading strategy",
     },
     {
         icon: "🤝",
         title: "Mentorship",
-        body: "Paired with upperclassmen in trading & research",
-        bg: "var(--sky-gradient)",
-        color: "var(--navy)",
+        body: "Pair new members with senior members based on focus area (trading, research, dev)",
     },
     {
         icon: "⚽",
         title: "Market Games",
-        body: "Monthly market-making & trading simulations",
-        bg: "var(--navy-gradient)",
-        color: "#fff",
+        body: "Student-run market-making simulations",
     },
 ];
 
@@ -29,22 +23,33 @@ export default function EducationPage() {
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                    <span className="tag tag-lime mb-2 block w-fit">Internal Membership &middot; Program</span>
                     <div className="chevron chevron-sky mb-4">Education</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
-                        A student-run curriculum that gives internal members early exposure to the skills
-                        used in real quantitative roles.
+                        A student-run curriculum open exclusively to CQG&apos;s internal members &mdash;
+                        early, hands-on exposure to the skills used in real quantitative roles.
                     </p>
                 </div>
             </section>
 
             <section className="py-16 sm:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="hex-row">
+                    <div className="pillar-row">
                         {pillars.map((p) => (
-                            <div key={p.title} className="hex-chip" style={{ background: p.bg }}>
-                                <div className="hex-icon">{p.icon}</div>
-                                <h3 style={{ color: p.color }}>{p.title}</h3>
-                                <p style={{ color: p.color, opacity: 0.85 }}>{p.body}</p>
+                            <div key={p.title} className="event-card" style={{ alignSelf: "stretch" }}>
+                                <div
+                                    className="event-card-body items-center text-center h-full"
+                                    style={{ background: "linear-gradient(135deg, #D3D9E4 0%, #B8C0D1 55%, #9AA5BA 100%)" }}
+                                >
+                                    <div
+                                        className="flex items-center justify-center rounded-full"
+                                        style={{ width: 56, height: 56, background: "var(--lime-gradient)", fontSize: "1.5rem" }}
+                                    >
+                                        {p.icon}
+                                    </div>
+                                    <h3 className="font-display font-bold text-[1.1rem] text-navy">{p.title}</h3>
+                                    <p className="text-ink-soft text-[0.95rem] leading-relaxed">{p.body}</p>
+                                </div>
                             </div>
                         ))}
                     </div>

@@ -171,7 +171,7 @@ export default function CrownGame() {
           {phase === "won" ? "Play Again" : "Shuffle & Play"}
         </button>
       </div>
-      <div className="relative" style={{ height: "min(420px, 60vw)" }}>
+      <div className="relative" style={{ height: "min(420px, 68vw)" }}>
         {CARDS.map((card, idx) => {
           const state = cards[card.id];
           const pos = CARD_POS[state.slot];

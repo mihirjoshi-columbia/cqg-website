@@ -1,54 +1,62 @@
 const formatPillars = [
     {
+        icon: "💰",
+        title: "$10K Prize Pool",
+        body: "",
+        bg: "var(--pink-gradient)",
+        color: "var(--navy)",
+    },
+    {
         icon: "📈",
         title: "Live Trading Rounds",
-        body: "Multi-round market-making & prop-trading simulations against peer teams",
-        bg: "var(--lime-gradient)",
+        body: "Multi-round market-making & prop-trading simulations against fellow competitors",
+        bg: "var(--pink-gradient)",
         color: "var(--navy)",
     },
     {
         icon: "🎓",
         title: "Undergrad-Only",
-        body: "Open exclusively to undergraduate teams from any accredited university",
-        bg: "var(--sky-gradient)",
+        body: "Open exclusively to undergraduates from any accredited US university",
+        bg: "var(--pink-gradient)",
         color: "var(--navy)",
     },
     {
         icon: "🗽",
         title: "Hosted at Columbia",
         body: "100–120 students on campus in New York City for the weekend",
-        bg: "var(--navy-gradient)",
-        color: "#fff",
+        bg: "var(--pink-gradient)",
+        color: "var(--navy)",
     },
 ];
 
-const schedule: { date: string; title: string; milestone?: boolean }[] = [
-    { date: "TBD — Fall 2026", title: "Applications open" },
-    { date: "TBD — Fall 2026", title: "Applications close" },
-    { date: "TBD — Fall 2026", title: "Team acceptances sent", milestone: true },
-    { date: "Saturday–Sunday, December 5–6, 2026", title: "CUTC held at Columbia University", milestone: true },
-    { date: "Sunday, December 6, 2026", title: "Awards & closing reception" },
+const schedule: { date: string; title: string; detail?: string; milestone?: boolean }[] = [
+    { date: "Monday, September 7, 2026", title: "Applications open" },
+    { date: "Friday, September 25, 2026", title: "Applications close" },
+    { date: "Friday, October 9, 2026", title: "Acceptances sent", milestone: true },
+    { date: "Friday–Saturday, December 4–5, 2026", title: "Competitors arrive" },
+    {
+        date: "Saturday, December 5, 2026",
+        title: "CUTC Day 1",
+        detail: "Includes the Quant Career Fair — open to all CUTC sponsors and CQG's general body",
+        milestone: true,
+    },
+    { date: "Sunday, December 6, 2026", title: "CUTC Day 2 — Awards & Closing", milestone: true },
 ];
 
 const eligibility = [
-    "Open to undergraduate students at any accredited college or university",
-    "Teams of 2–4 students; solo applicants can be matched with a team",
+    "Open to undergraduates at any accredited college or university in the United States",
     "No prior trading competition experience required",
-    "A limited number of teams per school to keep the room balanced",
+    "Primarily geared toward underclassmen — first- and second-years encouraged to apply",
 ];
 
 const faqs: { q: string; a: string }[] = [
     {
         q: "Is there a cost to attend?",
-        a: "We're finalizing pricing now. Our goal is to keep the entry fee low, and travel stipends may be available for teams coming from outside the NYC area — details TBD.",
+        a: "Travel and lodging will be covered for competitors. We'll share exact logistics after acceptances go out.",
     },
     {
         q: "What does the competition actually involve?",
-        a: "Teams compete across live, moderated trading rounds — think market-making and prop-trading simulations — run by CQG members and industry volunteers. No coding required.",
-    },
-    {
-        q: "Do we need our own laptops?",
-        a: "Yes, each team member should bring a laptop. Any competition-specific software will be shared ahead of time.",
+        a: "Compete across live, moderated trading rounds — think market-making and prop-trading simulations — run by CQG members and competition sponsors.",
     },
     {
         q: "Where can I ask other questions?",
@@ -61,7 +69,7 @@ export default function CompetitionPage() {
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <span className="tag tag-lime mb-4 inline-block">Flagship &middot; Fall 2026</span>
+                    <span className="tag tag-pink mb-2 block w-fit">Flagship &middot; Fall 2026</span>
                     <div className="chevron chevron-sky mb-4">Columbia University Trading Competition</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
                         CQG&apos;s new intercollegiate flagship event &mdash; an undergraduate-only trading
@@ -80,17 +88,17 @@ export default function CompetitionPage() {
                     <div className="chevron chevron-navy">What Is CUTC?</div>
                     <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mt-4">
                         The Columbia University Trading Competition is CQG&apos;s first intercollegiate
-                        flagship event &mdash; an undergraduate-only trading competition that brings teams
-                        from universities across the country to Columbia for a weekend of live trading
-                        games, built and run by CQG members alongside industry volunteers.
+                        flagship event &mdash; an undergraduate-only trading competition that brings
+                        undergraduates from universities across the country to Columbia for a weekend of
+                        live trading games, built and run by CQG members alongside competition sponsors.
                     </p>
 
-                    <div className="hex-row mt-11">
+                    <div className="pillar-row mt-11">
                         {formatPillars.map((p) => (
-                            <div key={p.title} className="hex-chip" style={{ background: p.bg }}>
-                                <div className="hex-icon">{p.icon}</div>
+                            <div key={p.title} className="pillar-card" style={{ background: p.bg }}>
+                                <div className="pillar-icon">{p.icon}</div>
                                 <h3 style={{ color: p.color }}>{p.title}</h3>
-                                <p style={{ color: p.color, opacity: 0.85 }}>{p.body}</p>
+                                {p.body && <p style={{ color: p.color, opacity: 0.85 }}>{p.body}</p>}
                             </div>
                         ))}
                     </div>
@@ -105,11 +113,11 @@ export default function CompetitionPage() {
                         Schedule
                     </h2>
                     <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-xl mt-3.5">
-                        Exact application dates are still being finalized &mdash; check back or reach out to
-                        be notified when they open.
+                        Mark your calendar &mdash; here&apos;s what to expect from application to
+                        competition day.
                     </p>
 
-                    <div className="timeline mt-10">
+                    <div className="timeline timeline-pink mt-10">
                         {schedule.map((step, i) => (
                             <div key={step.title} className={`timeline-step ${step.milestone ? "milestone" : ""}`}>
                                 <div className="timeline-marker">{i + 1}</div>
@@ -117,6 +125,9 @@ export default function CompetitionPage() {
                                     {step.date}
                                 </div>
                                 <div className="font-display font-bold text-[1.02rem] text-navy mt-1">{step.title}</div>
+                                {step.detail && (
+                                    <div className="text-ink-soft text-[0.9rem] mt-1.5 max-w-md">{step.detail}</div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -146,49 +157,29 @@ export default function CompetitionPage() {
                             <div>
                                 <h3 className="font-display font-bold text-[1.15rem]">Ready to compete?</h3>
                                 <p className="text-[#C3D2EA] mt-2.5 text-sm">
-                                    Applications haven&apos;t opened yet. Email us to be notified the moment they
-                                    go live, or with any questions about eligibility.
+                                    Applications are open now through September 25. Email us to apply, or
+                                    with any questions about eligibility.
                                 </p>
                             </div>
                             <a
-                                href="mailto:columbia.quant.group@gmail.com?subject=CUTC%20Application%20Interest"
-                                className="btn-cqg btn-lime"
+                                href="mailto:columbia.quant.group@gmail.com?subject=CUTC%20Application"
+                                className="btn-cqg btn-pink"
                             >
-                                Notify Me When Applications Open →
+                                Apply Now →
                             </a>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Prizes & sponsors */}
+            {/* Sponsors */}
             <section className="py-16 sm:py-24 bg-paper">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="chevron chevron-navy">Prizes</div>
-                    <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mt-4">
-                        Prize amounts are being finalized alongside our sponsors &mdash; check back closer to
-                        the event for the full breakdown.
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-9">
-                        {[
-                            { place: "1st Place", detail: "Prize amount TBD" },
-                            { place: "2nd Place", detail: "Prize amount TBD" },
-                            { place: "3rd Place", detail: "Prize amount TBD" },
-                        ].map((p) => (
-                            <div key={p.place} className="angle-card">
-                                <div className="angle-card-body text-center">
-                                    <div className="stat-num text-[2rem]">{p.place}</div>
-                                    <div className="text-ink-faint font-mono text-[0.8rem] mt-2">{p.detail}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="angle-card mt-14">
+                    <div className="angle-card max-w-3xl">
                         <div className="angle-card-body flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                             <div>
                                 <h3 className="font-display font-bold text-[1.2rem] text-navy">
-                                    Sponsoring CUTC?
+                                    Interested in Sponsoring CUTC?
                                 </h3>
                                 <p className="text-ink-soft leading-relaxed mt-2.5 max-w-lg">
                                     CUTC sponsors get direct access to a room of 100+ vetted, competition-tested
@@ -198,7 +189,7 @@ export default function CompetitionPage() {
                             </div>
                             <a
                                 href="mailto:columbia.quant.group@gmail.com?subject=CUTC%20Sponsorship%20Inquiry"
-                                className="btn-cqg btn-lime btn-sm flex-none"
+                                className="btn-cqg btn-pink btn-sm flex-none"
                             >
                                 Request Sponsorship Deck
                             </a>

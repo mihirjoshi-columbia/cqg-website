@@ -163,7 +163,7 @@ function ExecCard({ exec }: { exec: Exec }) {
 
 export default function ExecBoard() {
     return (
-        <section className="py-16">
+        <section className="bg-paper-alt py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2026 Executive Board</h2>
                 <div

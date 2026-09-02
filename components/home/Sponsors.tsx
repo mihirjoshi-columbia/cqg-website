@@ -33,9 +33,9 @@ export default function Sponsors() {
 
       <section className="py-16 sm:py-24 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="chevron chevron-lime mx-auto inline-flex">Ready to break in?</div>
+          <div className="chevron chevron-sky mx-auto inline-flex">Ready to break in?</div>
           <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mx-auto mt-6">
-            Sign up for the general body to get invites to info sessions, trading games, and Q&amp;As
+            Sign up for the general body for firm info sessions, Q&amp;As, and firm-run trading challenges
             &mdash; or apply when internal recruitment opens this fall.
           </p>
           <div className="flex justify-center mt-7">
