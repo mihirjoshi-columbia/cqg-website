@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/blasts/dispatch",
-      "schedule": "*/5 * * * *"
-    }
-  ]
-}

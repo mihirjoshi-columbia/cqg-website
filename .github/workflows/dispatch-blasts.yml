@@ -1,0 +1,15 @@
+name: Dispatch email blasts
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/blasts/dispatch
+        run: |
+          curl -fsS -X GET "${{ secrets.SITE_URL }}/api/blasts/dispatch" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
