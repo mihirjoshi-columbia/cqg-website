@@ -67,12 +67,7 @@ export default function RecruitmentPage() {
                                     &mdash; open to undergrads and grad students alike.
                                 </p>
                             </div>
-                            <a
-                                href="https://docs.google.com/forms/d/e/1FAIpQLSf40xbUhMYx8ELABAJccR5BftONiy-W5QZohLuGVV2pQAxf5A/viewform?usp=dialog"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn-cqg btn-lime"
-                            >
+                            <a href="/portal/signup" className="btn-cqg btn-lime">
                                 Sign Up →
                             </a>
                         </div>

@@ -157,14 +157,12 @@ export default function CompetitionPage() {
                             <div>
                                 <h3 className="font-display font-bold text-[1.15rem]">Ready to compete?</h3>
                                 <p className="text-[#C3D2EA] mt-2.5 text-sm">
-                                    Applications are open now through September 25. Email us to apply, or
-                                    with any questions about eligibility.
+                                    Applications are open now through September 25. Create a CUTC account to
+                                    apply &mdash; Columbia and Barnard students apply from their CQG portal
+                                    account instead.
                                 </p>
                             </div>
-                            <a
-                                href="mailto:columbia.quant.group@gmail.com?subject=CUTC%20Application"
-                                className="btn-cqg btn-pink"
-                            >
+                            <a href="/cutc/apply/signup" className="btn-cqg btn-pink">
                                 Apply Now →
                             </a>
                         </div>

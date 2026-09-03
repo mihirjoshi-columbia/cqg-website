@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { LinkedInIcon, InstagramIcon, MailIcon } from "@/components/icons/SocialIcons";
 
 export default function Footer() {
@@ -53,7 +54,12 @@ export default function Footer() {
                 </div>
             </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-2 font-mono text-xs text-[#5D719A] border-t border-navy-line/60">
-                <div className="pt-4">© {new Date().getFullYear()} Columbia Quant Group. All rights reserved.</div>
+                <div className="pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <span>© {new Date().getFullYear()} Columbia Quant Group. All rights reserved.</span>
+                    <Link href="/privacy-policy" className="hover:text-sky transition-colors">
+                        Privacy Policy
+                    </Link>
+                </div>
             </div>
         </footer>
     );

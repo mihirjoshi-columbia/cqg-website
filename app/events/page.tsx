@@ -51,12 +51,7 @@ export default function EventsPage() {
                                 trading challenges are announced &mdash; open to undergrads and grad students
                                 alike.
                             </p>
-                            <a
-                                href="https://docs.google.com/forms/d/e/1FAIpQLSf40xbUhMYx8ELABAJccR5BftONiy-W5QZohLuGVV2pQAxf5A/viewform?usp=dialog"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn-cqg btn-lime self-start"
-                            >
+                            <a href="/portal/signup" className="btn-cqg btn-lime self-start">
                                 Sign Up &rarr;
                             </a>
                         </div>
