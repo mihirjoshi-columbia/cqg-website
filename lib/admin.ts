@@ -28,5 +28,9 @@ export async function requireAdmin() {
         redirect("/portal/dashboard");
     }
 
+    if (!profile.resume_path) {
+        redirect("/portal/complete-profile");
+    }
+
     return { supabase, profile, admin: createServiceRoleClient() };
 }

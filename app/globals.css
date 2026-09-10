@@ -723,6 +723,45 @@ h1, h2, h3, h4 {
 }
 .field-checkbox-row label { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.4; }
 
+.combobox { position: relative; }
+.combobox-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  z-index: 20;
+  box-shadow: 0 10px 24px -10px rgba(11, 47, 98, 0.25);
+}
+.combobox-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.combobox-option:hover, .combobox-option:focus {
+  background: var(--paper-alt);
+  outline: none;
+}
+
+.field-radio-group { display: flex; gap: 1.4rem; }
+.field-radio-option { display: flex; align-items: center; gap: 0.45rem; }
+.field-radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--navy);
+  margin: 0;
+}
+.field-radio-option label { font-size: 0.9rem; color: var(--ink); }
+
 .form-banner {
   font-family: var(--font-plex-mono), monospace;
   font-size: 0.82rem;

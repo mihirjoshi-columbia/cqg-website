@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isCutcEmail } from "@/lib/domains";
 
 export interface LoginState {
     error?: string;
@@ -14,6 +15,17 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
 
     if (!email || !password) {
         return { error: "Email and password are required." };
+    }
+
+    // CQG and CUTC accounts share one Supabase Auth user pool, so a CQG
+    // account's credentials would otherwise authenticate here too and then
+    // dead-end (no matching cutc_profiles row) with no explanation. Reject by
+    // domain up front instead of letting that happen silently.
+    if (!isCutcEmail(email)) {
+        return {
+            error:
+                "Columbia/Barnard accounts apply to CUTC from inside their CQG portal account — log in through the CQG portal instead.",
+        };
     }
 
     const supabase = await createClient();

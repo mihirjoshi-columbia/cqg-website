@@ -19,16 +19,6 @@ export default function ProfileForm({ profile }: { profile: CutcProfile }) {
                 <input className="field-input" id="name" name="name" type="text" defaultValue={profile.name} required />
             </div>
 
-            <div className="field">
-                <label className="field-label" htmlFor="school">School</label>
-                <input className="field-input" id="school" name="school" type="text" defaultValue={profile.school} required />
-            </div>
-
-            <div className="field">
-                <label className="field-label" htmlFor="year">Class year</label>
-                <input className="field-input" id="year" name="year" type="text" defaultValue={profile.year} required />
-            </div>
-
             <button type="submit" className="btn-cqg btn-pink btn-sm w-fit" disabled={pending}>
                 {pending ? "Saving…" : "Save changes"}
             </button>

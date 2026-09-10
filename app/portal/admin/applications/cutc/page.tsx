@@ -50,7 +50,12 @@ export default async function CutcApplicationsPage() {
                         <tr>
                             <th>Applicant</th>
                             <th>Type</th>
-                            <th>School</th>
+                            <th>College</th>
+                            <th>Major</th>
+                            <th>Grad Yr</th>
+                            <th>Gender</th>
+                            <th>Prior Intern?</th>
+                            <th>Lined Up?</th>
                             <th>Cycle</th>
                             <th>Resume</th>
                             <th>Status</th>
@@ -71,7 +76,12 @@ export default async function CutcApplicationsPage() {
                                             {app.applicant_type === "cqg_member" ? "CQG member" : "External"}
                                         </span>
                                     </td>
-                                    <td>{applicant?.school ?? "—"}</td>
+                                    <td>{app.college}</td>
+                                    <td>{app.major}</td>
+                                    <td>{app.grad_year}</td>
+                                    <td>{app.gender}</td>
+                                    <td>{app.prior_internship ? "Yes" : "No"}</td>
+                                    <td>{app.internship_lined_up ? "Yes" : "No"}</td>
                                     <td>{c?.label ?? app.cycle_id}</td>
                                     <td>
                                         {applicant?.resume_path ? (

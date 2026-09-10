@@ -14,12 +14,10 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
     const name = String(formData.get("name") || "").trim();
-    const school = String(formData.get("school") || "").trim();
-    const year = String(formData.get("year") || "").trim();
     const attestation = formData.get("attestation") === "on";
     const agree = formData.get("agree") === "on";
 
-    if (!email || !password || !name || !school || !year) {
+    if (!email || !password || !name) {
         return { error: "All fields are required." };
     }
     if (!isCutcEmail(email)) {
@@ -66,8 +64,6 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
         id: linkData.user.id,
         email,
         name,
-        school,
-        year,
         attestation,
     });
 

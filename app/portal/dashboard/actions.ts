@@ -13,6 +13,8 @@ export async function logoutAction() {
 }
 
 const VALID_SCHOOLS: CqgSchool[] = ["CC", "SEAS", "Barnard", "GS", "GRAD"];
+const VALID_YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
+const VALID_GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export interface ProfileUpdateState {
     error?: string;
@@ -28,12 +30,19 @@ export async function updateProfileAction(
     const gradProgram = String(formData.get("grad_program") || "").trim();
     const year = String(formData.get("year") || "").trim();
     const major = String(formData.get("major") || "").trim();
+    const gender = String(formData.get("gender") || "").trim();
 
-    if (!name || !school || !year || !major) {
+    if (!name || !school || !year || !major || !gender) {
         return { error: "All fields are required." };
     }
     if (!VALID_SCHOOLS.includes(school)) {
         return { error: "Please choose a valid school." };
+    }
+    if (!VALID_YEARS.includes(year)) {
+        return { error: "Please choose a valid class year." };
+    }
+    if (!VALID_GENDERS.includes(gender)) {
+        return { error: "Please choose a valid gender." };
     }
     if (school === "GRAD" && !gradProgram) {
         return { error: "Please tell us which graduate program you're in." };
@@ -51,6 +60,7 @@ export async function updateProfileAction(
         grad_program: school === "GRAD" ? gradProgram : null,
         year,
         major,
+        gender,
     });
 
     if (error) {
@@ -109,6 +119,7 @@ export async function uploadResumeAction(
     }
 
     revalidatePath("/portal/dashboard");
+    revalidatePath("/portal/complete-profile");
     return { success: true };
 }
 
@@ -208,7 +219,7 @@ export async function applyForMembershipAction() {
     revalidatePath("/portal/dashboard");
 }
 
-export async function applyForCutcAction() {
+export async function applyForCutcAction(formData: FormData) {
     const supabase = await createClient();
     const {
         data: { user },
@@ -224,8 +235,9 @@ export async function applyForCutcAction() {
 
     // Internal Members can't apply while they hold that tier — re-checked
     // live against current tier, so stepping back to general_body reopens
-    // eligibility automatically.
-    if (!profile || profile.tier === "member") {
+    // eligibility automatically. Grad students are never eligible, same as
+    // Internal Membership.
+    if (!profile || profile.tier === "member" || profile.school === "GRAD") {
         return;
     }
 
@@ -244,11 +256,30 @@ export async function applyForCutcAction() {
         return; // no open cycle right now
     }
 
+    const college = String(formData.get("college") || "").trim();
+    const major = String(formData.get("major") || "").trim();
+    const gradYear = String(formData.get("grad_year") || "").trim();
+    const country = String(formData.get("country") || "").trim();
+    const gender = String(formData.get("gender") || "").trim();
+    const priorInternship = formData.get("prior_internship");
+    const internshipLinedUp = formData.get("internship_lined_up");
+
+    if (!college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp) {
+        return; // required fields enforced client-side too; bail quietly if bypassed
+    }
+
     const { error } = await insertRow(supabase, "cutc_applications", {
         cycle_id: cycle.id,
         applicant_type: "cqg_member",
         cqg_profile_id: user.id,
         cutc_profile_id: null,
+        college,
+        major,
+        grad_year: gradYear,
+        country,
+        gender,
+        prior_internship: priorInternship === "yes",
+        internship_lined_up: internshipLinedUp === "yes",
     });
 
     if (error) {

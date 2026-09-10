@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { applyForCutcAction } from "./actions";
-import ApplyButton from "./ApplyButton";
+import CutcApplicationForm from "@/components/cutc/CutcApplicationForm";
 import type { CutcProfile, CutcCycle, CutcApplication } from "@/lib/supabase/types";
 
 export default async function ApplicationCard({ profile }: { profile: CutcProfile }) {
@@ -67,17 +67,5 @@ export default async function ApplicationCard({ profile }: { profile: CutcProfil
         );
     }
 
-    return (
-        <div className="event-card" style={{ maxWidth: 560 }}>
-            <div className="event-card-body">
-                <span className="tag tag-pink w-fit">Applications open</span>
-                <p className="text-ink-soft text-sm">
-                    {cycle.label} is open now. Applying uses the profile and resume you already have on file.
-                </p>
-                <form action={applyForCutcAction}>
-                    <ApplyButton />
-                </form>
-            </div>
-        </div>
-    );
+    return <CutcApplicationForm action={applyForCutcAction} cycleLabel={cycle.label} />;
 }

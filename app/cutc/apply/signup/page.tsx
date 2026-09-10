@@ -12,7 +12,7 @@ export default function SignupPage() {
                         <h1 className="font-display font-extrabold text-2xl text-navy">Create your account</h1>
                         <p className="text-ink-soft text-sm mt-2">
                             For students outside Columbia and Barnard. Columbia/Barnard students should apply to
-                            CUTC from their CQG portal account instead.
+                            CUTC from their CQG General Body portal account instead.
                         </p>
                     </div>
                     <SignupForm />

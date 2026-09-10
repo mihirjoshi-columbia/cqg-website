@@ -27,6 +27,8 @@ export interface CqgProfile {
     major: string;
     resume_path: string | null;
     tier: CqgTier;
+    gender: string | null;
+    resume_reminder_sent_at: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -55,10 +57,9 @@ export interface CutcProfile {
     id: string;
     email: string;
     name: string;
-    school: string;
-    year: string;
     resume_path: string | null;
     attestation: boolean;
+    resume_reminder_sent_at: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -79,6 +80,13 @@ export interface CutcApplication {
     applicant_type: CutcApplicantType;
     cqg_profile_id: string | null;
     cutc_profile_id: string | null;
+    college: string;
+    major: string;
+    grad_year: string;
+    country: string;
+    gender: string;
+    prior_internship: boolean;
+    internship_lined_up: boolean;
     submitted_at: string;
     decided_at: string | null;
     decided_by: string | null;
@@ -143,8 +151,8 @@ export interface Database {
         Tables: {
             cqg_profiles: {
                 Row: CqgProfile;
-                Insert: Omit<CqgProfile, "created_at" | "updated_at" | "tier" | "resume_path"> &
-                    Partial<Pick<CqgProfile, "tier" | "resume_path">>;
+                Insert: Omit<CqgProfile, "created_at" | "updated_at" | "tier" | "resume_path" | "resume_reminder_sent_at"> &
+                    Partial<Pick<CqgProfile, "tier" | "resume_path" | "resume_reminder_sent_at">>;
                 Update: Partial<CqgProfile>;
                 Relationships: [];
             };
@@ -165,8 +173,8 @@ export interface Database {
             };
             cutc_profiles: {
                 Row: CutcProfile;
-                Insert: Omit<CutcProfile, "created_at" | "updated_at" | "resume_path"> &
-                    Partial<Pick<CutcProfile, "resume_path">>;
+                Insert: Omit<CutcProfile, "created_at" | "updated_at" | "resume_path" | "resume_reminder_sent_at"> &
+                    Partial<Pick<CutcProfile, "resume_path" | "resume_reminder_sent_at">>;
                 Update: Partial<CutcProfile>;
                 Relationships: [];
             };

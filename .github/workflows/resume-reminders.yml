@@ -1,0 +1,15 @@
+name: Resume reminders
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/resume-reminders/dispatch
+        run: |
+          curl -fsS -X GET "${{ secrets.SITE_URL }}/api/resume-reminders/dispatch" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

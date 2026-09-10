@@ -56,9 +56,17 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-2 font-mono text-xs text-[#5D719A] border-t border-navy-line/60">
                 <div className="pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <span>© {new Date().getFullYear()} Columbia Quant Group. All rights reserved.</span>
-                    <Link href="/privacy-policy" className="hover:text-sky transition-colors">
-                        Privacy Policy
-                    </Link>
+                    <div className="flex items-center gap-5">
+                        <Link href="/portal/login" className="hover:text-sky transition-colors">
+                            CQG Login
+                        </Link>
+                        <Link href="/cutc/apply/login" className="hover:text-sky transition-colors">
+                            CUTC Login
+                        </Link>
+                        <Link href="/privacy-policy" className="hover:text-sky transition-colors">
+                            Privacy Policy
+                        </Link>
+                    </div>
                 </div>
             </div>
         </footer>

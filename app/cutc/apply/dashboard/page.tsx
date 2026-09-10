@@ -30,6 +30,10 @@ export default async function DashboardPage() {
         redirect("/cutc/apply/login");
     }
 
+    if (!profile.resume_path) {
+        redirect("/cutc/apply/complete-profile");
+    }
+
     return (
         <div className="portal-shell">
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">

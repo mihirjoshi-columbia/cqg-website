@@ -11,6 +11,10 @@ export default function LoginPage() {
                     <div>
                         <span className="eyebrow text-sky-deep mb-2 block">CQG Portal</span>
                         <h1 className="font-display font-extrabold text-2xl text-navy">Log in</h1>
+                        <p className="text-ink-soft text-sm mt-2">
+                            Manage your profile and resume, apply for Internal Membership, and RSVP to events.
+                            For Columbia and Barnard students.
+                        </p>
                     </div>
                     <Suspense fallback={null}>
                         <LoginForm />

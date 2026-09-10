@@ -43,6 +43,10 @@ export default async function DashboardPage() {
         redirect("/portal/login");
     }
 
+    if (!profile.resume_path) {
+        redirect("/portal/complete-profile");
+    }
+
     return (
         <div className="portal-shell">
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">

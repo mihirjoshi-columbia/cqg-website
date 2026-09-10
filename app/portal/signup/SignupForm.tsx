@@ -3,12 +3,19 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signupAction, type SignupState } from "./actions";
+import { CQG_MAJORS } from "@/lib/data/cqg-majors";
+import { GRAD_PROGRAMS } from "@/lib/data/grad-programs";
 
 const initialState: SignupState = {};
+
+const YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
+const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function SignupForm() {
     const [state, formAction, pending] = useActionState(signupAction, initialState);
     const [school, setSchool] = useState("");
+    const [major, setMajor] = useState("");
+    const [gradProgram, setGradProgram] = useState("");
 
     return (
         <form action={formAction} className="flex flex-col gap-5">
@@ -21,8 +28,8 @@ export default function SignupForm() {
 
             <div className="field">
                 <label className="field-label" htmlFor="email">Columbia / Barnard email</label>
-                <input className="field-input" id="email" name="email" type="email" required placeholder="you@columbia.edu" />
-                <span className="field-hint">Must end in columbia.edu or barnard.edu</span>
+                <input className="field-input" id="email" name="email" type="email" required placeholder="abc1234@columbia.edu" />
+                <span className="field-hint">Must be your UNI address, e.g. abc1234@columbia.edu or xy6789@barnard.edu</span>
             </div>
 
             <div className="field">
@@ -53,18 +60,75 @@ export default function SignupForm() {
             {school === "GRAD" && (
                 <div className="field">
                     <label className="field-label" htmlFor="grad_program">Graduate program</label>
-                    <input className="field-input" id="grad_program" name="grad_program" type="text" placeholder="e.g. MS Financial Engineering" />
+                    <select
+                        className="field-select"
+                        id="grad_program"
+                        name={gradProgram === "Other" ? undefined : "grad_program"}
+                        required
+                        value={gradProgram}
+                        onChange={(e) => setGradProgram(e.target.value)}
+                    >
+                        <option value="" disabled>Select your program</option>
+                        {GRAD_PROGRAMS.map((p) => (
+                            <option key={p} value={p}>{p}</option>
+                        ))}
+                    </select>
+                    {gradProgram === "Other" && (
+                        <input
+                            className="field-input mt-2"
+                            type="text"
+                            name="grad_program"
+                            placeholder="Tell us your program"
+                            required
+                        />
+                    )}
                 </div>
             )}
 
             <div className="field">
                 <label className="field-label" htmlFor="year">Class year</label>
-                <input className="field-input" id="year" name="year" type="text" required placeholder="e.g. 2028" />
+                <select className="field-select" id="year" name="year" defaultValue="" required>
+                    <option value="" disabled>Select a year</option>
+                    {YEARS.map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                    ))}
+                </select>
             </div>
 
             <div className="field">
                 <label className="field-label" htmlFor="major">Major / concentration</label>
-                <input className="field-input" id="major" name="major" type="text" required />
+                <select
+                    className="field-select"
+                    id="major"
+                    name={major === "Other" ? undefined : "major"}
+                    required
+                    value={major}
+                    onChange={(e) => setMajor(e.target.value)}
+                >
+                    <option value="" disabled>Select your major</option>
+                    {CQG_MAJORS.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                    ))}
+                </select>
+                {major === "Other" && (
+                    <input
+                        className="field-input mt-2"
+                        type="text"
+                        name="major"
+                        placeholder="Tell us your major"
+                        required
+                    />
+                )}
+            </div>
+
+            <div className="field">
+                <label className="field-label" htmlFor="gender">Gender</label>
+                <select className="field-select" id="gender" name="gender" defaultValue="" required>
+                    <option value="" disabled>Select an option</option>
+                    {GENDERS.map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                    ))}
+                </select>
             </div>
 
             <div className="field-checkbox-row">

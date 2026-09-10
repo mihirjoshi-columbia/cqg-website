@@ -22,10 +22,8 @@ export async function updateProfileAction(
     formData: FormData
 ): Promise<ProfileUpdateState> {
     const name = String(formData.get("name") || "").trim();
-    const school = String(formData.get("school") || "").trim();
-    const year = String(formData.get("year") || "").trim();
 
-    if (!name || !school || !year) {
+    if (!name) {
         return { error: "All fields are required." };
     }
 
@@ -35,7 +33,7 @@ export async function updateProfileAction(
     } = await supabase.auth.getUser();
     if (!user) redirect("/cutc/apply/login");
 
-    const { error } = await updateRow(supabase, "cutc_profiles", user.id, { name, school, year });
+    const { error } = await updateRow(supabase, "cutc_profiles", user.id, { name });
     if (error) {
         console.error("[cutc dashboard] profile update failed:", error);
         return { error: "Could not update your profile. Please try again." };
@@ -92,6 +90,7 @@ export async function uploadResumeAction(
     }
 
     revalidatePath("/cutc/apply/dashboard");
+    revalidatePath("/cutc/apply/complete-profile");
     return { success: true };
 }
 
@@ -144,7 +143,7 @@ export async function deleteAccountAction() {
     redirect("/cutc/apply/login?accountDeleted=1");
 }
 
-export async function applyForCutcAction() {
+export async function applyForCutcAction(formData: FormData) {
     const supabase = await createClient();
     const {
         data: { user },
@@ -166,11 +165,30 @@ export async function applyForCutcAction() {
         return; // no open cycle right now
     }
 
+    const college = String(formData.get("college") || "").trim();
+    const major = String(formData.get("major") || "").trim();
+    const gradYear = String(formData.get("grad_year") || "").trim();
+    const country = String(formData.get("country") || "").trim();
+    const gender = String(formData.get("gender") || "").trim();
+    const priorInternship = formData.get("prior_internship");
+    const internshipLinedUp = formData.get("internship_lined_up");
+
+    if (!college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp) {
+        return; // required fields enforced client-side too; bail quietly if bypassed
+    }
+
     const { error } = await insertRow(supabase, "cutc_applications", {
         cycle_id: cycle.id,
         applicant_type: "external",
         cqg_profile_id: null,
         cutc_profile_id: user.id,
+        college,
+        major,
+        grad_year: gradYear,
+        country,
+        gender,
+        prior_internship: priorInternship === "yes",
+        internship_lined_up: internshipLinedUp === "yes",
     });
 
     if (error) {

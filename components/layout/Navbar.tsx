@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const navLinks: { name: string; href: string; children?: { name: string; href: string }[] }[] = [
   { name: "Home", href: "/" },
@@ -27,6 +28,11 @@ const navLinks: { name: string; href: string; children?: { name: string; href: s
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { user, loading, portalKind } = useAuth();
+
+  const dashboardHref =
+    portalKind === "cqg" ? "/portal/dashboard" : portalKind === "cutc" ? "/cutc/apply/dashboard" : null;
+  const showDashboardLink = Boolean(user) && !loading && Boolean(dashboardHref);
 
   return (
     <nav className="fixed w-full z-50 bg-white/92 backdrop-blur-md border-b border-line">
@@ -101,6 +107,38 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {showDashboardLink ? (
+              <Link href={dashboardHref!} className="btn-cqg btn-outline-navy btn-sm flex-none">
+                Dashboard
+              </Link>
+            ) : (
+              <div className="relative group flex-none">
+                <button
+                  type="button"
+                  className="btn-cqg btn-outline-navy btn-sm flex items-center gap-1"
+                >
+                  Log In
+                  <ChevronDown size={14} className="mt-px" />
+                </button>
+                <div className="absolute right-0 top-full pt-3 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-150">
+                  <div className="bg-white border border-line shadow-lg min-w-[180px] py-1.5">
+                    <Link
+                      href="/portal/login"
+                      className="block px-4 py-2 text-[0.85rem] font-semibold whitespace-nowrap text-ink-soft hover:text-navy hover:bg-paper-alt"
+                    >
+                      CQG Portal
+                    </Link>
+                    <Link
+                      href="/cutc/apply/login"
+                      className="block px-4 py-2 text-[0.85rem] font-semibold whitespace-nowrap text-ink-soft hover:text-navy hover:bg-paper-alt"
+                    >
+                      CUTC
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -175,6 +213,36 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+
+              <div className="border-t border-line mt-2 pt-2">
+                {showDashboardLink ? (
+                  <Link
+                    href={dashboardHref!}
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-base font-semibold text-ink-soft hover:text-navy hover:bg-paper-alt"
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <div className="px-3 py-2 text-base font-semibold text-ink-soft">Log In</div>
+                    <Link
+                      href="/portal/login"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-6 py-2 text-[0.95rem] font-semibold text-ink-soft hover:text-navy hover:bg-paper-alt"
+                    >
+                      CQG Portal
+                    </Link>
+                    <Link
+                      href="/cutc/apply/login"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-6 py-2 text-[0.95rem] font-semibold text-ink-soft hover:text-navy hover:bg-paper-alt"
+                    >
+                      CUTC
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

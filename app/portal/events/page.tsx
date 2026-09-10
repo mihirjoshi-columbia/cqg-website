@@ -28,6 +28,14 @@ export default async function PortalEventsPage() {
     } = await supabase.auth.getUser();
     if (!user) redirect("/portal/login");
 
+    const { data: profile } = await supabase
+        .from("cqg_profiles")
+        .select("resume_path")
+        .eq("id", user.id)
+        .maybeSingle()
+        .overrideTypes<{ resume_path: string | null }, { merge: false }>();
+    if (!profile?.resume_path) redirect("/portal/complete-profile");
+
     const { data: events } = await supabase
         .from("cqg_events")
         .select("*")

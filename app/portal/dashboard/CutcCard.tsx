@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { applyForCutcAction } from "./actions";
-import ApplyButton from "./ApplyButton";
+import CutcApplicationForm from "@/components/cutc/CutcApplicationForm";
+import { cqgSchoolToCollegeName } from "@/lib/domains";
 import type { CqgProfile, CutcCycle, CutcApplication } from "@/lib/supabase/types";
 
 export default async function CutcCard({ profile }: { profile: CqgProfile }) {
@@ -11,6 +12,20 @@ export default async function CutcCard({ profile }: { profile: CqgProfile }) {
                     <span className="tag tag-outline w-fit">CUTC</span>
                     <p className="text-ink-soft text-sm">
                         Internal Members aren&apos;t eligible to compete in CUTC while holding that role.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (profile.school === "GRAD") {
+        return (
+            <div className="event-card" style={{ maxWidth: 560 }}>
+                <div className="event-card-body">
+                    <span className="tag tag-outline w-fit">CUTC</span>
+                    <p className="text-ink-soft text-sm">
+                        CUTC is limited to undergraduates. You&apos;re welcome to stay active as a General Body
+                        member — firm events and Q&amp;As are open to grad students too.
                     </p>
                 </div>
             </div>
@@ -81,16 +96,11 @@ export default async function CutcCard({ profile }: { profile: CqgProfile }) {
     }
 
     return (
-        <div className="event-card" style={{ maxWidth: 560 }}>
-            <div className="event-card-body">
-                <span className="tag tag-pink w-fit">Applications open</span>
-                <p className="text-ink-soft text-sm">
-                    {cycle.label} is open now. Applying uses the profile and resume you already have on file.
-                </p>
-                <form action={applyForCutcAction}>
-                    <ApplyButton label="Apply to CUTC" className="btn-pink" />
-                </form>
-            </div>
-        </div>
+        <CutcApplicationForm
+            action={applyForCutcAction}
+            cycleLabel={cycle.label}
+            lockedCollege={cqgSchoolToCollegeName(profile.school)}
+            lockedGender={profile.gender ?? undefined}
+        />
     );
 }

@@ -33,16 +33,6 @@ export default function SignupForm() {
                 <span className="field-hint">At least 8 characters</span>
             </div>
 
-            <div className="field">
-                <label className="field-label" htmlFor="school">School</label>
-                <input className="field-input" id="school" name="school" type="text" required placeholder="e.g. University of Michigan" />
-            </div>
-
-            <div className="field">
-                <label className="field-label" htmlFor="year">Class year</label>
-                <input className="field-input" id="year" name="year" type="text" required placeholder="e.g. 2028" />
-            </div>
-
             <div className="field-checkbox-row">
                 <input id="attestation" name="attestation" type="checkbox" required />
                 <label htmlFor="attestation">
