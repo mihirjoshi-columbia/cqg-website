@@ -5,8 +5,8 @@ import { useFormStatus } from "react-dom";
 import Combobox from "@/components/ui/Combobox";
 import { US_COLLEGES } from "@/lib/data/us-colleges";
 import { MAJORS } from "@/lib/data/majors";
+import { GRAD_YEARS } from "@/lib/data/grad-years";
 
-const GRAD_YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
 const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 function SubmitButton() {

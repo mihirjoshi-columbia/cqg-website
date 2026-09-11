@@ -5,6 +5,7 @@ import { createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow } from "@/lib/supabase/helpers";
 import { isCqgDomain, isCqgUniFormat } from "@/lib/domains";
 import { sendVerificationEmail } from "@/lib/email";
+import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgSchool } from "@/lib/supabase/types";
 
 export interface SignupState {
@@ -12,7 +13,6 @@ export interface SignupState {
 }
 
 const VALID_SCHOOLS: CqgSchool[] = ["CC", "SEAS", "Barnard", "GS", "GRAD"];
-const VALID_YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
 const VALID_GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export async function signupAction(_prev: SignupState, formData: FormData): Promise<SignupState> {
@@ -32,8 +32,8 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     if (!VALID_SCHOOLS.includes(school)) {
         return { error: "Please choose a valid school." };
     }
-    if (!VALID_YEARS.includes(year)) {
-        return { error: "Please choose a valid class year." };
+    if (!GRAD_YEARS.includes(year)) {
+        return { error: "Please choose a valid graduation term." };
     }
     if (!VALID_GENDERS.includes(gender)) {
         return { error: "Please choose a valid gender." };

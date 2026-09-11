@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { applyForMembershipAction } from "./actions";
-import ApplyButton from "./ApplyButton";
+import MembershipApplicationForm from "./MembershipApplicationForm";
 import type { CqgProfile, CqgMembershipCycle, CqgMembershipApplication } from "@/lib/supabase/types";
 
 export default async function MembershipCard({ profile }: { profile: CqgProfile }) {
@@ -103,9 +102,7 @@ export default async function MembershipCard({ profile }: { profile: CqgProfile 
                 <p className="text-ink-soft text-sm">
                     {cycle.label} is open now. Applying uses the profile and resume you already have on file.
                 </p>
-                <form action={applyForMembershipAction}>
-                    <ApplyButton />
-                </form>
+                <MembershipApplicationForm />
             </div>
         </div>
     );

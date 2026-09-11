@@ -47,7 +47,7 @@ export interface CqgMembershipApplication {
     profile_id: string;
     cycle_id: string;
     status: ApplicationStatus;
-    short_answer: string | null;
+    accomplishments: string[];
     submitted_at: string;
     decided_at: string | null;
     decided_by: string | null;

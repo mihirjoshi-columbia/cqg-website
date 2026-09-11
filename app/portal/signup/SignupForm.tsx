@@ -5,10 +5,10 @@ import Link from "next/link";
 import { signupAction, type SignupState } from "./actions";
 import { CQG_MAJORS } from "@/lib/data/cqg-majors";
 import { GRAD_PROGRAMS } from "@/lib/data/grad-programs";
+import { GRAD_YEARS } from "@/lib/data/grad-years";
 
 const initialState: SignupState = {};
 
-const YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
 const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function SignupForm() {
@@ -86,10 +86,10 @@ export default function SignupForm() {
             )}
 
             <div className="field">
-                <label className="field-label" htmlFor="year">Class year</label>
+                <label className="field-label" htmlFor="year">Expected graduation</label>
                 <select className="field-select" id="year" name="year" defaultValue="" required>
-                    <option value="" disabled>Select a year</option>
-                    {YEARS.map((y) => (
+                    <option value="" disabled>Select a term</option>
+                    {GRAD_YEARS.map((y) => (
                         <option key={y} value={y}>{y}</option>
                     ))}
                 </select>

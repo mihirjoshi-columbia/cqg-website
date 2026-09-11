@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow, updateRow } from "@/lib/supabase/helpers";
+import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgProfile, CqgSchool, CqgMembershipCycle, CutcCycle } from "@/lib/supabase/types";
 
 export async function logoutAction() {
@@ -13,7 +14,6 @@ export async function logoutAction() {
 }
 
 const VALID_SCHOOLS: CqgSchool[] = ["CC", "SEAS", "Barnard", "GS", "GRAD"];
-const VALID_YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
 const VALID_GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export interface ProfileUpdateState {
@@ -38,8 +38,8 @@ export async function updateProfileAction(
     if (!VALID_SCHOOLS.includes(school)) {
         return { error: "Please choose a valid school." };
     }
-    if (!VALID_YEARS.includes(year)) {
-        return { error: "Please choose a valid class year." };
+    if (!GRAD_YEARS.includes(year)) {
+        return { error: "Please choose a valid graduation term." };
     }
     if (!VALID_GENDERS.includes(gender)) {
         return { error: "Please choose a valid gender." };
@@ -173,7 +173,13 @@ export async function deleteAccountAction() {
     redirect("/portal/login?accountDeleted=1");
 }
 
-export async function applyForMembershipAction() {
+const ACCOMPLISHMENT_WORD_LIMIT = 30;
+
+function wordCount(text: string): number {
+    return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+export async function applyForMembershipAction(formData: FormData) {
     const supabase = await createClient();
     const {
         data: { user },
@@ -189,6 +195,17 @@ export async function applyForMembershipAction() {
 
     if (!profile || profile.tier !== "general_body" || profile.school === "GRAD") {
         return; // not eligible — button shouldn't have been shown in the first place
+    }
+
+    const accomplishments = [1, 2, 3, 4, 5]
+        .map((i) => String(formData.get(`accomplishment_${i}`) || "").trim())
+        .filter(Boolean);
+
+    if (accomplishments.length === 0) {
+        return; // at least one is required; enforced client-side too
+    }
+    if (accomplishments.some((a) => wordCount(a) > ACCOMPLISHMENT_WORD_LIMIT)) {
+        return; // over the word cap; enforced client-side too, bail quietly if bypassed
     }
 
     const now = new Date().toISOString();
@@ -209,7 +226,7 @@ export async function applyForMembershipAction() {
     const { error } = await insertRow(supabase, "cqg_membership_applications", {
         profile_id: user.id,
         cycle_id: cycle.id,
-        short_answer: null,
+        accomplishments,
     });
 
     if (error) {

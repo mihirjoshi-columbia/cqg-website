@@ -51,6 +51,7 @@ export default async function MembershipApplicationsPage() {
                         <tr>
                             <th>Applicant</th>
                             <th>School</th>
+                            <th>Accomplishments</th>
                             <th>Cycle</th>
                             <th>Submitted</th>
                             <th>Status</th>
@@ -65,6 +66,13 @@ export default async function MembershipApplicationsPage() {
                                 <tr key={app.id}>
                                     <td>{p ? `${p.name} — ${p.email}` : app.profile_id}</td>
                                     <td>{p?.school}{p?.grad_program ? ` (${p.grad_program})` : ""}</td>
+                                    <td style={{ minWidth: 260 }}>
+                                        <ul className="text-xs" style={{ paddingLeft: "1rem", listStyle: "disc" }}>
+                                            {app.accomplishments.map((a, i) => (
+                                                <li key={i}>{a}</li>
+                                            ))}
+                                        </ul>
+                                    </td>
                                     <td>{c?.label ?? app.cycle_id}</td>
                                     <td className="text-xs">{new Date(app.submitted_at).toLocaleDateString()}</td>
                                     <td><span className={`tag ${STATUS_TAG[app.status]}`}>{app.status}</span></td>

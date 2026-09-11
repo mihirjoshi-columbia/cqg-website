@@ -4,11 +4,11 @@ import { useActionState, useState } from "react";
 import { updateProfileAction, type ProfileUpdateState } from "./actions";
 import { CQG_MAJORS } from "@/lib/data/cqg-majors";
 import { GRAD_PROGRAMS } from "@/lib/data/grad-programs";
+import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgProfile } from "@/lib/supabase/types";
 
 const initialState: ProfileUpdateState = {};
 
-const YEARS = ["2026", "2027", "2028", "2029", "2030", "2031"];
 const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function ProfileForm({ profile }: { profile: CqgProfile }) {
@@ -80,16 +80,16 @@ export default function ProfileForm({ profile }: { profile: CqgProfile }) {
             )}
 
             <div className="field">
-                <label className="field-label" htmlFor="year">Class year</label>
+                <label className="field-label" htmlFor="year">Expected graduation</label>
                 <select
                     className="field-select"
                     id="year"
                     name="year"
-                    defaultValue={YEARS.includes(profile.year) ? profile.year : ""}
+                    defaultValue={GRAD_YEARS.includes(profile.year) ? profile.year : ""}
                     required
                 >
-                    {!YEARS.includes(profile.year) && <option value="" disabled>Select a year</option>}
-                    {YEARS.map((y) => (
+                    {!GRAD_YEARS.includes(profile.year) && <option value="" disabled>Select a term</option>}
+                    {GRAD_YEARS.map((y) => (
                         <option key={y} value={y}>{y}</option>
                     ))}
                 </select>

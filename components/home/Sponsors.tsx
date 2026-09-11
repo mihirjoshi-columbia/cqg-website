@@ -5,6 +5,7 @@ const sponsors = [
   { key: "hrt-h-white", name: "HRT" },
   { key: "drw-white", name: "DRW" },
   { key: "sig-h-white", name: "SIG" },
+  { key: "citadel-securities-white", name: "Citadel Securities" },
 ];
 
 export default function Sponsors() {
