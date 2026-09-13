@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { uploadResumeAction, getResumeUrlAction, type ResumeUploadState } from "./actions";
+import { openBlankTab, showUrlInTab, closeTab } from "@/lib/browser/open-tab";
 
 const initialState: ResumeUploadState = {};
 
@@ -13,16 +14,13 @@ export default function ResumeUpload({ hasResume }: { hasResume: boolean }) {
     async function handleView() {
         setViewing(true);
         setViewError(null);
-        // Open the tab synchronously (inside the click's user-gesture window),
-        // then point it at the signed URL once we have it — awaiting first and
-        // calling window.open() after would get silently popup-blocked.
-        const newTab = window.open("", "_blank", "noopener,noreferrer");
+        const newTab = openBlankTab();
         const result = await getResumeUrlAction();
         setViewing(false);
-        if (result.url && newTab) {
-            newTab.location.href = result.url;
+        if (result.url) {
+            showUrlInTab(newTab, result.url);
         } else {
-            newTab?.close();
+            closeTab(newTab);
             setViewError(result.error || "Could not open resume.");
         }
     }

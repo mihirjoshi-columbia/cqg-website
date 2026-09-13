@@ -2,19 +2,20 @@
 
 import { useState } from "react";
 import { getMemberResumeUrlAction } from "./actions";
+import { openBlankTab, showUrlInTab, closeTab } from "@/lib/browser/open-tab";
 
 export default function ViewResumeButton({ profileId }: { profileId: string }) {
     const [loading, setLoading] = useState(false);
 
     async function handleClick() {
         setLoading(true);
-        const newTab = window.open("", "_blank", "noopener,noreferrer");
+        const newTab = openBlankTab();
         const result = await getMemberResumeUrlAction(profileId);
         setLoading(false);
-        if (result.url && newTab) {
-            newTab.location.href = result.url;
+        if (result.url) {
+            showUrlInTab(newTab, result.url);
         } else {
-            newTab?.close();
+            closeTab(newTab);
             alert(result.error || "Could not open resume.");
         }
     }
