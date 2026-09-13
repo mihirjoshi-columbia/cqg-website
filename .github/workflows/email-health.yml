@@ -1,0 +1,26 @@
+name: Email health check
+
+# Manual diagnostic. Calls /api/email/health, which reports whether Resend is
+# configured and (with an address) attempts a real send and returns Resend's
+# verbatim rejection. Safe to delete once the delivery issue is resolved.
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: "Optional address to send a real test email to. Leave blank for config only."
+        required: false
+        default: ""
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/email/health
+        run: |
+          URL="${{ secrets.SITE_URL }}/api/email/health"
+          if [ -n "${{ inputs.to }}" ]; then
+            URL="$URL?to=${{ inputs.to }}"
+          fi
+          # No -f: a non-2xx body is exactly what we want to read.
+          curl -sS -w '\nHTTP %{http_code}\n' -X GET "$URL" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
