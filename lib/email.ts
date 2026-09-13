@@ -43,12 +43,31 @@ export function brandedEmailHtml(opts: {
       <div style="font-size:14px;line-height:1.6;color:#4B5568;">${bodyHtml}</div>
       ${
           ctaHref
-              ? `<a href="${ctaHref}" style="display:inline-block;margin-top:20px;background:#E8FA0A;color:#0B2F62;font-weight:700;font-size:14px;padding:12px 22px;text-decoration:none;">${ctaLabel ?? "Continue"}</a>`
+              ? `<a href="${ctaHref}" style="display:inline-block;margin-top:20px;background:#E8FA0A;color:#0B2F62;font-weight:700;font-size:14px;padding:12px 22px;text-decoration:none;">${ctaLabel ?? "Continue"}</a>
+      <p style="font-size:12px;line-height:1.5;color:#8A93A6;margin:18px 0 0;">If the button doesn't work, copy and paste this link into your browser:<br><span style="color:#4B5568;word-break:break-all;">${ctaHref}</span></p>`
               : ""
       }
     </div>
   </div>
 </div>`;
+}
+
+// Text/plain counterpart to brandedEmailHtml. The link is spelled out in
+// full rather than hidden behind a label, so it still works wherever the
+// HTML part is stripped.
+function brandedEmailText(opts: {
+    heading: string;
+    bodyText: string;
+    ctaLabel?: string;
+    ctaHref?: string;
+}): string {
+    const { heading, bodyText, ctaLabel, ctaHref } = opts;
+    const lines = ["Columbia Quant Group", "", heading, "", bodyText];
+    if (ctaHref) {
+        lines.push("", `${ctaLabel ?? "Continue"}: ${ctaHref}`);
+    }
+    lines.push("", "—", "Columbia Quant Group", "https://www.columbiaquantgroup.com");
+    return lines.join("\n");
 }
 
 function resendConfigured() {
@@ -67,16 +86,30 @@ async function send(opts: {
     to: string;
     subject: string;
     html: string;
+    text: string;
+    headers?: Record<string, string>;
 }): Promise<void> {
     if (!resendConfigured()) {
         throw new EmailSendError("RESEND_API_KEY is not set");
     }
+
+    const replyTo = process.env.RESEND_REPLY_TO;
 
     const { data, error } = await client().emails.send({
         from: fromAddress(),
         to: opts.to,
         subject: opts.subject,
         html: opts.html,
+        // Every message carries a real text/plain part. An HTML-only message
+        // is a long-standing spam heuristic, and these were going out
+        // HTML-only -- which matters here because Resend reports them as
+        // "delivered" either way: the receiving server accepts the message
+        // and then decides Inbox vs Junk on its own, invisibly to us.
+        text: opts.text,
+        // A monitored reply address reads as more legitimate than a bare
+        // noreply@ on a domain with no MX record.
+        ...(replyTo ? { replyTo } : {}),
+        ...(opts.headers ? { headers: opts.headers } : {}),
     });
 
     if (error) {
@@ -104,51 +137,79 @@ function logLinkInDev(kind: string, to: string, actionLink: string): boolean {
 
 export async function sendVerificationEmail(to: string, name: string, actionLink: string) {
     if (logLinkInDev("verification", to, actionLink)) return;
+    const heading = "Verify your email";
+    const body = `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll be asked to upload a resume to finish setting up your profile.`;
     await send({
         to,
         subject: "Verify your email — Columbia Quant Group",
-        html: brandedEmailHtml({
-            heading: "Verify your email",
-            bodyHtml: `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll be asked to upload a resume to finish setting up your profile.`,
-            ctaLabel: "Verify Email",
-            ctaHref: actionLink,
-        }),
+        html: brandedEmailHtml({ heading, bodyHtml: body, ctaLabel: "Verify Email", ctaHref: actionLink }),
+        text: brandedEmailText({ heading, bodyText: body, ctaLabel: "Verify Email", ctaHref: actionLink }),
     });
 }
 
 export async function sendPasswordResetEmail(to: string, actionLink: string) {
     if (logLinkInDev("password reset", to, actionLink)) return;
+    const heading = "Reset your password";
+    const body = "We received a request to reset your password. If this wasn't you, you can ignore this email.";
     await send({
         to,
         subject: "Reset your password — Columbia Quant Group",
-        html: brandedEmailHtml({
-            heading: "Reset your password",
-            bodyHtml: `We received a request to reset your password. If this wasn't you, you can ignore this email.`,
-            ctaLabel: "Reset Password",
-            ctaHref: actionLink,
-        }),
+        html: brandedEmailHtml({ heading, bodyHtml: body, ctaLabel: "Reset Password", ctaHref: actionLink }),
+        text: brandedEmailText({ heading, bodyText: body, ctaLabel: "Reset Password", ctaHref: actionLink }),
     });
 }
 
 // The blast dispatch loop in lib/blasts.ts records the thrown message against
 // the recipient row, so a failure here is visible in the admin UI.
+//
+// Unlike the transactional mail above, blasts are bulk and carry
+// List-Unsubscribe: mailbox providers expect it on bulk mail and penalise its
+// absence. It is deliberately NOT set on verification/reset mail, which a
+// user must not be able to opt out of.
 export async function sendBlastEmail(to: string, subject: string, bodyHtml: string) {
-    await send({ to, subject, html: brandedEmailHtml({ heading: subject, bodyHtml }) });
+    const unsubscribe = process.env.RESEND_UNSUBSCRIBE_MAILTO;
+    await send({
+        to,
+        subject,
+        html: brandedEmailHtml({ heading: subject, bodyHtml }),
+        text: brandedEmailText({ heading: subject, bodyText: stripHtml(bodyHtml) }),
+        ...(unsubscribe
+            ? {
+                  headers: {
+                      "List-Unsubscribe": `<mailto:${unsubscribe}?subject=unsubscribe>`,
+                      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                  },
+              }
+            : {}),
+    });
 }
 
 // The sweep in lib/resume-reminders.ts only marks an account as reminded once
 // this resolves, so a failed send is retried on the next run.
 export async function sendResumeReminderEmail(to: string, name: string, uploadUrl: string) {
+    const heading = "One step left to finish your account";
+    const body = `Hi ${name}, you verified your email but haven't finished setting up your account yet. Upload your resume to complete your profile — your dashboard stays locked until you do.`;
     await send({
         to,
         subject: "Action required: complete your profile — Columbia Quant Group",
-        html: brandedEmailHtml({
-            heading: "One step left to finish your account",
-            bodyHtml: `Hi ${name}, you verified your email but haven't finished setting up your account yet. Upload your resume to complete your profile — your dashboard stays locked until you do.`,
-            ctaLabel: "Complete Your Profile",
-            ctaHref: uploadUrl,
-        }),
+        html: brandedEmailHtml({ heading, bodyHtml: body, ctaLabel: "Complete Your Profile", ctaHref: uploadUrl }),
+        text: brandedEmailText({ heading, bodyText: body, ctaLabel: "Complete Your Profile", ctaHref: uploadUrl }),
     });
+}
+
+// Admin-authored blast bodies are HTML; the text part needs a readable
+// equivalent rather than raw markup.
+function stripHtml(html: string): string {
+    return html
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/p>/gi, "\n\n")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
 }
 
 // Config snapshot for the /api/email/health diagnostic. Never returns the
@@ -159,6 +220,7 @@ export function emailConfigStatus() {
         resendApiKeySet: Boolean(key),
         resendApiKeyPrefix: key ? `${key.slice(0, 6)}…` : null,
         fromAddress: process.env.RESEND_FROM_EMAIL ?? null,
+        replyTo: process.env.RESEND_REPLY_TO ?? null,
         siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? null,
         nodeEnv: process.env.NODE_ENV ?? null,
     };
@@ -197,6 +259,10 @@ export async function sendTestEmail(to: string): Promise<{ ok: boolean; id?: str
             html: brandedEmailHtml({
                 heading: "Test email",
                 bodyHtml: "If you are reading this, Resend is configured correctly.",
+            }),
+            text: brandedEmailText({
+                heading: "Test email",
+                bodyText: "If you are reading this, Resend is configured correctly.",
             }),
         });
         if (error) return { ok: false, error };
