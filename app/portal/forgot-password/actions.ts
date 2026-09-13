@@ -1,7 +1,7 @@
 "use server";
 
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { isCqgEmail } from "@/lib/domains";
+import { isCqgDomain } from "@/lib/domains";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 export interface ForgotPasswordState {
@@ -16,7 +16,7 @@ export async function forgotPasswordAction(
 ): Promise<ForgotPasswordState> {
     const email = String(formData.get("email") || "").trim().toLowerCase();
 
-    if (email && isCqgEmail(email)) {
+    if (email && isCqgDomain(email)) {
         const admin = createServiceRoleClient();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow } from "@/lib/supabase/helpers";
-import { isCqgDomain, isCqgUniFormat } from "@/lib/domains";
+import { isCqgDomain } from "@/lib/domains";
 import { sendVerificationEmail } from "@/lib/email";
 import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgSchool } from "@/lib/supabase/types";
@@ -38,11 +38,11 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     if (!VALID_GENDERS.includes(gender)) {
         return { error: "Please choose a valid gender." };
     }
+    // Domain only. A UNI-format check (2-3 letters + 4 digits) used to live
+    // here too, but Barnard addresses are firstname.lastname@barnard.edu and
+    // Columbia hands out name aliases as well, so it rejected real students.
     if (!isCqgDomain(email)) {
         return { error: "You need a columbia.edu or barnard.edu email to create a CQG account." };
-    }
-    if (!isCqgUniFormat(email)) {
-        return { error: "Your email must be your UNI address, e.g. abc1234@columbia.edu." };
     }
     if (password.length < 8) {
         return { error: "Password must be at least 8 characters." };
@@ -62,7 +62,10 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
         .eq("email", email)
         .maybeSingle();
     if (existing) {
-        return { error: "An account with this email already exists — try logging in instead." };
+        return {
+            error:
+                "An account with this email already exists — log in instead. If you never got the verification email, you can resend it from the login page.",
+        };
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";

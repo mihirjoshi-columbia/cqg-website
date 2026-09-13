@@ -1,7 +1,7 @@
 "use server";
 
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { isCutcEmail } from "@/lib/domains";
+import { isCutcLoginDomain } from "@/lib/domains";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 export interface ForgotPasswordState {
@@ -14,7 +14,7 @@ export async function forgotPasswordAction(
 ): Promise<ForgotPasswordState> {
     const email = String(formData.get("email") || "").trim().toLowerCase();
 
-    if (email && isCutcEmail(email)) {
+    if (email && isCutcLoginDomain(email)) {
         const admin = createServiceRoleClient();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 

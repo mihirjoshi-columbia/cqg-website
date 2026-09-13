@@ -29,7 +29,7 @@ export default function SignupForm() {
             <div className="field">
                 <label className="field-label" htmlFor="email">Columbia / Barnard email</label>
                 <input className="field-input" id="email" name="email" type="email" required placeholder="abc1234@columbia.edu" />
-                <span className="field-hint">Must be your UNI address, e.g. abc1234@columbia.edu or xy6789@barnard.edu</span>
+                <span className="field-hint">Any columbia.edu or barnard.edu address — your UNI (abc1234@columbia.edu) or your name alias both work.</span>
             </div>
 
             <div className="field">

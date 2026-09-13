@@ -1,8 +1,13 @@
 name: Resume reminders
 
+# DISABLED (scheduled runs removed 2026-09-13). The hourly sweep this used to
+# run deleted every account with no resume on file, including the ~20 accounts
+# that pre-dated the resume requirement entirely -- those users were signed up
+# back when resume upload was optional, so the sweep saw them as "verified >24h
+# ago, no resume" on its very first run and removed them a day later. The sweep
+# itself no longer deletes anything (see lib/resume-reminders.ts), but it stays
+# manual-only until someone decides the nag emails are actually wanted.
 on:
-  schedule:
-    - cron: "0 * * * *"
   workflow_dispatch: {}
 
 jobs:

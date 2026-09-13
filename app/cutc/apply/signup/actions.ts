@@ -44,7 +44,10 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
         .eq("email", email)
         .maybeSingle();
     if (existing) {
-        return { error: "An account with this email already exists — try logging in instead." };
+        return {
+            error:
+                "An account with this email already exists — log in instead. If you never got the verification email, you can resend it from the login page.",
+        };
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";

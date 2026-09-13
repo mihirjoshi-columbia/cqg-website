@@ -58,7 +58,7 @@ export async function sendVerificationEmail(to: string, name: string, actionLink
             subject: "Verify your email — Columbia Quant Group",
             html: brandedEmailHtml({
                 heading: "Verify your email",
-                bodyHtml: `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll need to complete your profile, including uploading a resume, to finish setting up your account — incomplete accounts are subject to deletion.`,
+                bodyHtml: `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll be asked to upload a resume to finish setting up your profile.`,
                 ctaLabel: "Verify Email",
                 ctaHref: actionLink,
             }),
@@ -86,10 +86,10 @@ export async function sendBlastEmail(to: string, subject: string, bodyHtml: stri
     }
 }
 
-// Both of these, unlike the auth emails above, must propagate send failures
-// — the resume-reminder sweep in lib/resume-reminders.ts only advances an
-// account toward deletion once it knows the warning actually reached the
-// applicant, not just that it tried to.
+// Unlike the auth emails above, this propagates send failures — the sweep in
+// lib/resume-reminders.ts only marks an account as reminded once it knows the
+// email actually went out, so a failed send is retried on the next run rather
+// than silently swallowed.
 export async function sendResumeReminderEmail(to: string, name: string, uploadUrl: string) {
     if (!resendConfigured()) {
         throw new Error("RESEND_API_KEY not set");
@@ -100,29 +100,9 @@ export async function sendResumeReminderEmail(to: string, name: string, uploadUr
         subject: "Action required: complete your profile — Columbia Quant Group",
         html: brandedEmailHtml({
             heading: "One step left to finish your account",
-            bodyHtml: `Hi ${name}, you verified your email but haven't finished setting up your account yet. To finish creating your account, you must complete your entire profile, including uploading a resume. If you don't complete this within 24 hours, your account will be deleted and you'll need to re-register.`,
+            bodyHtml: `Hi ${name}, you verified your email but haven't finished setting up your account yet. Upload your resume to complete your profile — your dashboard stays locked until you do.`,
             ctaLabel: "Complete Your Profile",
             ctaHref: uploadUrl,
-        }),
-    });
-    if (error) {
-        throw new Error(error.message);
-    }
-}
-
-export async function sendAccountDeletedEmail(to: string, name: string, signupUrl: string) {
-    if (!resendConfigured()) {
-        throw new Error("RESEND_API_KEY not set");
-    }
-    const { error } = await client().emails.send({
-        from: fromAddress(),
-        to,
-        subject: "Your account was removed — Columbia Quant Group",
-        html: brandedEmailHtml({
-            heading: "Your account was removed",
-            bodyHtml: `Hi ${name}, your account was deleted because a resume was never uploaded within the required window. If you'd still like to join, you're welcome to register again.`,
-            ctaLabel: "Register Again",
-            ctaHref: signupUrl,
         }),
     });
     if (error) {
