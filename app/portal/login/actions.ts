@@ -96,6 +96,11 @@ export async function resendVerificationAction(
         return { error: "Could not send a new link. Please try again in a minute." };
     }
 
-    await sendVerificationEmail(email, profile?.name ?? "there", data.properties.action_link);
+    try {
+        await sendVerificationEmail(email, profile?.name ?? "there", data.properties.action_link);
+    } catch (err) {
+        console.error(`[login] verification email failed for ${email}:`, err);
+        return { error: "Could not send a new link. Please try again in a minute." };
+    }
     return { resent: true };
 }

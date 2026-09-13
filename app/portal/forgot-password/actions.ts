@@ -27,7 +27,15 @@ export async function forgotPasswordAction(
         });
 
         if (!error && data?.properties?.action_link) {
-            await sendPasswordResetEmail(email, data.properties.action_link);
+            try {
+                await sendPasswordResetEmail(email, data.properties.action_link);
+            } catch (err) {
+                // Still report "submitted" below -- surfacing this would leak
+                // which addresses have accounts -- but log it, because a
+                // silent failure here is indistinguishable from an unknown
+                // address and that is exactly how the outage went unnoticed.
+                console.error(`[forgot-password] reset email failed for ${email}:`, err);
+            }
         }
     }
 

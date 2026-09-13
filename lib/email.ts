@@ -4,8 +4,22 @@ function client() {
     return new Resend(process.env.RESEND_API_KEY);
 }
 
-function fromAddress() {
-    return process.env.RESEND_FROM_EMAIL || "Columbia Quant Group <noreply@cqg.example.org>";
+// No usable default: "noreply@cqg.example.org" is a placeholder domain that
+// Resend will always reject, so falling back to it just produced a send that
+// failed for a second, more confusing reason. Missing config is now an error.
+function fromAddress(): string {
+    const from = process.env.RESEND_FROM_EMAIL;
+    if (!from) {
+        throw new EmailSendError("RESEND_FROM_EMAIL is not set");
+    }
+    return from;
+}
+
+export class EmailSendError extends Error {
+    constructor(message: string, readonly detail?: unknown) {
+        super(message);
+        this.name = "EmailSendError";
+    }
 }
 
 // Plain, inline-styled template — email clients don't load app/globals.css,
@@ -37,65 +51,95 @@ export function brandedEmailHtml(opts: {
 </div>`;
 }
 
-// Resend isn't configured yet in every environment (e.g. local dev before
-// the Resend account exists). Rather than let a missing API key take down
-// signup/password-reset entirely, log the link server-side and move on —
-// callers should treat email sending as best-effort, not something to await
-// failure on.
 function resendConfigured() {
     return Boolean(process.env.RESEND_API_KEY);
 }
 
-export async function sendVerificationEmail(to: string, name: string, actionLink: string) {
+// The Resend SDK does NOT throw on API failures -- resend/dist/index.cjs
+// fetchRequest() returns `{ data: null, error }` for every non-ok response
+// AND for network failures, and its own logError() is a no-op when
+// NODE_ENV === "production". So `try { await client().emails.send(...) }
+// catch {}` -- which is what the auth emails used to do -- caught nothing,
+// discarded the error object, and left zero trace in production logs. That
+// is why verification emails silently stopped arriving with no error
+// anywhere. Every send now goes through here, and every failure throws.
+async function send(opts: {
+    to: string;
+    subject: string;
+    html: string;
+}): Promise<void> {
     if (!resendConfigured()) {
-        console.warn(`[email] RESEND_API_KEY not set — verification link for ${to}:\n${actionLink}`);
-        return;
+        throw new EmailSendError("RESEND_API_KEY is not set");
     }
-    try {
-        await client().emails.send({
-            from: fromAddress(),
-            to,
-            subject: "Verify your email — Columbia Quant Group",
-            html: brandedEmailHtml({
-                heading: "Verify your email",
-                bodyHtml: `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll be asked to upload a resume to finish setting up your profile.`,
-                ctaLabel: "Verify Email",
-                ctaHref: actionLink,
-            }),
-        });
-    } catch (err) {
-        console.error(`[email] failed to send verification email to ${to}:`, err);
-    }
-}
 
-// Unlike the auth emails above, blast sends must propagate failures — the
-// dispatch loop in lib/blasts.ts needs the real error to record against the
-// recipient row, not a swallowed one.
-export async function sendBlastEmail(to: string, subject: string, bodyHtml: string) {
-    if (!resendConfigured()) {
-        throw new Error("RESEND_API_KEY not set");
-    }
-    const { error } = await client().emails.send({
+    const { data, error } = await client().emails.send({
         from: fromAddress(),
-        to,
-        subject,
-        html: brandedEmailHtml({ heading: subject, bodyHtml }),
+        to: opts.to,
+        subject: opts.subject,
+        html: opts.html,
     });
+
     if (error) {
-        throw new Error(error.message);
+        // Log here as well as throwing: callers decide how to degrade, but
+        // the operator always needs the real reason (unverified sending
+        // domain, test-mode recipient restriction, bad key, rate limit).
+        console.error(`[email] Resend rejected "${opts.subject}" to ${opts.to}:`, error);
+        throw new EmailSendError(error.message || "Resend rejected the message", error);
+    }
+    if (!data?.id) {
+        console.error(`[email] Resend returned no message id for ${opts.to}`);
+        throw new EmailSendError("Resend returned no message id");
     }
 }
 
-// Unlike the auth emails above, this propagates send failures — the sweep in
-// lib/resume-reminders.ts only marks an account as reminded once it knows the
-// email actually went out, so a failed send is retried on the next run rather
-// than silently swallowed.
+// Local-dev convenience only: before the Resend account exists there is no
+// way to click a verification link, so print it to the server console
+// instead. Deliberately never active in production -- swallowing a missing
+// API key there is how this failure mode stayed invisible.
+function logLinkInDev(kind: string, to: string, actionLink: string): boolean {
+    if (process.env.NODE_ENV === "production" || resendConfigured()) return false;
+    console.warn(`[email] RESEND_API_KEY not set — ${kind} link for ${to}:\n${actionLink}`);
+    return true;
+}
+
+export async function sendVerificationEmail(to: string, name: string, actionLink: string) {
+    if (logLinkInDev("verification", to, actionLink)) return;
+    await send({
+        to,
+        subject: "Verify your email — Columbia Quant Group",
+        html: brandedEmailHtml({
+            heading: "Verify your email",
+            bodyHtml: `Hi ${name}, click below to verify your email address and activate your account. After verifying, you'll be asked to upload a resume to finish setting up your profile.`,
+            ctaLabel: "Verify Email",
+            ctaHref: actionLink,
+        }),
+    });
+}
+
+export async function sendPasswordResetEmail(to: string, actionLink: string) {
+    if (logLinkInDev("password reset", to, actionLink)) return;
+    await send({
+        to,
+        subject: "Reset your password — Columbia Quant Group",
+        html: brandedEmailHtml({
+            heading: "Reset your password",
+            bodyHtml: `We received a request to reset your password. If this wasn't you, you can ignore this email.`,
+            ctaLabel: "Reset Password",
+            ctaHref: actionLink,
+        }),
+    });
+}
+
+// The blast dispatch loop in lib/blasts.ts records the thrown message against
+// the recipient row, so a failure here is visible in the admin UI.
+export async function sendBlastEmail(to: string, subject: string, bodyHtml: string) {
+    await send({ to, subject, html: brandedEmailHtml({ heading: subject, bodyHtml }) });
+}
+
+// The sweep in lib/resume-reminders.ts only marks an account as reminded once
+// this resolves, so a failed send is retried on the next run.
 export async function sendResumeReminderEmail(to: string, name: string, uploadUrl: string) {
-    if (!resendConfigured()) {
-        throw new Error("RESEND_API_KEY not set");
-    }
-    const { error } = await client().emails.send({
-        from: fromAddress(),
+    await send({
         to,
         subject: "Action required: complete your profile — Columbia Quant Group",
         html: brandedEmailHtml({
@@ -105,29 +149,41 @@ export async function sendResumeReminderEmail(to: string, name: string, uploadUr
             ctaHref: uploadUrl,
         }),
     });
-    if (error) {
-        throw new Error(error.message);
-    }
 }
 
-export async function sendPasswordResetEmail(to: string, actionLink: string) {
-    if (!resendConfigured()) {
-        console.warn(`[email] RESEND_API_KEY not set — password reset link for ${to}:\n${actionLink}`);
-        return;
-    }
+// Config snapshot for the /api/email/health diagnostic. Never returns the
+// API key itself, only whether it is present and what it looks like.
+export function emailConfigStatus() {
+    const key = process.env.RESEND_API_KEY;
+    return {
+        resendApiKeySet: Boolean(key),
+        resendApiKeyPrefix: key ? `${key.slice(0, 6)}…` : null,
+        fromAddress: process.env.RESEND_FROM_EMAIL ?? null,
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? null,
+        nodeEnv: process.env.NODE_ENV ?? null,
+    };
+}
+
+// Sends a real message and returns Resend's verdict instead of throwing, so
+// the diagnostic route can report the exact rejection.
+export async function sendTestEmail(to: string): Promise<{ ok: boolean; error?: unknown }> {
     try {
-        await client().emails.send({
-            from: fromAddress(),
+        await send({
             to,
-            subject: "Reset your password — Columbia Quant Group",
+            subject: "Test — Columbia Quant Group",
             html: brandedEmailHtml({
-                heading: "Reset your password",
-                bodyHtml: `We received a request to reset your password. If this wasn't you, you can ignore this email.`,
-                ctaLabel: "Reset Password",
-                ctaHref: actionLink,
+                heading: "Test email",
+                bodyHtml: "If you are reading this, Resend is configured correctly.",
             }),
         });
+        return { ok: true };
     } catch (err) {
-        console.error(`[email] failed to send password reset email to ${to}:`, err);
+        return {
+            ok: false,
+            error:
+                err instanceof EmailSendError
+                    ? { message: err.message, detail: err.detail }
+                    : { message: String(err) },
+        };
     }
 }

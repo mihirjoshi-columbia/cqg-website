@@ -76,7 +76,21 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
         return { error: "Could not create your profile. Please try again." };
     }
 
-    await sendVerificationEmail(email, name, linkData.properties.action_link);
+    try {
+        await sendVerificationEmail(email, name, linkData.properties.action_link);
+    } catch (err) {
+        // The account exists at this point, so don't roll it back -- the send
+        // may well have gone out before whatever failed. Say so plainly
+        // instead of redirecting to a "check your email" screen for an email
+        // that never arrived, which is what used to happen when this error
+        // was swallowed inside lib/email.ts.
+        console.error(`[signup] verification email failed for ${email}:`, err);
+        return {
+            error:
+                "Your account was created, but we couldn't send the verification email. Try \"Resend verification email\" on the login page, or contact us if it keeps failing.",
+        };
+    }
+
 
     redirect("/cutc/apply/login?justSignedUp=1");
 }
