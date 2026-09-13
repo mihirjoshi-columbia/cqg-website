@@ -10,6 +10,10 @@ on:
         description: "Optional address to send a real test email to. Leave blank for config only."
         required: false
         default: ""
+      recent:
+        description: "Optional: list the last N real sends and their delivery outcome."
+        required: false
+        default: ""
 
 jobs:
   check:
@@ -18,7 +22,9 @@ jobs:
       - name: Call /api/email/health
         run: |
           URL="${{ secrets.SITE_URL }}/api/email/health"
-          if [ -n "${{ inputs.to }}" ]; then
+          if [ -n "${{ inputs.recent }}" ]; then
+            URL="$URL?recent=${{ inputs.recent }}"
+          elif [ -n "${{ inputs.to }}" ]; then
             URL="$URL?to=${{ inputs.to }}"
           fi
           # No -f: a non-2xx body is exactly what we want to read.

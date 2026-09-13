@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { emailConfigStatus, sendTestEmail, getEmailStatus } from "@/lib/email";
+import { emailConfigStatus, sendTestEmail, getEmailStatus, listRecentEmails } from "@/lib/email";
 
 // Diagnostic for "emails aren't arriving". Same shared-secret protection as
 // /api/blasts/dispatch, since it can trigger a real send.
@@ -23,6 +23,16 @@ export async function GET(request: NextRequest) {
     }
 
     const config = emailConfigStatus();
+
+    // ?recent=N -> what actually happened to the last N real sends.
+    const recent = request.nextUrl.searchParams.get("recent");
+    if (recent) {
+        return NextResponse.json({
+            config,
+            recent: await listRecentEmails(Math.min(Number(recent) || 25, 100)),
+        });
+    }
+
     const to = request.nextUrl.searchParams.get("to");
 
     if (!to) {

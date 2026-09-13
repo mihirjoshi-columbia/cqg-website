@@ -164,6 +164,27 @@ export function emailConfigStatus() {
     };
 }
 
+// Recent sends with their delivery outcome. The per-message last_event is
+// what separates "never sent" from "sent, accepted, and then filtered by the
+// recipient" -- the two look identical from inside this app.
+export async function listRecentEmails(limit = 50): Promise<unknown> {
+    if (!resendConfigured()) return { error: "RESEND_API_KEY is not set" };
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (client().emails as any).list({ limit });
+        if (error) return { error };
+        const rows = (data?.data ?? data ?? []) as Record<string, unknown>[];
+        return rows.map((d) => ({
+            to: d.to,
+            subject: d.subject,
+            created_at: d.created_at,
+            last_event: d.last_event,
+        }));
+    } catch (err) {
+        return { error: String(err) };
+    }
+}
+
 // Sends a real message and returns Resend's verdict instead of throwing, so
 // the diagnostic route can report the exact rejection.
 export async function sendTestEmail(to: string): Promise<{ ok: boolean; id?: string; error?: unknown }> {
