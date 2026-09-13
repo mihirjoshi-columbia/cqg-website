@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { emailConfigStatus, sendTestEmail } from "@/lib/email";
+import { emailConfigStatus, sendTestEmail, getEmailStatus } from "@/lib/email";
 
 // Diagnostic for "emails aren't arriving". Same shared-secret protection as
 // /api/blasts/dispatch, since it can trigger a real send.
@@ -30,5 +30,16 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await sendTestEmail(to);
-    return NextResponse.json({ config, testSend: result }, { status: result.ok ? 200 : 502 });
+
+    // A 200 from Resend only means "accepted for delivery". Wait briefly and
+    // read the delivery event back, since "accepted then filtered" and
+    // "delivered" are indistinguishable at send time.
+    let delivery: unknown = "not checked";
+    if (result.ok && result.id) {
+        const waitMs = Number(request.nextUrl.searchParams.get("wait") ?? "10000");
+        await new Promise((r) => setTimeout(r, Math.min(Math.max(waitMs, 0), 25000)));
+        delivery = await getEmailStatus(result.id);
+    }
+
+    return NextResponse.json({ config, testSend: result, delivery }, { status: result.ok ? 200 : 502 });
 }

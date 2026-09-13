@@ -166,9 +166,11 @@ export function emailConfigStatus() {
 
 // Sends a real message and returns Resend's verdict instead of throwing, so
 // the diagnostic route can report the exact rejection.
-export async function sendTestEmail(to: string): Promise<{ ok: boolean; error?: unknown }> {
+export async function sendTestEmail(to: string): Promise<{ ok: boolean; id?: string; error?: unknown }> {
+    if (!resendConfigured()) return { ok: false, error: { message: "RESEND_API_KEY is not set" } };
     try {
-        await send({
+        const { data, error } = await client().emails.send({
+            from: fromAddress(),
             to,
             subject: "Test — Columbia Quant Group",
             html: brandedEmailHtml({
@@ -176,14 +178,33 @@ export async function sendTestEmail(to: string): Promise<{ ok: boolean; error?: 
                 bodyHtml: "If you are reading this, Resend is configured correctly.",
             }),
         });
-        return { ok: true };
+        if (error) return { ok: false, error };
+        return { ok: true, id: data?.id };
     } catch (err) {
+        return { ok: false, error: { message: String(err) } };
+    }
+}
+
+// API acceptance is not delivery. Resend returns 200 with a message id and
+// only later records what actually happened to the message -- "delivered",
+// "bounced", "complained", "delivery_delayed". That distinction is the whole
+// question when mail is accepted but never arrives, so the diagnostic reads
+// the event back rather than treating a 200 as success.
+export async function getEmailStatus(id: string): Promise<unknown> {
+    if (!resendConfigured()) return { error: "RESEND_API_KEY is not set" };
+    try {
+        const { data, error } = await client().emails.get(id);
+        if (error) return { error };
+        const d = data as unknown as Record<string, unknown> | null;
         return {
-            ok: false,
-            error:
-                err instanceof EmailSendError
-                    ? { message: err.message, detail: err.detail }
-                    : { message: String(err) },
+            id: d?.id,
+            to: d?.to,
+            from: d?.from,
+            subject: d?.subject,
+            created_at: d?.created_at,
+            last_event: d?.last_event,
         };
+    } catch (err) {
+        return { error: String(err) };
     }
 }
