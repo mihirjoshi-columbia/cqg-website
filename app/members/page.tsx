@@ -25,6 +25,7 @@ const seniorAdvisors = [
     { name: "Steven Spasov", company: "", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
     { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
 ];
 
 export default function MembersPage() {
