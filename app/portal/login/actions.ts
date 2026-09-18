@@ -34,7 +34,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     // the wrong place to enforce a signup rule; see lib/domains.ts.
     if (!isCqgDomain(email)) {
         return {
-            error: "That's not a columbia.edu or barnard.edu email — log in through the CUTC portal instead.",
+            error: "That's not a columbia.edu or barnard.edu email — log in through the CTT portal instead.",
         };
     }
 

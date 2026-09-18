@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ResetPasswordForm from "./ResetPasswordForm";
 
-export const metadata = { title: "Set New Password — CUTC" };
+export const metadata = { title: "Set New Password — CTT" };
 
 export default async function ResetPasswordPage() {
     const supabase = await createClient();
@@ -19,7 +19,7 @@ export default async function ResetPasswordPage() {
             <div className="auth-card">
                 <div className="auth-card-body">
                     <div>
-                        <span className="eyebrow text-pink-deep mb-2 block">CUTC</span>
+                        <span className="eyebrow text-pink-deep mb-2 block">CTT</span>
                         <h1 className="font-display font-extrabold text-2xl text-navy">Set a new password</h1>
                     </div>
                     <ResetPasswordForm />

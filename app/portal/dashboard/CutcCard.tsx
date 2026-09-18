@@ -9,9 +9,9 @@ export default async function CutcCard({ profile }: { profile: CqgProfile }) {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
-                    <span className="tag tag-outline w-fit">CUTC</span>
+                    <span className="tag tag-outline w-fit">CTT</span>
                     <p className="text-ink-soft text-sm">
-                        Internal Members aren&apos;t eligible to compete in CUTC while holding that role.
+                        Internal Members aren&apos;t eligible to compete in CTT while holding that role.
                     </p>
                 </div>
             </div>
@@ -22,9 +22,9 @@ export default async function CutcCard({ profile }: { profile: CqgProfile }) {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
-                    <span className="tag tag-outline w-fit">CUTC</span>
+                    <span className="tag tag-outline w-fit">CTT</span>
                     <p className="text-ink-soft text-sm">
-                        CUTC is limited to undergraduates. You&apos;re welcome to stay active as a General Body
+                        CTT is limited to undergraduates. You&apos;re welcome to stay active as a General Body
                         member — firm events and Q&amp;As are open to grad students too.
                     </p>
                 </div>
@@ -49,9 +49,9 @@ export default async function CutcCard({ profile }: { profile: CqgProfile }) {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
-                    <span className="tag tag-outline w-fit">CUTC</span>
+                    <span className="tag tag-outline w-fit">CTT</span>
                     <p className="text-ink-soft text-sm">
-                        Applications aren&apos;t open right now — check back when the next CUTC cycle opens.
+                        Applications aren&apos;t open right now — check back when the next CTT cycle opens.
                     </p>
                 </div>
             </div>

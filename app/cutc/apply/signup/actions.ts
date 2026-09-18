@@ -23,7 +23,7 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     if (!isCutcEmail(email)) {
         return {
             error:
-                "You need a non-Columbia .edu email for a CUTC account. Columbia/Barnard students apply to CUTC from inside their CQG portal account instead.",
+                "You need a non-Columbia .edu email for a CTT account. Columbia/Barnard students apply to CTT from inside their CQG portal account instead.",
         };
     }
     if (password.length < 8) {

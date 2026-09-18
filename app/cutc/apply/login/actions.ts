@@ -33,7 +33,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     if (!isCutcLoginDomain(email)) {
         return {
             error:
-                "Columbia/Barnard accounts apply to CUTC from inside their CQG portal account — log in through the CQG portal instead.",
+                "Columbia/Barnard accounts apply to CTT from inside their CQG portal account — log in through the CQG portal instead.",
         };
     }
 

@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
                     <span className="tag tag-sky mb-2 block w-fit">Legal</span>
                     <div className="chevron chevron-sky mb-4">Privacy Policy</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
-                        What we collect through the CQG and CUTC portals, who can see it, and how to have it
+                        What we collect through the CQG and CTT portals, who can see it, and how to have it
                         deleted.
                     </p>
                 </div>
@@ -26,10 +26,10 @@ export default function PrivacyPolicyPage() {
                         <div>
                             <h2 className="font-display font-bold text-xl text-navy mb-2">What we collect</h2>
                             <p>
-                                Creating a CQG account (columbia.edu / barnard.edu students) or a CUTC account
+                                Creating a CQG account (columbia.edu / barnard.edu students) or a CTT account
                                 (other .edu students) collects your name, school email, school/program, class year,
                                 and major or field of study. You may optionally upload a resume (PDF, up to 5MB).
-                                Applying for Internal Membership, CUTC, or a firm event creates an application
+                                Applying for Internal Membership, CTT, or a firm event creates an application
                                 record tied to your account. If you attend an event we track, admins record whether
                                 you attended.
                             </p>

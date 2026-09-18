@@ -69,7 +69,7 @@ export default async function CyclesPage() {
 
             <section>
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="eyebrow block">CUTC cycles</h2>
+                    <h2 className="eyebrow block">CTT cycles</h2>
                     <a href="/api/admin/cycles/cutc/export" className="btn-cqg btn-outline-navy btn-sm">
                         Export CSV
                     </a>

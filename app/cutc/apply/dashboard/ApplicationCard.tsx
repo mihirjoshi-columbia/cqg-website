@@ -21,9 +21,9 @@ export default async function ApplicationCard({ profile }: { profile: CutcProfil
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
-                    <span className="tag tag-outline w-fit">CUTC</span>
+                    <span className="tag tag-outline w-fit">CTT</span>
                     <p className="text-ink-soft text-sm">
-                        Applications aren&apos;t open right now — check back when the next CUTC cycle opens.
+                        Applications aren&apos;t open right now — check back when the next CTT cycle opens.
                     </p>
                 </div>
             </div>

@@ -7,7 +7,7 @@ import ApplicationCard from "./ApplicationCard";
 import DangerZone from "./DangerZone";
 import type { CutcProfile } from "@/lib/supabase/types";
 
-export const metadata = { title: "Dashboard — CUTC" };
+export const metadata = { title: "Dashboard — CTT" };
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
         <div className="portal-shell">
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
                 <div>
-                    <span className="eyebrow text-pink-deep mb-2 block">CUTC</span>
+                    <span className="eyebrow text-pink-deep mb-2 block">CTT</span>
                     <h1 className="font-display font-extrabold text-2xl text-navy">
                         Welcome, {profile.name.split(" ")[0]}
                     </h1>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
                 </section>
 
                 <section>
-                    <h2 className="eyebrow mb-3 block">CUTC application</h2>
+                    <h2 className="eyebrow mb-3 block">CTT application</h2>
                     <ApplicationCard profile={profile} />
                 </section>
 

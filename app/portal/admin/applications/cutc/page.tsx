@@ -3,7 +3,7 @@ import DecisionButtons from "./DecisionButtons";
 import ViewResumeButton from "./ViewResumeButton";
 import type { CutcApplication, CqgProfile, CutcProfile, CutcCycle } from "@/lib/supabase/types";
 
-export const metadata = { title: "CUTC Applications — CQG Admin" };
+export const metadata = { title: "CTT Applications — CQG Admin" };
 
 const STATUS_TAG: Record<string, string> = {
     pending: "tag-sky",

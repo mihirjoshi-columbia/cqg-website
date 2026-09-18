@@ -19,7 +19,7 @@ const pillars = [
   },
   {
     icon: "🏆",
-    title: "CUTC",
+    title: "CTT",
     body: "Our flagship competition, open to undergrads nationwide",
     bg: "var(--pink-gradient)",
     color: "var(--navy)",
@@ -35,7 +35,7 @@ export default function WhatWeDo() {
         <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mt-4">
           Columbia Quant Group runs three distinct programs: a selective internal membership for
           undergraduates who complete our technical screening, an open general body for the wider Columbia
-          community, and CUTC &mdash; the intercollegiate trading competition we exclusively host each
+          community, and CTT &mdash; the intercollegiate trading competition we exclusively host each
           fall.
         </p>
 

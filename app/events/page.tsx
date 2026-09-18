@@ -103,15 +103,15 @@ export default function EventsPage() {
                         <div className="angle-card-body flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                             <div>
                                 <h3 className="font-display font-bold text-[1.1rem]">
-                                    Looking for CUTC?
+                                    Looking for CTT?
                                 </h3>
                                 <p className="text-[#C3D2EA] mt-2 text-sm max-w-sm">
-                                    The Columbia University Trading Competition is CQG&apos;s own flagship
+                                    The Columbia Trading Tournament is CQG&apos;s own flagship
                                     event, open to undergrads at any US university.
                                 </p>
                             </div>
                             <Link href="/competition" className="btn-cqg btn-pink btn-sm flex-none">
-                                View CUTC &rarr;
+                                View CTT &rarr;
                             </Link>
                         </div>
                     </div>

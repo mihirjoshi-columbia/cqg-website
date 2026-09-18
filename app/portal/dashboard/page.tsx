@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                 </section>
 
                 <section>
-                    <h2 className="eyebrow mb-3 block">CUTC</h2>
+                    <h2 className="eyebrow mb-3 block">CTT</h2>
                     <CutcCard profile={profile} />
                 </section>
 

@@ -21,26 +21,28 @@ const formatPillars = [
         color: "var(--navy)",
     },
     {
-        icon: "🗽",
-        title: "Hosted at Columbia",
-        body: "100–120 students on campus in New York City for the weekend",
+        icon: "✈️",
+        title: "Travel & Lodging Covered",
+        body: "All travel and lodging costs are fully covered — hosted at Columbia in New York City for the weekend",
         bg: "var(--pink-gradient)",
         color: "var(--navy)",
     },
 ];
 
 const schedule: { date: string; title: string; detail?: string; milestone?: boolean }[] = [
-    { date: "Monday, September 7, 2026", title: "Applications open" },
-    { date: "Friday, September 25, 2026", title: "Applications close" },
-    { date: "Friday, October 9, 2026", title: "Acceptances sent", milestone: true },
+    {
+        date: "Coming soon",
+        title: "Applications open",
+        detail: "Applications aren't open yet — watch this page and our socials for the exact date",
+    },
     { date: "Friday–Saturday, December 4–5, 2026", title: "Competitors arrive" },
     {
         date: "Saturday, December 5, 2026",
-        title: "CUTC Day 1",
-        detail: "Includes the Quant Career Fair — open to all CUTC sponsors and CQG's general body",
+        title: "CTT Day 1",
+        detail: "Includes the Quant Career Fair — open to all CTT sponsors and CQG's general body",
         milestone: true,
     },
-    { date: "Sunday, December 6, 2026", title: "CUTC Day 2 — Awards & Closing", milestone: true },
+    { date: "Sunday, December 6, 2026", title: "CTT Day 2 — Awards & Closing", milestone: true },
 ];
 
 const eligibility = [
@@ -52,7 +54,7 @@ const eligibility = [
 const faqs: { q: string; a: string }[] = [
     {
         q: "Is there a cost to attend?",
-        a: "Travel and lodging will be covered for competitors. We'll share exact logistics after acceptances go out.",
+        a: "Travel and lodging are fully covered for competitors. We'll share exact logistics after acceptances go out.",
     },
     {
         q: "What does the competition actually involve?",
@@ -70,14 +72,14 @@ export default function CompetitionPage() {
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <span className="tag tag-pink mb-2 block w-fit">Flagship &middot; Fall 2026</span>
-                    <div className="chevron chevron-sky mb-4">Columbia University Trading Competition</div>
+                    <div className="chevron chevron-sky mb-4">Columbia Trading Tournament</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] max-w-xl">
                         CQG&apos;s new intercollegiate flagship event &mdash; an undergraduate-only trading
                         competition bringing 100&ndash;120 students from universities across the US to
                         Columbia for live trading games.
                     </p>
                     <span className="font-mono text-[0.78rem] text-[#8CA0C2] mt-5 inline-block">
-                        CUTC &middot; December 5&ndash;6, 2026 &middot; New York, NY
+                        CTT &middot; December 5&ndash;6, 2026 &middot; New York, NY
                     </span>
                 </div>
             </section>
@@ -85,9 +87,9 @@ export default function CompetitionPage() {
             {/* Overview & format */}
             <section className="py-16 sm:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="chevron chevron-navy">What Is CUTC?</div>
+                    <div className="chevron chevron-navy">What Is CTT?</div>
                     <p className="text-ink-soft text-[1.05rem] leading-relaxed max-w-2xl mt-4">
-                        The Columbia University Trading Competition is CQG&apos;s first intercollegiate
+                        The Columbia Trading Tournament is CQG&apos;s first intercollegiate
                         flagship event &mdash; an undergraduate-only trading competition that brings
                         undergraduates from universities across the country to Columbia for a weekend of
                         live trading games, built and run by CQG members alongside competition sponsors.
@@ -155,16 +157,12 @@ export default function CompetitionPage() {
                     <div className="angle-card angle-card-navy">
                         <div className="angle-card-body flex flex-col items-start justify-between gap-6">
                             <div>
-                                <h3 className="font-display font-bold text-[1.15rem]">Ready to compete?</h3>
+                                <h3 className="font-display font-bold text-[1.15rem]">Applications aren&apos;t open yet</h3>
                                 <p className="text-[#C3D2EA] mt-2.5 text-sm">
-                                    Applications are open now through September 25. Create a CUTC account to
-                                    apply &mdash; Columbia and Barnard students apply from their CQG portal
-                                    account instead.
+                                    Be on the lookout soon! We&apos;re finalizing details for this year&apos;s
+                                    competition — check back here or watch our socials for the exact date.
                                 </p>
                             </div>
-                            <a href="/cutc/apply/signup" className="btn-cqg btn-pink">
-                                Apply Now →
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -177,16 +175,16 @@ export default function CompetitionPage() {
                         <div className="angle-card-body flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                             <div>
                                 <h3 className="font-display font-bold text-[1.2rem] text-navy">
-                                    Interested in Sponsoring CUTC?
+                                    Interested in Sponsoring CTT?
                                 </h3>
                                 <p className="text-ink-soft leading-relaxed mt-2.5 max-w-lg">
-                                    CUTC sponsors get direct access to a room of 100+ vetted, competition-tested
+                                    CTT sponsors get direct access to a room of 100+ vetted, competition-tested
                                     undergraduate traders from across the country. Reach out for our sponsorship
                                     package.
                                 </p>
                             </div>
                             <a
-                                href="mailto:columbia.quant.group@gmail.com?subject=CUTC%20Sponsorship%20Inquiry"
+                                href="mailto:columbia.quant.group@gmail.com?subject=CTT%20Sponsorship%20Inquiry"
                                 className="btn-cqg btn-pink btn-sm flex-none"
                             >
                                 Request Sponsorship Deck

@@ -4,7 +4,7 @@ import { logoutAction } from "../dashboard/actions";
 import ResumeUpload from "../dashboard/ResumeUpload";
 import type { CutcProfile } from "@/lib/supabase/types";
 
-export const metadata = { title: "Complete Your Profile — CUTC" };
+export const metadata = { title: "Complete Your Profile — CTT" };
 
 export default async function CompleteProfilePage() {
     const supabase = await createClient();
@@ -28,7 +28,7 @@ export default async function CompleteProfilePage() {
             <div className="auth-card">
                 <div className="auth-card-body">
                     <div>
-                        <span className="eyebrow text-pink-deep mb-2 block">CUTC</span>
+                        <span className="eyebrow text-pink-deep mb-2 block">CTT</span>
                         <h1 className="font-display font-extrabold text-2xl text-navy">
                             One last step, {profile.name.split(" ")[0]}
                         </h1>

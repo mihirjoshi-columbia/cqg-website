@@ -15,7 +15,7 @@ const STATUS_TAG: Record<string, string> = {
 
 const SEGMENT_LABEL: Record<string, string> = {
     cqg_tier: "CQG tier",
-    cutc_group: "CUTC group",
+    cutc_group: "CTT group",
     event_group: "Event group",
 };
 

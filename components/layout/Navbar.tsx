@@ -133,7 +133,7 @@ export default function Navbar() {
                       href="/cutc/apply/login"
                       className="block px-4 py-2 text-[0.85rem] font-semibold whitespace-nowrap text-ink-soft hover:text-navy hover:bg-paper-alt"
                     >
-                      CUTC
+                      CTT
                     </Link>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className="block px-6 py-2 text-[0.95rem] font-semibold text-ink-soft hover:text-navy hover:bg-paper-alt"
                     >
-                      CUTC
+                      CTT
                     </Link>
                   </>
                 )}

@@ -22,7 +22,7 @@ export default function Hero() {
           </h1>
           <p className="text-[#C3D2EA] text-lg leading-relaxed mt-6 max-w-xl">
             Columbia&apos;s only student group built around trading, quantitative research, and technical
-            finance &mdash; a selective internal membership, a 970+ student general body, and CUTC, the
+            finance &mdash; a selective internal membership, a 970+ student general body, and CTT, the
             trading competition we exclusively host for undergraduates nationwide.
           </p>
           <div className="flex flex-col gap-3.5 mt-9">
@@ -36,7 +36,7 @@ export default function Hero() {
             </div>
             <div className="flex flex-wrap gap-3.5">
               <a href="/competition" className="btn-cqg btn-pink">
-                Apply to CUTC
+                Apply to CTT
               </a>
               <a href="/contact" className="btn-cqg btn-outline">
                 Partner with Us

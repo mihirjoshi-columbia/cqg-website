@@ -1,6 +1,6 @@
 import VerifyHandler from "./VerifyHandler";
 
-export const metadata = { title: "Verifying — CUTC" };
+export const metadata = { title: "Verifying — CTT" };
 
 export default function VerifyPage() {
     return (
@@ -8,7 +8,7 @@ export default function VerifyPage() {
             <div className="auth-card">
                 <div className="auth-card-body">
                     <div>
-                        <span className="eyebrow text-pink-deep mb-2 block">CUTC</span>
+                        <span className="eyebrow text-pink-deep mb-2 block">CTT</span>
                         <h1 className="font-display font-extrabold text-2xl text-navy">Verifying your account</h1>
                     </div>
                     <VerifyHandler />

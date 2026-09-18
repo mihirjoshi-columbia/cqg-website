@@ -61,7 +61,7 @@ export default function Footer() {
                             CQG Login
                         </Link>
                         <Link href="/cutc/apply/login" className="hover:text-sky transition-colors">
-                            CUTC Login
+                            CTT Login
                         </Link>
                         <Link href="/privacy-policy" className="hover:text-sky transition-colors">
                             Privacy Policy

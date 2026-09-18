@@ -34,7 +34,7 @@ export async function GET() {
         .overrideTypes<CutcCycle, { merge: false }>();
 
     if (!cycle) {
-        return NextResponse.json({ error: "No CUTC cycle exists yet." }, { status: 404 });
+        return NextResponse.json({ error: "No CTT cycle exists yet." }, { status: 404 });
     }
 
     const { data: applications } = await admin

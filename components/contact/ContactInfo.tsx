@@ -39,7 +39,7 @@ export default function ContactInfo() {
                         </h3>
                         <p className="text-ink-soft leading-relaxed mt-3.5">
                             We work with firms year-round on firm-hosted events, resume books, and the
-                            Columbia University Trading Competition. Reach out for our current sponsorship
+                            Columbia Trading Tournament. Reach out for our current sponsorship
                             package.
                         </p>
                         <a
