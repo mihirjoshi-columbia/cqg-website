@@ -22,10 +22,19 @@ const seniorAdvisors = [
     { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
     { name: "Kshitig Seth", company: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
     { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
-    { name: "Steven Spasov", company: "", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Steven Spasov", company: "Jane Street", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
     { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+];
+
+const seniorMembers2627 = [
+    { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Johnathan Mo", company: "SIG", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
+    { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Steven Spasov", company: "Jane Street", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Ashley Seo", company: "IMC", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
 ];
 
 export default function MembersPage() {
@@ -47,6 +56,14 @@ export default function MembersPage() {
 
             <FirmsCollage />
             <ExecBoard />
+            <section className="py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2026–2027 Internal Members</h2>
+                    <div className="space-y-10">
+                        <AdvisorList title="Senior Members" advisors={seniorMembers2627} />
+                    </div>
+                </div>
+            </section>
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2025–2026 Internal Members</h2>
