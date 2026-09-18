@@ -76,7 +76,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
                 <div className="event-card-body">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <h2 className="font-display font-bold text-xl text-navy">{event!.title}</h2>
-                        <LockToggle eventId={event!.id} locked={event!.applications_locked} />
+                        <div className="flex items-center gap-2">
+                            <a href={`/api/admin/events/${eventId}/export`} className="btn-cqg btn-outline-navy btn-sm">
+                                Export CSV
+                            </a>
+                            <LockToggle eventId={event!.id} locked={event!.applications_locked} />
+                        </div>
                     </div>
                     <p className="text-ink-soft text-sm">{event!.description}</p>
                     <div className="text-ink-faint text-xs flex flex-col gap-1">

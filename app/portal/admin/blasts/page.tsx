@@ -39,7 +39,12 @@ export default async function AdminBlastsPage() {
             <div style={{ overflowX: "auto" }}>
                 <div className="flex items-center justify-between mb-3">
                     <p className="text-ink-faint text-sm">{blasts?.length ?? 0} blasts</p>
-                    <DispatchButton />
+                    <div className="flex items-center gap-2">
+                        <a href="/api/admin/blasts/export" className="btn-cqg btn-outline-navy btn-sm">
+                            Export CSV
+                        </a>
+                        <DispatchButton />
+                    </div>
                 </div>
                 <table className="data-table">
                     <thead>

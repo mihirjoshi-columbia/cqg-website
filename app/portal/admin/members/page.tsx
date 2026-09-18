@@ -16,7 +16,12 @@ export default async function AdminMembersPage() {
 
     return (
         <div>
-            <p className="text-ink-faint text-sm mb-4">{members?.length ?? 0} accounts</p>
+            <div className="flex items-center justify-between mb-4">
+                <p className="text-ink-faint text-sm">{members?.length ?? 0} accounts</p>
+                <a href="/api/admin/members/export" className="btn-cqg btn-outline-navy btn-sm">
+                    Export CSV
+                </a>
+            </div>
             <div style={{ overflowX: "auto" }}>
                 <table className="data-table">
                     <thead>

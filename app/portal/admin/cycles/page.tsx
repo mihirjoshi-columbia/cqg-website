@@ -28,7 +28,12 @@ export default async function CyclesPage() {
     return (
         <div className="flex flex-col gap-10">
             <section>
-                <h2 className="eyebrow mb-3 block">Internal Membership cycles</h2>
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="eyebrow block">Internal Membership cycles</h2>
+                    <a href="/api/admin/cycles/membership/export" className="btn-cqg btn-outline-navy btn-sm">
+                        Export CSV
+                    </a>
+                </div>
                 <div className="grid gap-6" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(280px, 380px)" }}>
                     <div style={{ overflowX: "auto" }}>
                         <table className="data-table">
@@ -63,7 +68,12 @@ export default async function CyclesPage() {
             </section>
 
             <section>
-                <h2 className="eyebrow mb-3 block">CUTC cycles</h2>
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="eyebrow block">CUTC cycles</h2>
+                    <a href="/api/admin/cycles/cutc/export" className="btn-cqg btn-outline-navy btn-sm">
+                        Export CSV
+                    </a>
+                </div>
                 <div className="grid gap-6" style={{ gridTemplateColumns: "minmax(0,1fr) minmax(280px, 380px)" }}>
                     <div style={{ overflowX: "auto" }}>
                         <table className="data-table">

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
+import { buildCsv, csvResponse, slugify } from "@/lib/csv";
 import type { CqgMembershipApplication, CqgMembershipCycle, CqgProfile } from "@/lib/supabase/types";
 
 const RESUME_LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
@@ -23,15 +24,6 @@ const COLUMNS = [
     "Submitted At",
     "Cycle",
 ] as const;
-
-// Excel/Sheets-safe CSV cell: wrap in quotes whenever the value contains a
-// comma, quote, or newline, doubling any embedded quotes.
-function csvCell(value: string): string {
-    if (/[",\n]/.test(value)) {
-        return `"${value.replace(/"/g, '""')}"`;
-    }
-    return value;
-}
 
 export async function GET() {
     const { admin } = await requireAdmin();
@@ -63,7 +55,7 @@ export async function GET() {
         : { data: [] as CqgProfile[] };
     const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
 
-    const rows: string[] = [COLUMNS.join(",")];
+    const rows: unknown[][] = [];
 
     for (const app of apps) {
         const p = profileMap.get(app.profile_id);
@@ -78,7 +70,7 @@ export async function GET() {
 
         const accomplishments = [0, 1, 2, 3, 4].map((i) => app.accomplishments[i] ?? "");
 
-        const cells = [
+        rows.push([
             p?.name ?? "",
             p?.email ?? "",
             p?.school ?? "",
@@ -92,18 +84,9 @@ export async function GET() {
             app.status,
             app.submitted_at,
             cycle.label,
-        ];
-
-        rows.push(cells.map((c) => csvCell(String(c))).join(","));
+        ]);
     }
 
-    const csv = rows.join("\r\n");
-    const filename = `membership-applications-${cycle.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.csv`;
-
-    return new NextResponse(csv, {
-        headers: {
-            "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": `attachment; filename="${filename}"`,
-        },
-    });
+    const csv = buildCsv(COLUMNS, rows);
+    return csvResponse(csv, `membership-applications-${slugify(cycle.label)}.csv`);
 }
