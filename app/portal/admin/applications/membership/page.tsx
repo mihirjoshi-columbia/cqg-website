@@ -44,7 +44,12 @@ export default async function MembershipApplicationsPage() {
 
     return (
         <div>
-            <p className="text-ink-faint text-sm mb-4">{apps.length} applications</p>
+            <div className="flex items-center justify-between mb-4">
+                <p className="text-ink-faint text-sm">{apps.length} applications</p>
+                <a href="/api/admin/membership-applications/export" className="btn-cqg btn-outline-navy btn-sm">
+                    Export CSV
+                </a>
+            </div>
             <div style={{ overflowX: "auto" }}>
                 <table className="data-table">
                     <thead>
