@@ -21,7 +21,7 @@ export interface CqgProfile {
     id: string;
     email: string;
     name: string;
-    school: CqgSchool;
+    school: CqgSchool | null;
     grad_program: string | null;
     year: string;
     major: string;

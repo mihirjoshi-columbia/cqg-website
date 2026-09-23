@@ -48,7 +48,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ eve
         return [
             p?.name ?? "",
             p?.email ?? "",
-            p ? `${p.school}${p.grad_program ? ` (${p.grad_program})` : ""}` : "",
+            p ? `${p.school ?? ""}${p.grad_program ? ` (${p.grad_program})` : ""}` : "",
             app.status,
             app.attended ? "Yes" : "No",
             app.applied_at,

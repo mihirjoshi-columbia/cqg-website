@@ -59,6 +59,6 @@ export function isCutcLoginDomain(email: string): boolean {
 // A CQG member's "College/University" on a CUTC application is fixed to
 // their verified school, not freely chosen — Barnard students attend
 // Barnard College; every other CQG school value is Columbia University.
-export function cqgSchoolToCollegeName(school: string): string {
+export function cqgSchoolToCollegeName(school: string | null): string {
     return school === "Barnard" ? "Barnard College" : "Columbia University";
 }

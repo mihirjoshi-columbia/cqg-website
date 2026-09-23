@@ -58,7 +58,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
         return (
             <tr key={app.id}>
                 <td>{p ? `${p.name} — ${p.email}` : app.profile_id}</td>
-                <td>{p ? `${p.school}${p.grad_program ? ` (${p.grad_program})` : ""}` : "—"}</td>
+                <td>{p ? `${p.school ?? "—"}${p.grad_program ? ` (${p.grad_program})` : ""}` : "—"}</td>
                 <td><span className={`tag ${STATUS_TAG[app.status]}`}>{app.status}</span></td>
                 <td>
                     {showDecide && <DecideButtons applicationId={app.id} eventId={eventId} />}

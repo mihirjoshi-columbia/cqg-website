@@ -13,7 +13,7 @@ const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
 export default function ProfileForm({ profile }: { profile: CqgProfile }) {
     const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
-    const [school, setSchool] = useState(profile.school);
+    const [school, setSchool] = useState(profile.school ?? "");
     const [major, setMajor] = useState(CQG_MAJORS.includes(profile.major) ? profile.major : "Other");
     const [gradProgram, setGradProgram] = useState(
         profile.grad_program && GRAD_PROGRAMS.includes(profile.grad_program) ? profile.grad_program : "Other"
@@ -37,8 +37,9 @@ export default function ProfileForm({ profile }: { profile: CqgProfile }) {
                     name="school"
                     required
                     value={school}
-                    onChange={(e) => setSchool(e.target.value as CqgProfile["school"])}
+                    onChange={(e) => setSchool(e.target.value)}
                 >
+                    {!school && <option value="" disabled>Select your school</option>}
                     <option value="CC">Columbia College (CC)</option>
                     <option value="SEAS">Engineering (SEAS)</option>
                     <option value="Barnard">Barnard</option>
