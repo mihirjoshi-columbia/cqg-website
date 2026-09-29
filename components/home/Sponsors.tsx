@@ -7,6 +7,7 @@ const sponsors = [
   { key: "sig-h-white", name: "SIG" },
   { key: "citadel-securities-h-white", name: "Citadel Securities" },
   { key: "all-options-white", name: "All Options" },
+  { key: "old-mission-capital-white", name: "Old Mission Capital" },
 ];
 
 export default function Sponsors() {
