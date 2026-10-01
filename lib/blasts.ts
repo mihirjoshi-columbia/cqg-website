@@ -10,11 +10,13 @@ interface Recipient {
     name: string;
 }
 
-// How many recipients to actually send per dispatch call. Keeps a single
-// invocation fast and lets a large blast resume across multiple cron ticks
-// instead of trying to blast everyone in one shot (see the volume note in
-// the migration/plan — Resend's free tier can't do 970+ sends at once).
-const BATCH_SIZE = 50;
+// How many recipients to actually send per dispatch call. On the $20/mo
+// Resend plan there's no daily cap and the account's hard limit is 10
+// req/sec, so this isn't a volume ceiling -- it's pacing. 200 per 5-minute
+// cron tick is ~0.67/sec sustained, well under the API limit, but still
+// avoids the burst-send pattern that got CQG's domain reputation flagged
+// before (see the DMARC/burst-pattern investigation).
+const BATCH_SIZE = 200;
 
 export async function resolveSegment(
     admin: ReturnType<typeof createServiceRoleClient>,
