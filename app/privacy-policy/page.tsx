@@ -22,7 +22,8 @@ export default function PrivacyPolicyPage() {
                             <p>
                                 Creating a CQG account (columbia.edu / barnard.edu students) or a CTT account
                                 (other .edu students) collects your name, school email, school/program, class year,
-                                and major or field of study. You may optionally upload a resume (PDF, up to 4MB).
+                                and major or field of study. A resume (PDF, up to 4MB) is required to complete
+                                account creation.
                                 Applying for Internal Membership, CTT, or a firm event creates an application
                                 record tied to your account. If you attend an event we track, admins record whether
                                 you attended.
