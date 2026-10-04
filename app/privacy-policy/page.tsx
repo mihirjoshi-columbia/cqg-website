@@ -17,12 +17,6 @@ export default function PrivacyPolicyPage() {
             <section className="py-16 sm:py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: "760px" }}>
                     <div className="prose-cqg flex flex-col gap-8 text-ink-soft text-[0.98rem] leading-relaxed">
-                        <div className="form-banner form-banner-error">
-                            This policy was drafted to describe how the system actually works, not reviewed by a
-                            lawyer. If CQG needs this to satisfy a specific compliance requirement, have counsel
-                            review it before relying on it.
-                        </div>
-
                         <div>
                             <h2 className="font-display font-bold text-xl text-navy mb-2">What we collect</h2>
                             <p>

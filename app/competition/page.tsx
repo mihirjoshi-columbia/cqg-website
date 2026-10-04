@@ -39,7 +39,7 @@ const schedule: { date: string; title: string; detail?: string; milestone?: bool
     {
         date: "Saturday, December 5, 2026",
         title: "CTT Day 1",
-        detail: "Includes the Quant Career Fair — open to all CTT sponsors and CQG's general body",
+        detail: "Meet our sponsors — open to all invited competitors and CQG's general body",
         milestone: true,
     },
     { date: "Sunday, December 6, 2026", title: "CTT Day 2 — Awards & Closing", milestone: true },
