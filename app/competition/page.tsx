@@ -22,8 +22,8 @@ const formatPillars = [
     },
     {
         icon: "✈️",
-        title: "Travel & Lodging Covered",
-        body: "All travel and lodging costs are fully covered — hosted at Columbia in New York City for the weekend",
+        title: "Travel & Lodging Stipends",
+        body: "Stipends are set by where you're traveling from — expect travel and lodging to be fully covered. Hosted at Columbia in New York City for the weekend",
         bg: "var(--pink-gradient)",
         color: "var(--navy)",
     },
@@ -54,7 +54,7 @@ const eligibility = [
 const faqs: { q: string; a: string }[] = [
     {
         q: "Is there a cost to attend?",
-        a: "Travel and lodging are fully covered for competitors. We'll share exact logistics after acceptances go out.",
+        a: "Competitors should expect travel and lodging to be fully covered. We'll set travel and lodging stipends based on where you're traveling from, and share exact amounts and logistics after acceptances go out.",
     },
     {
         q: "What does the competition actually involve?",

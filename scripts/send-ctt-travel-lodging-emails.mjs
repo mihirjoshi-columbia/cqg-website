@@ -29,7 +29,7 @@ function buildContent(name) {
     const paragraphs = [
         `Hi ${name}, thanks for applying to the Columbia Trading Tournament. We've split our travel & housing question into two separate questions, so we need you to answer them again.`,
         `Please log in and answer both: <strong>will you need travel accommodations?</strong> and <strong>will you need lodging accommodations?</strong> Your application is otherwise unchanged — you don't need to resubmit anything. It takes about 30 seconds, and the questions are on your dashboard.`,
-        `Please answer by <strong>October 23 at 11:59 PM ET</strong>. Travel and lodging are fully covered for competitors.`,
+        `Please answer by <strong>October 23 at 11:59 PM ET</strong>. We set travel and lodging stipends based on where you're traveling from — you should expect them to be fully covered.`,
         `If you run into any trouble, just reply to this email and we'll help sort it out.`,
     ];
     const ctaHref = `${SITE_URL}/ctt/apply/dashboard`;

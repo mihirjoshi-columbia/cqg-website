@@ -28,7 +28,7 @@ function loadEnv() {
 function buildContent(person) {
     const heading = "CTT applications are open";
     const paragraphs = [
-        `Hi ${person.name}, applications for the Columbia Trading Tournament (CTT) are now open. CTT is December 5–6, 2026 in New York — travel and lodging are fully covered for competitors. Applications close <strong>October 23 at 11:59 PM ET</strong>.`,
+        `Hi ${person.name}, applications for the Columbia Trading Tournament (CTT) are now open. CTT is December 5–6, 2026 in New York — we set travel and lodging stipends based on where you're traveling from, and you should expect them to be fully covered. Applications close <strong>October 23 at 11:59 PM ET</strong>.`,
     ];
     let ctaHref;
     if (person.verified) {

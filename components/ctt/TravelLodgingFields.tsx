@@ -25,7 +25,7 @@ export default function TravelLodgingFields() {
             <YesNo
                 name="lodging_needed"
                 label="Will you need lodging accommodations?"
-                hint="Travel and lodging are fully covered for competitors."
+                hint="We set travel and lodging stipends based on where you're traveling from — you should expect them to be fully covered."
             />
         </>
     );
