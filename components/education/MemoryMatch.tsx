@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface MatchItem {
     key: string;
@@ -53,11 +53,26 @@ function shuffledDeck(): Tile[] {
 
 type Phase = "preview" | "playing" | "won";
 
+const BEST_TIME_KEY = "cqg-memory-match-best-ms";
+
+const nowMs = () => Date.now();
+
+function formatTime(ms: number): string {
+    const tenths = Math.floor(ms / 100);
+    const minutes = Math.floor(tenths / 600);
+    const seconds = Math.floor(tenths / 10) % 60;
+    return `${minutes}:${String(seconds).padStart(2, "0")}.${tenths % 10}`;
+}
+
 export default function MemoryMatch() {
     const [deck, setDeck] = useState<Tile[]>(naturalDeck);
     const [phase, setPhase] = useState<Phase>("preview");
     const [picked, setPicked] = useState<string[]>([]);
     const [busy, setBusy] = useState(false);
+    const [elapsed, setElapsed] = useState(0);
+    const [bestMs, setBestMs] = useState<number | null>(null);
+    const [newBest, setNewBest] = useState(false);
+    const startedAt = useRef(0);
     const matchedPairs = new Set(deck.filter((t) => t.matched).map((t) => t.key)).size;
 
     useEffect(() => {
@@ -67,8 +82,27 @@ export default function MemoryMatch() {
         setDeck(shuffledDeck());
     }, []);
 
+    useEffect(() => {
+        // Best time lives in this browser only; read after mount so server and client HTML match.
+        try {
+            const saved = Number(localStorage.getItem(BEST_TIME_KEY));
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            if (saved > 0) setBestMs(saved);
+        } catch {
+            // storage unavailable (private mode etc.) -- the game just won't remember a best
+        }
+    }, []);
+
+    useEffect(() => {
+        if (phase !== "playing") return;
+        const id = setInterval(() => setElapsed(nowMs() - startedAt.current), 100);
+        return () => clearInterval(id);
+    }, [phase]);
+
     const restart = () => {
         setDeck(shuffledDeck());
+        setElapsed(0);
+        setNewBest(false);
         setPhase("preview");
         setPicked([]);
         setBusy(false);
@@ -76,6 +110,8 @@ export default function MemoryMatch() {
 
     const start = () => {
         if (phase !== "preview") return;
+        startedAt.current = nowMs();
+        setElapsed(0);
         setPhase("playing");
     };
 
@@ -102,6 +138,17 @@ export default function MemoryMatch() {
             setBusy(false);
             const newMatchedCount = matchedPairs + 1;
             if (newMatchedCount === MATCH_ITEMS.length) {
+                const finalMs = nowMs() - startedAt.current;
+                setElapsed(finalMs);
+                if (bestMs === null || finalMs < bestMs) {
+                    setBestMs(finalMs);
+                    setNewBest(true);
+                    try {
+                        localStorage.setItem(BEST_TIME_KEY, String(finalMs));
+                    } catch {
+                        // see above
+                    }
+                }
                 setPhase("won");
             }
         } else {
@@ -117,7 +164,7 @@ export default function MemoryMatch() {
     if (phase === "playing") {
         status = matchedPairs > 0 || picked.length > 0 ? `${matchedPairs} of ${MATCH_ITEMS.length} found.` : "Find every pair.";
     } else if (phase === "won") {
-        status = "All matched! 🎉";
+        status = `All matched in ${formatTime(elapsed)}! ${newBest ? "New best! " : ""}🎉`;
     }
 
     return (
@@ -125,6 +172,10 @@ export default function MemoryMatch() {
             <div className="game-bar" style={{ maxWidth: "640px" }}>
                 <span className="game-status" aria-live="polite">{status}</span>
                 <div className="flex gap-2.5 items-center">
+                    <span className="font-mono text-sm tabular-nums text-ink-soft" aria-label="Elapsed time">
+                        {formatTime(elapsed)}
+                        {bestMs !== null && <span className="text-ink-faint"> · Best {formatTime(bestMs)}</span>}
+                    </span>
                     {phase !== "preview" && (
                         <button type="button" className="restart-link" onClick={restart}>
                             ↺ Restart
