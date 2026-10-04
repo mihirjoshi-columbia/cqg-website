@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# one-off import scripts write credentials / PII here -- never commit
+scripts/*-output.csv
+scripts/resume-manifest.json
