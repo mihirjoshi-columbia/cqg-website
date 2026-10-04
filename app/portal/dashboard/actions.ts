@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow, updateRow } from "@/lib/supabase/helpers";
 import { parseCttApplicationExtras } from "@/lib/ctt-application";
+import { RESUME_MAX_BYTES, RESUME_MAX_LABEL, looksLikePdf } from "@/lib/resume-file";
 import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgProfile, CqgSchool, CqgMembershipCycle, CttCycle } from "@/lib/supabase/types";
 
@@ -78,8 +79,6 @@ export interface ResumeUploadState {
     success?: boolean;
 }
 
-const RESUME_MAX_BYTES = 5 * 1024 * 1024;
-
 export async function uploadResumeAction(
     _prev: ResumeUploadState,
     formData: FormData
@@ -88,11 +87,11 @@ export async function uploadResumeAction(
     if (!(file instanceof File) || file.size === 0) {
         return { error: "Please choose a file." };
     }
-    if (file.type !== "application/pdf") {
+    if (!(await looksLikePdf(file))) {
         return { error: "Resumes must be a PDF." };
     }
     if (file.size > RESUME_MAX_BYTES) {
-        return { error: "File must be under 5MB." };
+        return { error: `File must be under ${RESUME_MAX_LABEL}.` };
     }
 
     const supabase = await createClient();
