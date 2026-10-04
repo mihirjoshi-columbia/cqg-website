@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/admin";
 import CycleForm from "./CycleForm";
-import { createMembershipCycleAction, createCutcCycleAction } from "./actions";
-import type { CqgMembershipCycle, CutcCycle } from "@/lib/supabase/types";
+import { createMembershipCycleAction, createCttCycleAction } from "./actions";
+import type { CqgMembershipCycle, CttCycle } from "@/lib/supabase/types";
 
 export const metadata = { title: "Cycles — CQG Admin" };
 
@@ -19,11 +19,11 @@ export default async function CyclesPage() {
         .order("opens_at", { ascending: false })
         .overrideTypes<CqgMembershipCycle[], { merge: false }>();
 
-    const { data: cutcCycles } = await supabase
-        .from("cutc_cycles")
+    const { data: cttCycles } = await supabase
+        .from("ctt_cycles")
         .select("*")
         .order("opens_at", { ascending: false })
-        .overrideTypes<CutcCycle[], { merge: false }>();
+        .overrideTypes<CttCycle[], { merge: false }>();
 
     return (
         <div className="flex flex-col gap-10">
@@ -70,7 +70,7 @@ export default async function CyclesPage() {
             <section>
                 <div className="flex items-center justify-between mb-3">
                     <h2 className="eyebrow block">CTT cycles</h2>
-                    <a href="/api/admin/cycles/cutc/export" className="btn-cqg btn-outline-navy btn-sm">
+                    <a href="/api/admin/cycles/ctt/export" className="btn-cqg btn-outline-navy btn-sm">
                         Export CSV
                     </a>
                 </div>
@@ -81,7 +81,7 @@ export default async function CyclesPage() {
                                 <tr><th>Label</th><th>Opens</th><th>Closes</th><th>Status</th></tr>
                             </thead>
                             <tbody>
-                                {(cutcCycles ?? []).map((c) => (
+                                {(cttCycles ?? []).map((c) => (
                                     <tr key={c.id}>
                                         <td>{c.label}</td>
                                         <td className="text-xs">{new Date(c.opens_at).toLocaleString()}</td>
@@ -93,7 +93,7 @@ export default async function CyclesPage() {
                                         </td>
                                     </tr>
                                 ))}
-                                {!cutcCycles?.length && (
+                                {!cttCycles?.length && (
                                     <tr><td colSpan={4} className="text-ink-faint text-sm">No cycles yet.</td></tr>
                                 )}
                             </tbody>
@@ -101,7 +101,7 @@ export default async function CyclesPage() {
                     </div>
                     <div className="event-card">
                         <div className="event-card-body">
-                            <CycleForm action={createCutcCycleAction} accent="btn-pink" />
+                            <CycleForm action={createCttCycleAction} accent="btn-pink" />
                         </div>
                     </div>
                 </div>

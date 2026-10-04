@@ -31,7 +31,7 @@ export default function Navbar() {
   const { user, loading, portalKind } = useAuth();
 
   const dashboardHref =
-    portalKind === "cqg" ? "/portal/dashboard" : portalKind === "cutc" ? "/cutc/apply/dashboard" : null;
+    portalKind === "cqg" ? "/portal/dashboard" : portalKind === "ctt" ? "/ctt/apply/dashboard" : null;
   const showDashboardLink = Boolean(user) && !loading && Boolean(dashboardHref);
 
   return (
@@ -130,7 +130,7 @@ export default function Navbar() {
                       CQG Portal
                     </Link>
                     <Link
-                      href="/cutc/apply/login"
+                      href="/ctt/apply/login"
                       className="block px-4 py-2 text-[0.85rem] font-semibold whitespace-nowrap text-ink-soft hover:text-navy hover:bg-paper-alt"
                     >
                       CTT
@@ -234,7 +234,7 @@ export default function Navbar() {
                       CQG Portal
                     </Link>
                     <Link
-                      href="/cutc/apply/login"
+                      href="/ctt/apply/login"
                       onClick={() => setIsOpen(false)}
                       className="block px-6 py-2 text-[0.95rem] font-semibold text-ink-soft hover:text-navy hover:bg-paper-alt"
                     >

@@ -43,8 +43,8 @@ export async function createBlastAction(_prev: BlastFormState, formData: FormDat
     let segmentParams: Record<string, unknown> = {};
     if (segmentType === "cqg_tier") {
         segmentParams = { tier: String(formData.get("cqg_tier") || "all") };
-    } else if (segmentType === "cutc_group") {
-        segmentParams = { status: String(formData.get("cutc_status") || "all") };
+    } else if (segmentType === "ctt_group") {
+        segmentParams = { status: String(formData.get("ctt_status") || "all") };
     } else if (segmentType === "event_group") {
         const eventId = String(formData.get("event_id") || "");
         if (!eventId) return { error: "Please choose an event." };

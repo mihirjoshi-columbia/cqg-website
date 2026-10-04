@@ -60,7 +60,7 @@ export default function Footer() {
                         <Link href="/portal/login" className="hover:text-sky transition-colors">
                             CQG Login
                         </Link>
-                        <Link href="/cutc/apply/login" className="hover:text-sky transition-colors">
+                        <Link href="/ctt/apply/login" className="hover:text-sky transition-colors">
                             CTT Login
                         </Link>
                         <Link href="/privacy-policy" className="hover:text-sky transition-colors">

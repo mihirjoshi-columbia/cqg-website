@@ -36,7 +36,7 @@ export default function BlastForm({ events }: { events: CqgEvent[] }) {
                     onChange={(e) => setSegmentType(e.target.value)}
                 >
                     <option value="cqg_tier">CQG tier group</option>
-                    <option value="cutc_group">CTT group</option>
+                    <option value="ctt_group">CTT group</option>
                     <option value="event_group">Event group</option>
                 </select>
             </div>
@@ -53,10 +53,10 @@ export default function BlastForm({ events }: { events: CqgEvent[] }) {
                 </div>
             )}
 
-            {segmentType === "cutc_group" && (
+            {segmentType === "ctt_group" && (
                 <div className="field">
                     <label className="field-label">CTT status</label>
-                    <select className="field-select" name="cutc_status" defaultValue="all">
+                    <select className="field-select" name="ctt_status" defaultValue="all">
                         <option value="all">All CTT accounts</option>
                         <option value="pending">Pending applicants</option>
                         <option value="approved">Accepted applicants</option>

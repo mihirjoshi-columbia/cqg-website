@@ -31,38 +31,38 @@ export async function resolveSegment(
         return (data ?? []).map((p) => ({ profileKind: "cqg" as const, profileId: p.id, email: p.email, name: p.name }));
     }
 
-    if (segmentType === "cutc_group") {
+    if (segmentType === "ctt_group") {
         const status = params.status as string | undefined;
 
         if (!status || status === "all") {
             const { data } = await admin
-                .from("cutc_profiles")
+                .from("ctt_profiles")
                 .select("id,email,name")
                 .overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>();
-            return (data ?? []).map((p) => ({ profileKind: "cutc" as const, profileId: p.id, email: p.email, name: p.name }));
+            return (data ?? []).map((p) => ({ profileKind: "ctt" as const, profileId: p.id, email: p.email, name: p.name }));
         }
 
         const { data: apps } = await admin
-            .from("cutc_applications")
-            .select("applicant_type,cqg_profile_id,cutc_profile_id")
+            .from("ctt_applications")
+            .select("applicant_type,cqg_profile_id,ctt_profile_id")
             .eq("status", status)
-            .overrideTypes<{ applicant_type: string; cqg_profile_id: string | null; cutc_profile_id: string | null }[], { merge: false }>();
+            .overrideTypes<{ applicant_type: string; cqg_profile_id: string | null; ctt_profile_id: string | null }[], { merge: false }>();
 
         const cqgIds = [...new Set((apps ?? []).filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
-        const cutcIds = [...new Set((apps ?? []).filter((a) => a.cutc_profile_id).map((a) => a.cutc_profile_id as string))];
+        const cttIds = [...new Set((apps ?? []).filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
 
-        const [{ data: cqgProfiles }, { data: cutcProfiles }] = await Promise.all([
+        const [{ data: cqgProfiles }, { data: cttProfiles }] = await Promise.all([
             cqgIds.length
                 ? admin.from("cqg_profiles").select("id,email,name").in("id", cqgIds).overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>()
                 : Promise.resolve({ data: [] as { id: string; email: string; name: string }[] }),
-            cutcIds.length
-                ? admin.from("cutc_profiles").select("id,email,name").in("id", cutcIds).overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>()
+            cttIds.length
+                ? admin.from("ctt_profiles").select("id,email,name").in("id", cttIds).overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>()
                 : Promise.resolve({ data: [] as { id: string; email: string; name: string }[] }),
         ]);
 
         return [
             ...(cqgProfiles ?? []).map((p) => ({ profileKind: "cqg" as const, profileId: p.id, email: p.email, name: p.name })),
-            ...(cutcProfiles ?? []).map((p) => ({ profileKind: "cutc" as const, profileId: p.id, email: p.email, name: p.name })),
+            ...(cttProfiles ?? []).map((p) => ({ profileKind: "ctt" as const, profileId: p.id, email: p.email, name: p.name })),
         ];
     }
 

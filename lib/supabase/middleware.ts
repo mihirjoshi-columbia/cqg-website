@@ -46,10 +46,10 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
     const isCqgProtected = path.startsWith("/portal") && !isPublicPortalPath(path);
-    const isCutcProtected = path.startsWith("/cutc/apply") && !isPublicCutcPath(path);
+    const isCttProtected = path.startsWith("/ctt/apply") && !isPublicCttPath(path);
 
-    if (!user && (isCqgProtected || isCutcProtected)) {
-        const redirectPath = isCutcProtected ? "/cutc/apply/login" : "/portal/login";
+    if (!user && (isCqgProtected || isCttProtected)) {
+        const redirectPath = isCttProtected ? "/ctt/apply/login" : "/portal/login";
         const url = request.nextUrl.clone();
         url.pathname = redirectPath;
         url.searchParams.set("next", path);
@@ -69,12 +69,12 @@ function isPublicPortalPath(path: string) {
     ].some((p) => path === p || path.startsWith(p + "/"));
 }
 
-function isPublicCutcPath(path: string) {
+function isPublicCttPath(path: string) {
     return [
-        "/cutc/apply/login",
-        "/cutc/apply/signup",
-        "/cutc/apply/verify",
-        "/cutc/apply/forgot-password",
-        "/cutc/apply/reset-password",
-    ].some((p) => path === p || path.startsWith(p + "/")) || path === "/cutc/apply";
+        "/ctt/apply/login",
+        "/ctt/apply/signup",
+        "/ctt/apply/verify",
+        "/ctt/apply/forgot-password",
+        "/ctt/apply/reset-password",
+    ].some((p) => path === p || path.startsWith(p + "/")) || path === "/ctt/apply";
 }

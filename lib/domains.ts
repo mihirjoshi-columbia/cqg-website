@@ -1,8 +1,8 @@
 // Email-domain gating for the two account universes. CQG accounts are
-// columbia.edu / barnard.edu exactly; CUTC accounts are everyone else.
+// columbia.edu / barnard.edu exactly; CTT accounts are everyone else.
 // Deliberately an exact-domain match (not "ends with columbia.edu"), so a
 // hypothetical subdomain like law.columbia.edu would currently be treated as
-// CUTC-eligible rather than CQG — matches what was actually specified
+// CTT-eligible rather than CQG — matches what was actually specified
 // ("columbia.edu or barnard.edu emails" / "any .edu, but NOT columbia or
 // barnard"), not a broader "anything under columbia.edu" rule.
 const CQG_DOMAINS = ["columbia.edu", "barnard.edu"];
@@ -25,7 +25,7 @@ export function isCqgDomain(email: string): boolean {
 // aliases as well, so that pattern rejected large numbers of real students —
 // and because it was applied at login too, it locked existing accounts out.
 
-// Student-email check for CUTC *signup*. ".edu" alone excluded every
+// Student-email check for CTT *signup*. ".edu" alone excluded every
 // international applicant (.ac.uk, .edu.cn, .edu.au, .ac.jp, ...), so match
 // the common academic patterns instead of the US-only one. Non-academic
 // domains that slip through are caught by the attestation checkbox and by
@@ -44,19 +44,19 @@ function isAcademicEmail(email: string): boolean {
     return ACADEMIC_PATTERNS.some((p) => p.test(domain));
 }
 
-// Signup-time gate for CUTC: an academic address that isn't a CQG one.
-export function isCutcEmail(email: string): boolean {
+// Signup-time gate for CTT: an academic address that isn't a CQG one.
+export function isCttEmail(email: string): boolean {
     return isAcademicEmail(email) && !isCqgDomain(email);
 }
 
-// Login-time gate for CUTC: portal routing only, no academic-domain check.
+// Login-time gate for CTT: portal routing only, no academic-domain check.
 // An account that already exists must be able to get back into it even if
 // the signup rules have tightened since.
-export function isCutcLoginDomain(email: string): boolean {
+export function isCttLoginDomain(email: string): boolean {
     return !isCqgDomain(email);
 }
 
-// A CQG member's "College/University" on a CUTC application is fixed to
+// A CQG member's "College/University" on a CTT application is fixed to
 // their verified school, not freely chosen — Barnard students attend
 // Barnard College; every other CQG school value is Columbia University.
 export function cqgSchoolToCollegeName(school: string | null): string {

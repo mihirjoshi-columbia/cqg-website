@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow, updateRow } from "@/lib/supabase/helpers";
 import { GRAD_YEARS } from "@/lib/data/grad-years";
-import type { CqgProfile, CqgSchool, CqgMembershipCycle, CutcCycle } from "@/lib/supabase/types";
+import type { CqgProfile, CqgSchool, CqgMembershipCycle, CttCycle } from "@/lib/supabase/types";
 
 export async function logoutAction() {
     const supabase = await createClient();
@@ -236,7 +236,7 @@ export async function applyForMembershipAction(formData: FormData) {
     revalidatePath("/portal/dashboard");
 }
 
-export async function applyForCutcAction(formData: FormData) {
+export async function applyForCttAction(formData: FormData) {
     const supabase = await createClient();
     const {
         data: { user },
@@ -260,14 +260,14 @@ export async function applyForCutcAction(formData: FormData) {
 
     const now = new Date().toISOString();
     const { data: cycle } = await supabase
-        .from("cutc_cycles")
+        .from("ctt_cycles")
         .select("*")
         .lte("opens_at", now)
         .gte("closes_at", now)
         .order("opens_at", { ascending: false })
         .limit(1)
         .maybeSingle()
-        .overrideTypes<CutcCycle, { merge: false }>();
+        .overrideTypes<CttCycle, { merge: false }>();
 
     if (!cycle) {
         return; // no open cycle right now
@@ -285,11 +285,11 @@ export async function applyForCutcAction(formData: FormData) {
         return; // required fields enforced client-side too; bail quietly if bypassed
     }
 
-    const { error } = await insertRow(supabase, "cutc_applications", {
+    const { error } = await insertRow(supabase, "ctt_applications", {
         cycle_id: cycle.id,
         applicant_type: "cqg_member",
         cqg_profile_id: user.id,
-        cutc_profile_id: null,
+        ctt_profile_id: null,
         college,
         major,
         grad_year: gradYear,
@@ -300,7 +300,7 @@ export async function applyForCutcAction(formData: FormData) {
     });
 
     if (error) {
-        console.error("[dashboard] cutc application insert failed:", error);
+        console.error("[dashboard] ctt application insert failed:", error);
     }
 
     revalidatePath("/portal/dashboard");

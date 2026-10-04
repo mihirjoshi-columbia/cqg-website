@@ -1,4 +1,4 @@
-// Broader than lib/data/majors.ts (used for CUTC applications) since CQG's
+// Broader than lib/data/majors.ts (used for CTT applications) since CQG's
 // General Body is open to all Columbia/Barnard undergrads, not just
 // quant-adjacent majors. "Other" covers joint/combined majors and anything
 // not listed.

@@ -1,7 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { updateRow } from "@/lib/supabase/helpers";
 import { sendResumeReminderEmail } from "@/lib/email";
-import type { CqgProfile, CutcProfile } from "@/lib/supabase/types";
+import type { CqgProfile, CttProfile } from "@/lib/supabase/types";
 
 // Resume upload is expected to finish account setup, and this sweep sends a
 // single reminder to accounts that verified their email but never uploaded
@@ -33,7 +33,7 @@ function hoursSince(iso: string): number {
 
 const KINDS = [
     { kind: "cqg", table: "cqg_profiles", uploadPath: "/portal/complete-profile" },
-    { kind: "cutc", table: "cutc_profiles", uploadPath: "/cutc/apply/complete-profile" },
+    { kind: "ctt", table: "ctt_profiles", uploadPath: "/ctt/apply/complete-profile" },
 ] as const;
 
 export async function sweepResumeReminders() {
@@ -49,7 +49,7 @@ export async function sweepResumeReminders() {
             .select("*")
             .is("resume_path", null)
             .is("resume_reminder_sent_at", null)
-            .overrideTypes<(CqgProfile | CutcProfile)[], { merge: false }>();
+            .overrideTypes<(CqgProfile | CttProfile)[], { merge: false }>();
 
         for (const profile of profiles ?? []) {
             const { data: authUser } = await admin.auth.admin.getUserById(profile.id);

@@ -6,9 +6,9 @@ import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 
 // Which portal a signed-in user's account belongs to — a user's id exists in
-// exactly one of cqg_profiles / cutc_profiles, never both, since signup is
+// exactly one of cqg_profiles / ctt_profiles, never both, since signup is
 // domain-gated. null means "not yet resolved" or "no matching profile row".
-export type PortalKind = "cqg" | "cutc" | null;
+export type PortalKind = "cqg" | "ctt" | null;
 
 interface AuthContextValue {
     user: User | null;
@@ -34,13 +34,13 @@ async function resolvePortalKind(
         .overrideTypes<{ id: string }, { merge: false }>();
     if (cqg) return "cqg";
 
-    const { data: cutc } = await supabase
-        .from("cutc_profiles")
+    const { data: ctt } = await supabase
+        .from("ctt_profiles")
         .select("id")
         .eq("id", userId)
         .maybeSingle()
         .overrideTypes<{ id: string }, { merge: false }>();
-    if (cutc) return "cutc";
+    if (ctt) return "ctt";
 
     return null;
 }

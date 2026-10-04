@@ -11,11 +11,11 @@ export type EventApplicationStatus =
     | "waitlisted"
     | "rejected"
     | "withdrawn";
-export type CutcApplicantType = "cqg_member" | "external";
-export type BlastSegmentType = "cqg_tier" | "cutc_group" | "event_group";
+export type CttApplicantType = "cqg_member" | "external";
+export type BlastSegmentType = "cqg_tier" | "ctt_group" | "event_group";
 export type BlastStatus = "draft" | "scheduled" | "sending" | "sent" | "failed";
 export type BlastRecipientStatus = "pending" | "sent" | "failed";
-export type ProfileKind = "cqg" | "cutc";
+export type ProfileKind = "cqg" | "ctt";
 
 export interface CqgProfile {
     id: string;
@@ -53,7 +53,7 @@ export interface CqgMembershipApplication {
     decided_by: string | null;
 }
 
-export interface CutcProfile {
+export interface CttProfile {
     id: string;
     email: string;
     name: string;
@@ -64,7 +64,7 @@ export interface CutcProfile {
     updated_at: string;
 }
 
-export interface CutcCycle {
+export interface CttCycle {
     id: string;
     label: string;
     opens_at: string;
@@ -73,13 +73,13 @@ export interface CutcCycle {
     created_at: string;
 }
 
-export interface CutcApplication {
+export interface CttApplication {
     id: string;
     cycle_id: string;
     status: ApplicationStatus;
-    applicant_type: CutcApplicantType;
+    applicant_type: CttApplicantType;
     cqg_profile_id: string | null;
-    cutc_profile_id: string | null;
+    ctt_profile_id: string | null;
     college: string;
     major: string;
     grad_year: string;
@@ -171,26 +171,26 @@ export interface Database {
                 Update: Partial<CqgMembershipApplication>;
                 Relationships: [];
             };
-            cutc_profiles: {
-                Row: CutcProfile;
-                Insert: Omit<CutcProfile, "created_at" | "updated_at" | "resume_path" | "resume_reminder_sent_at"> &
-                    Partial<Pick<CutcProfile, "resume_path" | "resume_reminder_sent_at">>;
-                Update: Partial<CutcProfile>;
+            ctt_profiles: {
+                Row: CttProfile;
+                Insert: Omit<CttProfile, "created_at" | "updated_at" | "resume_path" | "resume_reminder_sent_at"> &
+                    Partial<Pick<CttProfile, "resume_path" | "resume_reminder_sent_at">>;
+                Update: Partial<CttProfile>;
                 Relationships: [];
             };
-            cutc_cycles: {
-                Row: CutcCycle;
-                Insert: Omit<CutcCycle, "id" | "created_at">;
-                Update: Partial<CutcCycle>;
+            ctt_cycles: {
+                Row: CttCycle;
+                Insert: Omit<CttCycle, "id" | "created_at">;
+                Update: Partial<CttCycle>;
                 Relationships: [];
             };
-            cutc_applications: {
-                Row: CutcApplication;
+            ctt_applications: {
+                Row: CttApplication;
                 Insert: Omit<
-                    CutcApplication,
+                    CttApplication,
                     "id" | "status" | "submitted_at" | "decided_at" | "decided_by"
                 >;
-                Update: Partial<CutcApplication>;
+                Update: Partial<CttApplication>;
                 Relationships: [];
             };
             cqg_events: {

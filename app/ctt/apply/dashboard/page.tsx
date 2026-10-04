@@ -3,24 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { logoutAction } from "./actions";
 import ProfileForm from "./ProfileForm";
 import ResumeUpload from "./ResumeUpload";
-import MembershipCard from "./MembershipCard";
-import CttCard from "./CttCard";
+import ApplicationCard from "./ApplicationCard";
 import DangerZone from "./DangerZone";
-import type { CqgProfile } from "@/lib/supabase/types";
+import type { CttProfile } from "@/lib/supabase/types";
 
-export const metadata = { title: "Dashboard — CQG Portal" };
-
-const TIER_LABEL: Record<string, string> = {
-    general_body: "General Body",
-    member: "Internal Member",
-    admin: "Admin",
-};
-
-const TIER_TAG_CLASS: Record<string, string> = {
-    general_body: "tag-outline",
-    member: "tag-lime",
-    admin: "tag-pink",
-};
+export const metadata = { title: "Dashboard — CTT" };
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -29,47 +16,36 @@ export default async function DashboardPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-        redirect("/portal/login");
+        redirect("/ctt/apply/login");
     }
 
     const { data: profile } = await supabase
-        .from("cqg_profiles")
+        .from("ctt_profiles")
         .select("*")
         .eq("id", user.id)
         .maybeSingle()
-        .overrideTypes<CqgProfile, { merge: false }>();
+        .overrideTypes<CttProfile, { merge: false }>();
 
     if (!profile) {
-        redirect("/portal/login");
+        redirect("/ctt/apply/login");
     }
 
     if (!profile.resume_path) {
-        redirect("/portal/complete-profile");
+        redirect("/ctt/apply/complete-profile");
     }
 
     return (
         <div className="portal-shell">
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
                 <div>
-                    <span className="eyebrow text-sky-deep mb-2 block">CQG Portal</span>
+                    <span className="eyebrow text-pink-deep mb-2 block">CTT</span>
                     <h1 className="font-display font-extrabold text-2xl text-navy">
                         Welcome, {profile.name.split(" ")[0]}
                     </h1>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className={`tag ${TIER_TAG_CLASS[profile.tier]}`}>{TIER_LABEL[profile.tier]}</span>
-                    <a href="/portal/events" className="btn-cqg btn-outline-navy btn-sm">
-                        Events
-                    </a>
-                    {profile.tier === "admin" && (
-                        <a href="/portal/admin" className="btn-cqg btn-outline-navy btn-sm">
-                            Admin dashboard
-                        </a>
-                    )}
-                    <form action={logoutAction}>
-                        <button type="submit" className="btn-cqg btn-outline-navy btn-sm">Log out</button>
-                    </form>
-                </div>
+                <form action={logoutAction}>
+                    <button type="submit" className="btn-cqg btn-outline-navy btn-sm">Log out</button>
+                </form>
             </div>
 
             <div className="flex flex-col gap-10" style={{ maxWidth: 560 }}>
@@ -93,13 +69,8 @@ export default async function DashboardPage() {
                 </section>
 
                 <section>
-                    <h2 className="eyebrow mb-3 block">Internal Membership</h2>
-                    <MembershipCard profile={profile} />
-                </section>
-
-                <section>
-                    <h2 className="eyebrow mb-3 block">CTT</h2>
-                    <CttCard profile={profile} />
+                    <h2 className="eyebrow mb-3 block">CTT application</h2>
+                    <ApplicationCard profile={profile} />
                 </section>
 
                 <section>

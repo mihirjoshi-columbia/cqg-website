@@ -47,7 +47,7 @@ export async function createMembershipCycleAction(
     return { success: true };
 }
 
-export async function createCutcCycleAction(
+export async function createCttCycleAction(
     _prev: CycleFormState,
     formData: FormData
 ): Promise<CycleFormState> {
@@ -55,7 +55,7 @@ export async function createCutcCycleAction(
     const parsed = parseCycleForm(formData);
     if ("error" in parsed) return parsed;
 
-    const { error } = await insertRow(admin, "cutc_cycles", {
+    const { error } = await insertRow(admin, "ctt_cycles", {
         label: parsed.label,
         opens_at: new Date(parsed.opensAt).toISOString(),
         closes_at: new Date(parsed.closesAt).toISOString(),
@@ -63,7 +63,7 @@ export async function createCutcCycleAction(
     });
 
     if (error) {
-        console.error("[admin] create cutc cycle failed:", error);
+        console.error("[admin] create ctt cycle failed:", error);
         return { error: "Could not create cycle." };
     }
 
