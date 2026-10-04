@@ -61,6 +61,8 @@ export default async function CttApplicationsPage() {
                             <th>Gender</th>
                             <th>Prior Intern?</th>
                             <th>Lined Up?</th>
+                            <th>Where</th>
+                            <th>Travel/Housing?</th>
                             <th>Cycle</th>
                             <th>Resume</th>
                             <th>Status</th>
@@ -87,6 +89,8 @@ export default async function CttApplicationsPage() {
                                     <td>{app.gender}</td>
                                     <td>{app.prior_internship ? "Yes" : "No"}</td>
                                     <td>{app.internship_lined_up ? "Yes" : "No"}</td>
+                                    <td>{app.internship_location ?? "—"}</td>
+                                    <td>{app.travel_housing_needed ? "Yes" : "No"}</td>
                                     <td>{c?.label ?? app.cycle_id}</td>
                                     <td>
                                         {applicant?.resume_path ? (

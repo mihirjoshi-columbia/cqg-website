@@ -30,6 +30,7 @@ export default function CttApplicationForm({
     cycleLabel: string;
 }) {
     const [major, setMajor] = useState("");
+    const [linedUp, setLinedUp] = useState("");
 
     return (
         <div className="event-card" style={{ maxWidth: 560 }}>
@@ -136,14 +137,54 @@ export default function CttApplicationForm({
                         </span>
                         <div className="field-radio-group">
                             <div className="field-radio-option">
-                                <input type="radio" id="internship_lined_up_yes" name="internship_lined_up" value="yes" required />
+                                <input
+                                    type="radio"
+                                    id="internship_lined_up_yes"
+                                    name="internship_lined_up"
+                                    value="yes"
+                                    required
+                                    onChange={() => setLinedUp("yes")}
+                                />
                                 <label htmlFor="internship_lined_up_yes">Yes</label>
                             </div>
                             <div className="field-radio-option">
-                                <input type="radio" id="internship_lined_up_no" name="internship_lined_up" value="no" required />
+                                <input
+                                    type="radio"
+                                    id="internship_lined_up_no"
+                                    name="internship_lined_up"
+                                    value="no"
+                                    required
+                                    onChange={() => setLinedUp("no")}
+                                />
                                 <label htmlFor="internship_lined_up_no">No</label>
                             </div>
                         </div>
+                        {linedUp === "yes" && (
+                            <input
+                                className="field-input mt-2"
+                                type="text"
+                                name="internship_location"
+                                aria-label="Where is your internship or job?"
+                                placeholder="Where? (firm and location)"
+                                maxLength={200}
+                                required
+                            />
+                        )}
+                    </div>
+
+                    <div className="field">
+                        <span className="field-label">Will you need travel &amp; housing accommodations?</span>
+                        <div className="field-radio-group">
+                            <div className="field-radio-option">
+                                <input type="radio" id="travel_housing_needed_yes" name="travel_housing_needed" value="yes" required />
+                                <label htmlFor="travel_housing_needed_yes">Yes</label>
+                            </div>
+                            <div className="field-radio-option">
+                                <input type="radio" id="travel_housing_needed_no" name="travel_housing_needed" value="no" required />
+                                <label htmlFor="travel_housing_needed_no">No</label>
+                            </div>
+                        </div>
+                        <span className="field-hint">Travel and lodging are fully covered for competitors.</span>
                     </div>
 
                     <SubmitButton />

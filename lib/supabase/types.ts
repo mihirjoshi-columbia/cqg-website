@@ -87,6 +87,8 @@ export interface CttApplication {
     gender: string;
     prior_internship: boolean;
     internship_lined_up: boolean;
+    internship_location: string | null;
+    travel_housing_needed: boolean;
     submitted_at: string;
     decided_at: string | null;
     decided_by: string | null;

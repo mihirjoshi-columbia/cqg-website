@@ -31,9 +31,9 @@ const formatPillars = [
 
 const schedule: { date: string; title: string; detail?: string; milestone?: boolean }[] = [
     {
-        date: "Coming soon",
+        date: "Now – October 23, 11:59 PM ET",
         title: "Applications open",
-        detail: "Applications aren't open yet — watch this page and our socials for the exact date",
+        detail: "Create an account, then complete the application from your dashboard",
     },
     { date: "Friday–Saturday, December 4–5, 2026", title: "Competitors arrive" },
     {
@@ -157,11 +157,23 @@ export default function CompetitionPage() {
                     <div className="angle-card angle-card-navy">
                         <div className="angle-card-body flex flex-col items-start justify-between gap-6">
                             <div>
-                                <h3 className="font-display font-bold text-[1.15rem]">Applications aren&apos;t open yet</h3>
+                                <h3 className="font-display font-bold text-[1.15rem]">Applications are open</h3>
                                 <p className="text-[#C3D2EA] mt-2.5 text-sm">
-                                    Be on the lookout soon! We&apos;re finalizing details for this year&apos;s
-                                    competition — check back here or watch our socials for the exact date.
+                                    Applications close October 23 at 11:59 PM ET. Create an account to get
+                                    started — you&apos;ll complete the application from your dashboard.
                                 </p>
+                                <p className="text-[#C3D2EA] mt-2.5 text-sm">
+                                    Columbia &amp; Barnard students: log in with your CQG account and apply from
+                                    your CQG dashboard.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-3">
+                                <a href="/ctt/apply/signup" className="btn-cqg btn-pink">
+                                    Create account &amp; apply →
+                                </a>
+                                <a href="/ctt/apply/login" className="btn-cqg btn-outline">
+                                    Log in
+                                </a>
                             </div>
                         </div>
                     </div>

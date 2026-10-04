@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow, updateRow } from "@/lib/supabase/helpers";
+import { parseCttApplicationExtras } from "@/lib/ctt-application";
 import { GRAD_YEARS } from "@/lib/data/grad-years";
 import type { CqgProfile, CqgSchool, CqgMembershipCycle, CttCycle } from "@/lib/supabase/types";
 
@@ -281,7 +282,9 @@ export async function applyForCttAction(formData: FormData) {
     const priorInternship = formData.get("prior_internship");
     const internshipLinedUp = formData.get("internship_lined_up");
 
-    if (!college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp) {
+    const extras = parseCttApplicationExtras(formData);
+
+    if (!college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp || !extras) {
         return; // required fields enforced client-side too; bail quietly if bypassed
     }
 
@@ -297,6 +300,8 @@ export async function applyForCttAction(formData: FormData) {
         gender,
         prior_internship: priorInternship === "yes",
         internship_lined_up: internshipLinedUp === "yes",
+        internship_location: extras.internshipLocation,
+        travel_housing_needed: extras.travelHousingNeeded,
     });
 
     if (error) {
