@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow, updateRow } from "@/lib/supabase/helpers";
-import { parseCttApplicationExtras } from "@/lib/ctt-application";
+import { parseCttApplicationExtras, parseTravelLodgingAnswers } from "@/lib/ctt-application";
 import { RESUME_MAX_BYTES, RESUME_MAX_LABEL, looksLikePdf } from "@/lib/resume-file";
-import type { CttCycle } from "@/lib/supabase/types";
+import type { CttCycle, CttApplication } from "@/lib/supabase/types";
 
 export async function logoutAction() {
     const supabase = await createClient();
@@ -173,7 +173,7 @@ export async function applyForCttAction(formData: FormData) {
     const priorInternship = formData.get("prior_internship");
     const internshipLinedUp = formData.get("internship_lined_up");
 
-    const extras = parseCttApplicationExtras(formData);
+    const extras = parseCttApplicationExtras(formData, true);
 
     if (!college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp || !extras) {
         return; // required fields enforced client-side too; bail quietly if bypassed
@@ -192,11 +192,58 @@ export async function applyForCttAction(formData: FormData) {
         prior_internship: priorInternship === "yes",
         internship_lined_up: internshipLinedUp === "yes",
         internship_location: extras.internshipLocation,
-        travel_housing_needed: extras.travelHousingNeeded,
+        travel_needed: extras.travelNeeded,
+        lodging_needed: extras.lodgingNeeded,
     });
 
     if (error) {
         console.error("[ctt dashboard] application insert failed:", error);
+    }
+
+    revalidatePath("/ctt/apply/dashboard");
+}
+
+// Lets an applicant who applied before travel and lodging were split into two
+// questions answer them without resubmitting. Applications themselves aren't
+// user-editable (RLS), so this reads the caller's own row with their session,
+// then writes only these two columns with the service role.
+export async function updateTravelLodgingAction(formData: FormData) {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect("/ctt/apply/login");
+
+    const answers = parseTravelLodgingAnswers(formData);
+    if (!answers) return;
+
+    const now = new Date().toISOString();
+    const { data: cycle } = await supabase
+        .from("ctt_cycles")
+        .select("*")
+        .lte("opens_at", now)
+        .gte("closes_at", now)
+        .order("opens_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .overrideTypes<CttCycle, { merge: false }>();
+    if (!cycle) return; // answers can only change while the cycle is open
+
+    const { data: application } = await supabase
+        .from("ctt_applications")
+        .select("*")
+        .eq("ctt_profile_id", user.id)
+        .eq("cycle_id", cycle.id)
+        .maybeSingle()
+        .overrideTypes<CttApplication, { merge: false }>();
+    if (!application) return;
+
+    const { error } = await updateRow(createServiceRoleClient(), "ctt_applications", application.id, {
+        travel_needed: answers.travelNeeded,
+        lodging_needed: answers.lodgingNeeded,
+    });
+    if (error) {
+        console.error("[ctt dashboard] travel/lodging update failed:", error);
     }
 
     revalidatePath("/ctt/apply/dashboard");

@@ -88,7 +88,10 @@ export interface CttApplication {
     prior_internship: boolean;
     internship_lined_up: boolean;
     internship_location: string | null;
-    travel_housing_needed: boolean;
+    // Legacy combined answer from before travel and lodging were split.
+    travel_housing_needed: boolean | null;
+    travel_needed: boolean | null;
+    lodging_needed: boolean | null;
     submitted_at: string;
     decided_at: string | null;
     decided_by: string | null;
@@ -190,8 +193,8 @@ export interface Database {
                 Row: CttApplication;
                 Insert: Omit<
                     CttApplication,
-                    "id" | "status" | "submitted_at" | "decided_at" | "decided_by"
-                >;
+                    "id" | "status" | "submitted_at" | "decided_at" | "decided_by" | "travel_housing_needed"
+                > & { travel_housing_needed?: boolean | null };
                 Update: Partial<CttApplication>;
                 Relationships: [];
             };

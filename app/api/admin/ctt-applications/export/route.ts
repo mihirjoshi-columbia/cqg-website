@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { travelLodgingLabel } from "@/lib/ctt-application";
 import { requireAdmin } from "@/lib/admin";
 import { buildCsv, csvResponse, slugify } from "@/lib/csv";
 import type { CqgProfile, CttApplication, CttCycle, CttProfile } from "@/lib/supabase/types";
@@ -17,7 +18,8 @@ const COLUMNS = [
     "Prior Internship?",
     "Internship Lined Up?",
     "Internship Location",
-    "Needs Travel & Housing?",
+    "Needs Travel?",
+    "Needs Lodging?",
     "Resume Link",
     "Status",
     "Submitted At",
@@ -87,7 +89,8 @@ export async function GET() {
             app.prior_internship ? "Yes" : "No",
             app.internship_lined_up ? "Yes" : "No",
             app.internship_location ?? "",
-            app.travel_housing_needed ? "Yes" : "No",
+            travelLodgingLabel(app, "travel_needed"),
+            travelLodgingLabel(app, "lodging_needed"),
             resumeLink,
             app.status,
             app.submitted_at,

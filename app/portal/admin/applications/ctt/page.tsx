@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { travelLodgingLabel } from "@/lib/ctt-application";
 import DecisionButtons from "./DecisionButtons";
 import ViewResumeButton from "./ViewResumeButton";
 import type { CttApplication, CqgProfile, CttProfile, CttCycle } from "@/lib/supabase/types";
@@ -62,7 +63,8 @@ export default async function CttApplicationsPage() {
                             <th>Prior Intern?</th>
                             <th>Lined Up?</th>
                             <th>Where</th>
-                            <th>Travel/Housing?</th>
+                            <th>Travel?</th>
+                            <th>Lodging?</th>
                             <th>Cycle</th>
                             <th>Resume</th>
                             <th>Status</th>
@@ -90,7 +92,8 @@ export default async function CttApplicationsPage() {
                                     <td>{app.prior_internship ? "Yes" : "No"}</td>
                                     <td>{app.internship_lined_up ? "Yes" : "No"}</td>
                                     <td>{app.internship_location ?? "—"}</td>
-                                    <td>{app.travel_housing_needed ? "Yes" : "No"}</td>
+                                    <td>{travelLodgingLabel(app, "travel_needed")}</td>
+                                    <td>{travelLodgingLabel(app, "lodging_needed")}</td>
                                     <td>{c?.label ?? app.cycle_id}</td>
                                     <td>
                                         {applicant?.resume_path ? (

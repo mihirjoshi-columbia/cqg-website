@@ -101,6 +101,7 @@ export default async function CttCard({ profile }: { profile: CqgProfile }) {
             cycleLabel={cycle.label}
             lockedCollege={cqgSchoolToCollegeName(profile.school)}
             lockedGender={profile.gender ?? undefined}
+            askTravelLodging={false}
         />
     );
 }

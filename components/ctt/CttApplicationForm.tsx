@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import Combobox from "@/components/ui/Combobox";
+import TravelLodgingFields from "./TravelLodgingFields";
 import { US_COLLEGES } from "@/lib/data/us-colleges";
 import { MAJORS } from "@/lib/data/majors";
 import { GRAD_YEARS } from "@/lib/data/grad-years";
@@ -23,11 +24,13 @@ export default function CttApplicationForm({
     lockedCollege,
     lockedGender,
     cycleLabel,
+    askTravelLodging = true,
 }: {
     action: (formData: FormData) => void | Promise<void>;
     lockedCollege?: string;
     lockedGender?: string;
     cycleLabel: string;
+    askTravelLodging?: boolean;
 }) {
     const [major, setMajor] = useState("");
     const [linedUp, setLinedUp] = useState("");
@@ -172,20 +175,7 @@ export default function CttApplicationForm({
                         )}
                     </div>
 
-                    <div className="field">
-                        <span className="field-label">Will you need travel &amp; housing accommodations?</span>
-                        <div className="field-radio-group">
-                            <div className="field-radio-option">
-                                <input type="radio" id="travel_housing_needed_yes" name="travel_housing_needed" value="yes" required />
-                                <label htmlFor="travel_housing_needed_yes">Yes</label>
-                            </div>
-                            <div className="field-radio-option">
-                                <input type="radio" id="travel_housing_needed_no" name="travel_housing_needed" value="no" required />
-                                <label htmlFor="travel_housing_needed_no">No</label>
-                            </div>
-                        </div>
-                        <span className="field-hint">Travel and lodging are fully covered for competitors.</span>
-                    </div>
+                    {askTravelLodging && <TravelLodgingFields />}
 
                     <SubmitButton />
                 </form>

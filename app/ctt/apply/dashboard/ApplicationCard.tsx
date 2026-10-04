@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { applyForCttAction } from "./actions";
+import { applyForCttAction, updateTravelLodgingAction } from "./actions";
+import TravelLodgingUpdateForm from "./TravelLodgingUpdateForm";
+import { needsTravelLodgingAnswers } from "@/lib/ctt-application";
 import CttApplicationForm from "@/components/ctt/CttApplicationForm";
 import type { CttProfile, CttCycle, CttApplication } from "@/lib/supabase/types";
 
@@ -62,6 +64,7 @@ export default async function ApplicationCard({ profile }: { profile: CttProfile
                 <div className="event-card-body">
                     <span className={`tag ${copy.tag} w-fit`}>{copy.label}</span>
                     <p className="text-ink-soft text-sm">{copy.body}</p>
+                    {needsTravelLodgingAnswers(application) && <TravelLodgingUpdateForm action={updateTravelLodgingAction} />}
                 </div>
             </div>
         );
