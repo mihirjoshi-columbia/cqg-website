@@ -6,6 +6,8 @@ import type { CttApplication, CqgProfile, CttProfile, CttCycle } from "@/lib/sup
 
 export const metadata = { title: "CTT Applications — CQG Admin" };
 
+const ID_BATCH_SIZE = 150;
+
 const STATUS_TAG: Record<string, string> = {
     pending: "tag-sky",
     approved: "tag-pink",
@@ -26,21 +28,31 @@ export default async function CttApplicationsPage() {
     const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
     const cycleIds = [...new Set(apps.map((a) => a.cycle_id))];
 
-    const { data: cqgProfiles } = cqgIds.length
-        ? await supabase.from("cqg_profiles").select("*").in("id", cqgIds).overrideTypes<CqgProfile[], { merge: false }>()
-        : { data: [] as CqgProfile[] };
+    // .in() goes into the request URL, so one query for every applicant
+    // overruns the gateway's URI limit once a cycle has a few hundred
+    // applications -- the request fails and every name/resume renders blank.
+    // Fetch in batches that stay well under it, and surface a failure instead
+    // of silently showing empty cells.
+    async function profilesByIds<T>(table: "cqg_profiles" | "ctt_profiles" | "ctt_cycles", ids: string[]): Promise<T[]> {
+        const out: T[] = [];
+        for (let i = 0; i < ids.length; i += ID_BATCH_SIZE) {
+            const { data, error } = await supabase
+                .from(table)
+                .select("*")
+                .in("id", ids.slice(i, i + ID_BATCH_SIZE));
+            if (error) throw error;
+            out.push(...((data ?? []) as unknown as T[]));
+        }
+        return out;
+    }
 
-    const { data: cttProfiles } = cttIds.length
-        ? await supabase.from("ctt_profiles").select("*").in("id", cttIds).overrideTypes<CttProfile[], { merge: false }>()
-        : { data: [] as CttProfile[] };
+    const cqgProfiles = await profilesByIds<CqgProfile>("cqg_profiles", cqgIds);
+    const cttProfiles = await profilesByIds<CttProfile>("ctt_profiles", cttIds);
+    const cycles = await profilesByIds<CttCycle>("ctt_cycles", cycleIds);
 
-    const { data: cycles } = cycleIds.length
-        ? await supabase.from("ctt_cycles").select("*").in("id", cycleIds).overrideTypes<CttCycle[], { merge: false }>()
-        : { data: [] as CttCycle[] };
-
-    const cqgMap = new Map((cqgProfiles ?? []).map((p) => [p.id, p]));
-    const cttMap = new Map((cttProfiles ?? []).map((p) => [p.id, p]));
-    const cycleMap = new Map((cycles ?? []).map((c) => [c.id, c]));
+    const cqgMap = new Map(cqgProfiles.map((p) => [p.id, p]));
+    const cttMap = new Map(cttProfiles.map((p) => [p.id, p]));
+    const cycleMap = new Map(cycles.map((c) => [c.id, c]));
 
     return (
         <div>
