@@ -1,7 +1,19 @@
 // Parsing for the CTT application questions added after the original set,
 // shared by the external (/ctt/apply) and CQG-member (/portal) apply actions.
 
-import type { CttApplication } from "@/lib/supabase/types";
+import type { CqgProfile, CttApplication, CttCycle, CttProfile } from "@/lib/supabase/types";
+
+// An application with its applicant and cycle attached by the database in one
+// query. ctt_applications has two foreign keys to cqg_profiles (the applicant
+// and decided_by), so the CQG join has to name which one it means.
+export const CTT_APPLICATION_SELECT =
+    "*, cqg:cqg_profiles!cqg_profile_id(*), ctt:ctt_profiles(*), cycle:ctt_cycles(label)";
+
+export type CttApplicationRow = CttApplication & {
+    cqg: CqgProfile | null;
+    ctt: CttProfile | null;
+    cycle: Pick<CttCycle, "label"> | null;
+};
 
 export interface CttApplicationExtras {
     travelNeeded: boolean | null;

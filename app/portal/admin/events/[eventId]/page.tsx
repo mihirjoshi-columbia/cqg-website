@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
+import { fetchAllPages } from "@/lib/supabase/helpers";
+import { EVENT_APPLICATION_SELECT, type EventApplicationRow } from "@/lib/supabase/rows";
 import { requireAdmin } from "@/lib/admin";
 import LockToggle from "../LockToggle";
 import DecideButtons from "./DecideButtons";
 import AttendanceToggle from "./AttendanceToggle";
-import type { CqgEvent, CqgEventApplication, CqgProfile } from "@/lib/supabase/types";
+import type { CqgEvent } from "@/lib/supabase/types";
 
 export const metadata = { title: "Event — CQG Admin" };
 
@@ -31,29 +32,25 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
         notFound();
     }
 
-    const apps = await fetchAllPages<CqgEventApplication>((from, to) =>
+    // The API returns at most 1,000 rows per request, so read it in pages.
+    const apps = await fetchAllPages<EventApplicationRow>((from, to) =>
         supabase
             .from("cqg_event_applications")
-            .select("*")
+            .select(EVENT_APPLICATION_SELECT)
             .eq("event_id", eventId)
             .order("applied_at", { ascending: true })
             .order("id")
             .range(from, to)
-            .overrideTypes<CqgEventApplication[], { merge: false }>()
+            .overrideTypes<EventApplicationRow[], { merge: false }>()
     );
-    const profileIds = [...new Set(apps.map((a) => a.profile_id))];
-    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
-        supabase.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
-    );
-    const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const accepted = apps.filter((a) => a.status === "accepted");
     const pending = apps.filter((a) => a.status === "pending");
     const waitlisted = apps.filter((a) => a.status === "waitlisted");
     const other = apps.filter((a) => a.status === "rejected" || a.status === "withdrawn");
 
-    function renderRow(app: CqgEventApplication, showDecide: boolean, showAttendance: boolean) {
-        const p = profileMap.get(app.profile_id);
+    function renderRow(app: EventApplicationRow, showDecide: boolean, showAttendance: boolean) {
+        const p = app.profile;
         return (
             <tr key={app.id}>
                 <td>{p ? `${p.name} — ${p.email}` : app.profile_id}</td>

@@ -78,22 +78,6 @@ export async function fetchAllPages<T>(page: (from: number, to: number) => PageR
     }
 }
 
-// `.in("id", ids)` puts every id in the request URL, which the API rejects
-// ("Bad Request") somewhere past a few hundred uuids. Look ids up in chunks.
-export async function fetchByIds<T>(
-    ids: string[],
-    lookup: (chunk: string[]) => PageResult<T>,
-    chunkSize = 100
-): Promise<T[]> {
-    const chunks: string[][] = [];
-    for (let i = 0; i < ids.length; i += chunkSize) chunks.push(ids.slice(i, i + chunkSize));
-    const results = await Promise.all(chunks.map((chunk) => lookup(chunk)));
-    return results.flatMap(({ data, error }) => {
-        if (error) throw error;
-        return data ?? [];
-    });
-}
-
 // One signed-URL request per 100 files instead of one per row -- the CSV
 // exports include a resume link for every person, and per-row requests are
 // far too slow at a thousand rows.

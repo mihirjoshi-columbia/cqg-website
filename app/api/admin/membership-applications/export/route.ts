@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
+import { fetchAllPages, signedUrlMap } from "@/lib/supabase/helpers";
+import { MEMBERSHIP_APPLICATION_SELECT, type MembershipApplicationRow } from "@/lib/supabase/rows";
 import { requireAdmin } from "@/lib/admin";
 import { buildCsv, csvResponse, slugify } from "@/lib/csv";
-import type { CqgMembershipApplication, CqgMembershipCycle, CqgProfile } from "@/lib/supabase/types";
+import type { CqgMembershipCycle } from "@/lib/supabase/types";
 
 const RESUME_LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
@@ -26,6 +27,8 @@ const COLUMNS = [
     "Cycle",
 ] as const;
 
+export const maxDuration = 60;
+
 export async function GET() {
     const { admin } = await requireAdmin();
 
@@ -41,35 +44,31 @@ export async function GET() {
         return NextResponse.json({ error: "No membership cycle exists yet." }, { status: 404 });
     }
 
-    const apps = await fetchAllPages<CqgMembershipApplication>((from, to) =>
+    // The API returns at most 1,000 rows per request, so read it in pages.
+    const apps = await fetchAllPages<MembershipApplicationRow>((from, to) =>
         admin
             .from("cqg_membership_applications")
-            .select("*")
+            .select(MEMBERSHIP_APPLICATION_SELECT)
             .eq("cycle_id", cycle.id)
             .order("submitted_at", { ascending: false })
             .order("id")
             .range(from, to)
-            .overrideTypes<CqgMembershipApplication[], { merge: false }>()
+            .overrideTypes<MembershipApplicationRow[], { merge: false }>()
     );
-    const profileIds = [...new Set(apps.map((a) => a.profile_id))];
 
-    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
-        admin.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    // One batched request per 100 resumes instead of one request per row.
+    const resumeUrlByPath = await signedUrlMap(
+        admin,
+        "resumes",
+        apps.map((a) => a.profile?.resume_path).filter((x): x is string => Boolean(x)),
+        RESUME_LINK_TTL_SECONDS
     );
-    const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const rows: unknown[][] = [];
 
     for (const app of apps) {
-        const p = profileMap.get(app.profile_id);
-
-        let resumeLink = "";
-        if (p?.resume_path) {
-            const { data: signed } = await admin.storage
-                .from("resumes")
-                .createSignedUrl(p.resume_path, RESUME_LINK_TTL_SECONDS);
-            resumeLink = signed?.signedUrl ?? "";
-        }
+        const p = app.profile;
+        const resumeLink = (p?.resume_path && resumeUrlByPath.get(p.resume_path)) || "";
 
         const accomplishments = [0, 1, 2, 3, 4].map((i) => app.accomplishments[i] ?? "");
 

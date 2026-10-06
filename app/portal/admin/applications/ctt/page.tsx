@@ -1,9 +1,8 @@
 import { requireAdmin } from "@/lib/admin";
-import { travelLodgingLabel } from "@/lib/ctt-application";
-import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
+import { CTT_APPLICATION_SELECT, travelLodgingLabel, type CttApplicationRow } from "@/lib/ctt-application";
+import { fetchAllPages } from "@/lib/supabase/helpers";
 import DecisionButtons from "./DecisionButtons";
 import ViewResumeButton from "./ViewResumeButton";
-import type { CttApplication, CqgProfile, CttProfile, CttCycle } from "@/lib/supabase/types";
 
 export const metadata = { title: "CTT Applications — CQG Admin" };
 
@@ -16,33 +15,16 @@ const STATUS_TAG: Record<string, string> = {
 export default async function CttApplicationsPage() {
     const { supabase } = await requireAdmin();
 
-    const apps = await fetchAllPages<CttApplication>((from, to) =>
+    // The API returns at most 1,000 rows per request, so read it in pages.
+    const apps = await fetchAllPages<CttApplicationRow>((from, to) =>
         supabase
             .from("ctt_applications")
-            .select("*")
+            .select(CTT_APPLICATION_SELECT)
             .order("submitted_at", { ascending: false })
             .order("id")
             .range(from, to)
-            .overrideTypes<CttApplication[], { merge: false }>()
+            .overrideTypes<CttApplicationRow[], { merge: false }>()
     );
-    const cqgIds = [...new Set(apps.filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
-    const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
-    const cycleIds = [...new Set(apps.map((a) => a.cycle_id))];
-
-    const cqgProfiles = await fetchByIds<CqgProfile>(cqgIds, (chunk) =>
-        supabase.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
-    );
-    const cttProfiles = await fetchByIds<CttProfile>(cttIds, (chunk) =>
-        supabase.from("ctt_profiles").select("*").in("id", chunk).overrideTypes<CttProfile[], { merge: false }>()
-    );
-
-    const { data: cycles } = cycleIds.length
-        ? await supabase.from("ctt_cycles").select("*").in("id", cycleIds).overrideTypes<CttCycle[], { merge: false }>()
-        : { data: [] as CttCycle[] };
-
-    const cqgMap = new Map(cqgProfiles.map((p) => [p.id, p]));
-    const cttMap = new Map(cttProfiles.map((p) => [p.id, p]));
-    const cycleMap = new Map((cycles ?? []).map((c) => [c.id, c]));
 
     return (
         <div>
@@ -75,10 +57,7 @@ export default async function CttApplicationsPage() {
                     </thead>
                     <tbody>
                         {apps.map((app) => {
-                            const cqg = app.cqg_profile_id ? cqgMap.get(app.cqg_profile_id) : undefined;
-                            const ctt = app.ctt_profile_id ? cttMap.get(app.ctt_profile_id) : undefined;
-                            const applicant = cqg ?? ctt;
-                            const c = cycleMap.get(app.cycle_id);
+                            const applicant = app.cqg ?? app.ctt;
                             return (
                                 <tr key={app.id}>
                                     <td>{applicant ? `${applicant.name} — ${applicant.email}` : "—"}</td>
@@ -96,7 +75,7 @@ export default async function CttApplicationsPage() {
                                     <td>{app.internship_location ?? "—"}</td>
                                     <td>{travelLodgingLabel(app, "travel_needed")}</td>
                                     <td>{travelLodgingLabel(app, "lodging_needed")}</td>
-                                    <td>{c?.label ?? app.cycle_id}</td>
+                                    <td>{app.cycle?.label ?? app.cycle_id}</td>
                                     <td>
                                         {applicant?.resume_path ? (
                                             <ViewResumeButton

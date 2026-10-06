@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { fetchAllPages, fetchByIds, insertRows, updateRow } from "@/lib/supabase/helpers";
+import { fetchAllPages, insertRows, updateRow } from "@/lib/supabase/helpers";
 import { sendBlastEmail } from "@/lib/email";
 import type { EmailBlast, EmailBlastRecipient, BlastSegmentType, ProfileKind } from "@/lib/supabase/types";
 
@@ -21,8 +21,9 @@ const BATCH_SIZE = 200;
 type NamedRow = { id: string; email: string; name: string };
 
 // Every query below can match more than 1,000 rows (the API's silent per-request
-// cap) or more ids than fit in a URL, so they page / chunk. Missing recipients
-// here means people silently never get the blast.
+// cap), so they read in pages. Missing recipients here means people silently
+// never get the blast. Applicants come attached to their application row by the
+// database (one query), so there's nothing to look up afterwards.
 export async function resolveSegment(
     admin: ReturnType<typeof createServiceRoleClient>,
     segmentType: BlastSegmentType,
@@ -30,14 +31,6 @@ export async function resolveSegment(
 ): Promise<Recipient[]> {
     const cqgRecipient = (p: NamedRow): Recipient => ({ profileKind: "cqg", profileId: p.id, email: p.email, name: p.name });
     const cttRecipient = (p: NamedRow): Recipient => ({ profileKind: "ctt", profileId: p.id, email: p.email, name: p.name });
-    const lookupCqg = (ids: string[]) =>
-        fetchByIds<NamedRow>(ids, (chunk) =>
-            admin.from("cqg_profiles").select("id,email,name").in("id", chunk).overrideTypes<NamedRow[], { merge: false }>()
-        );
-    const lookupCtt = (ids: string[]) =>
-        fetchByIds<NamedRow>(ids, (chunk) =>
-            admin.from("ctt_profiles").select("id,email,name").in("id", chunk).overrideTypes<NamedRow[], { merge: false }>()
-        );
 
     if (segmentType === "cqg_tier") {
         const tier = params.tier as string | undefined;
@@ -59,33 +52,31 @@ export async function resolveSegment(
             return profiles.map(cttRecipient);
         }
 
-        type AppRow = { id: string; cqg_profile_id: string | null; ctt_profile_id: string | null };
+        // An applicant can have applied in more than one cycle, so de-duplicate by profile.
+        type AppRow = { cqg: NamedRow | null; ctt: NamedRow | null };
         const apps = await fetchAllPages<AppRow>((from, to) =>
             admin
                 .from("ctt_applications")
-                .select("id,cqg_profile_id,ctt_profile_id")
+                .select("cqg:cqg_profiles!cqg_profile_id(id,email,name), ctt:ctt_profiles(id,email,name)")
                 .eq("status", status)
                 .order("id")
                 .range(from, to)
                 .overrideTypes<AppRow[], { merge: false }>()
         );
-
-        const cqgIds = [...new Set(apps.filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
-        const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
-
-        const [cqgProfiles, cttProfiles] = await Promise.all([lookupCqg(cqgIds), lookupCtt(cttIds)]);
-        return [...cqgProfiles.map(cqgRecipient), ...cttProfiles.map(cttRecipient)];
+        const cqg = new Map(apps.flatMap((a) => (a.cqg ? [[a.cqg.id, a.cqg] as const] : [])));
+        const ctt = new Map(apps.flatMap((a) => (a.ctt ? [[a.ctt.id, a.ctt] as const] : [])));
+        return [...[...cqg.values()].map(cqgRecipient), ...[...ctt.values()].map(cttRecipient)];
     }
 
     if (segmentType === "event_group") {
         const eventId = params.eventId as string;
         const which = params.which as string; // "applied" | "attended"
 
-        type EventAppRow = { id: string; profile_id: string; status: string; attended: boolean };
+        type EventAppRow = { status: string; attended: boolean; profile: NamedRow | null };
         const apps = await fetchAllPages<EventAppRow>((from, to) =>
             admin
                 .from("cqg_event_applications")
-                .select("id,profile_id,status,attended")
+                .select("status,attended,profile:cqg_profiles!profile_id(id,email,name)")
                 .eq("event_id", eventId)
                 .order("id")
                 .range(from, to)
@@ -93,11 +84,7 @@ export async function resolveSegment(
         );
 
         const filtered = which === "attended" ? apps.filter((a) => a.attended) : apps.filter((a) => a.status !== "withdrawn");
-
-        const profileIds = [...new Set(filtered.map((a) => a.profile_id))];
-        if (!profileIds.length) return [];
-
-        return (await lookupCqg(profileIds)).map(cqgRecipient);
+        return filtered.flatMap((a) => (a.profile ? [cqgRecipient(a.profile)] : []));
     }
 
     return [];

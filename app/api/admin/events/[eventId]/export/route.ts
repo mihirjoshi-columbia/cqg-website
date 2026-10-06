@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
+import { fetchAllPages } from "@/lib/supabase/helpers";
+import { EVENT_APPLICATION_SELECT, type EventApplicationRow } from "@/lib/supabase/rows";
 import { requireAdmin } from "@/lib/admin";
 import { buildCsv, csvResponse, slugify } from "@/lib/csv";
-import type { CqgEvent, CqgEventApplication, CqgProfile } from "@/lib/supabase/types";
+import type { CqgEvent } from "@/lib/supabase/types";
 
 const COLUMNS = [
     "Name",
@@ -29,25 +30,20 @@ export async function GET(_request: Request, { params }: { params: Promise<{ eve
         return NextResponse.json({ error: "Event not found." }, { status: 404 });
     }
 
-    const apps = await fetchAllPages<CqgEventApplication>((from, to) =>
+    // The API returns at most 1,000 rows per request, so read it in pages.
+    const apps = await fetchAllPages<EventApplicationRow>((from, to) =>
         admin
             .from("cqg_event_applications")
-            .select("*")
+            .select(EVENT_APPLICATION_SELECT)
             .eq("event_id", eventId)
             .order("applied_at", { ascending: true })
             .order("id")
             .range(from, to)
-            .overrideTypes<CqgEventApplication[], { merge: false }>()
+            .overrideTypes<EventApplicationRow[], { merge: false }>()
     );
-    const profileIds = [...new Set(apps.map((a) => a.profile_id))];
-
-    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
-        admin.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
-    );
-    const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const rows: unknown[][] = apps.map((app) => {
-        const p = profileMap.get(app.profile_id);
+        const p = app.profile;
         return [
             p?.name ?? "",
             p?.email ?? "",
