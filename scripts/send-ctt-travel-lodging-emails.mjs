@@ -12,6 +12,7 @@ import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { brandedEmailHtml, brandedEmailText } from "./lib-email-template.mjs";
+import { fetchAllPages, fetchByIds } from "./lib-paging.mjs";
 
 const SITE_URL = "https://www.columbiaquantgroup.com";
 const MODE = process.argv.includes("--send") ? "send" : process.argv.includes("--dry-run") ? "dry-run" : "preview";
@@ -58,20 +59,21 @@ async function main() {
         if (error) throw error;
     }
 
-    const { data: apps, error } = await supabase
-        .from("ctt_applications")
-        .select("ctt_profile_id,travel_needed,lodging_needed,travel_housing_needed")
-        .eq("applicant_type", "external")
-        .eq("travel_housing_needed", true)
-        .or("travel_needed.is.null,lodging_needed.is.null");
-    if (error) throw error;
+    const apps = await fetchAllPages((from, to) =>
+        supabase
+            .from("ctt_applications")
+            .select("id,ctt_profile_id,travel_needed,lodging_needed,travel_housing_needed")
+            .eq("applicant_type", "external")
+            .eq("travel_housing_needed", true)
+            .or("travel_needed.is.null,lodging_needed.is.null")
+            .order("id")
+            .range(from, to)
+    );
 
-    const { data: profiles, error: pErr } = await supabase
-        .from("ctt_profiles")
-        .select("id,email,name")
-        .in("id", apps.map((a) => a.ctt_profile_id));
-    if (pErr) throw pErr;
-    const audience = profiles;
+    const audience = await fetchByIds(
+        [...new Set(apps.map((a) => a.ctt_profile_id))],
+        (chunk) => supabase.from("ctt_profiles").select("id,email,name").in("id", chunk)
+    );
     console.log(`${audience.length} applicants to email`);
 
     if (MODE === "preview") {

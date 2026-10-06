@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
 import { requireAdmin } from "@/lib/admin";
 import { buildCsv, csvResponse, slugify } from "@/lib/csv";
 import type { CqgMembershipApplication, CqgMembershipCycle, CqgProfile } from "@/lib/supabase/types";
@@ -40,20 +41,22 @@ export async function GET() {
         return NextResponse.json({ error: "No membership cycle exists yet." }, { status: 404 });
     }
 
-    const { data: applications } = await admin
-        .from("cqg_membership_applications")
-        .select("*")
-        .eq("cycle_id", cycle.id)
-        .order("submitted_at", { ascending: false })
-        .overrideTypes<CqgMembershipApplication[], { merge: false }>();
-
-    const apps = applications ?? [];
+    const apps = await fetchAllPages<CqgMembershipApplication>((from, to) =>
+        admin
+            .from("cqg_membership_applications")
+            .select("*")
+            .eq("cycle_id", cycle.id)
+            .order("submitted_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CqgMembershipApplication[], { merge: false }>()
+    );
     const profileIds = [...new Set(apps.map((a) => a.profile_id))];
 
-    const { data: profiles } = profileIds.length
-        ? await admin.from("cqg_profiles").select("*").in("id", profileIds).overrideTypes<CqgProfile[], { merge: false }>()
-        : { data: [] as CqgProfile[] };
-    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
+        admin.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    );
+    const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const rows: unknown[][] = [];
 

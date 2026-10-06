@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
 import { requireAdmin } from "@/lib/admin";
 import LockToggle from "../LockToggle";
 import DecideButtons from "./DecideButtons";
@@ -30,23 +31,21 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
         notFound();
     }
 
-    const { data: applications } = await supabase
-        .from("cqg_event_applications")
-        .select("*")
-        .eq("event_id", eventId)
-        .order("applied_at", { ascending: true })
-        .overrideTypes<CqgEventApplication[], { merge: false }>();
-
-    const apps = applications ?? [];
+    const apps = await fetchAllPages<CqgEventApplication>((from, to) =>
+        supabase
+            .from("cqg_event_applications")
+            .select("*")
+            .eq("event_id", eventId)
+            .order("applied_at", { ascending: true })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CqgEventApplication[], { merge: false }>()
+    );
     const profileIds = [...new Set(apps.map((a) => a.profile_id))];
-    const { data: profiles } = profileIds.length
-        ? await supabase
-              .from("cqg_profiles")
-              .select("*")
-              .in("id", profileIds)
-              .overrideTypes<CqgProfile[], { merge: false }>()
-        : { data: [] as CqgProfile[] };
-    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
+        supabase.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    );
+    const profileMap = new Map(profiles.map((p) => [p.id, p]));
 
     const accepted = apps.filter((a) => a.status === "accepted");
     const pending = apps.filter((a) => a.status === "pending");

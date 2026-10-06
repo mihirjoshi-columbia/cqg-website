@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { fetchAllPages } from "@/lib/supabase/helpers";
 import TierSelect from "./TierSelect";
 import ViewResumeButton from "./ViewResumeButton";
 import type { CqgProfile } from "@/lib/supabase/types";
@@ -8,16 +9,20 @@ export const metadata = { title: "Members — CQG Admin" };
 export default async function AdminMembersPage() {
     const { supabase } = await requireAdmin();
 
-    const { data: members } = await supabase
-        .from("cqg_profiles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .overrideTypes<CqgProfile[], { merge: false }>();
+    const members = await fetchAllPages<CqgProfile>((from, to) =>
+        supabase
+            .from("cqg_profiles")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CqgProfile[], { merge: false }>()
+    );
 
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
-                <p className="text-ink-faint text-sm">{members?.length ?? 0} accounts</p>
+                <p className="text-ink-faint text-sm">{members.length} accounts</p>
                 <a href="/api/admin/members/export" className="btn-cqg btn-outline-navy btn-sm">
                     Export CSV
                 </a>
@@ -36,7 +41,7 @@ export default async function AdminMembersPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {members?.map((m) => (
+                        {members.map((m) => (
                             <tr key={m.id}>
                                 <td>{m.name}</td>
                                 <td>{m.email}</td>

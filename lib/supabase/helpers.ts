@@ -58,3 +58,58 @@ export async function callRpc<T extends keyof Functions>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (client.rpc as any)(fn, args);
 }
+
+// PostgREST returns at most 1,000 rows per request and does so SILENTLY (no
+// error, no truncation flag), so any list that can grow past that has to be
+// read in pages. `page` must apply a stable ORDER BY (add a unique tiebreaker
+// such as .order("id")) or rows can repeat/skip across pages. Throws on error
+// rather than returning a partial list.
+const PAGE_SIZE = 1000;
+
+type PageResult<T> = PromiseLike<{ data: T[] | null; error: PostgrestError | null }>;
+
+export async function fetchAllPages<T>(page: (from: number, to: number) => PageResult<T>): Promise<T[]> {
+    const all: T[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await page(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        all.push(...(data ?? []));
+        if (!data || data.length < PAGE_SIZE) return all;
+    }
+}
+
+// `.in("id", ids)` puts every id in the request URL, which the API rejects
+// ("Bad Request") somewhere past a few hundred uuids. Look ids up in chunks.
+export async function fetchByIds<T>(
+    ids: string[],
+    lookup: (chunk: string[]) => PageResult<T>,
+    chunkSize = 100
+): Promise<T[]> {
+    const chunks: string[][] = [];
+    for (let i = 0; i < ids.length; i += chunkSize) chunks.push(ids.slice(i, i + chunkSize));
+    const results = await Promise.all(chunks.map((chunk) => lookup(chunk)));
+    return results.flatMap(({ data, error }) => {
+        if (error) throw error;
+        return data ?? [];
+    });
+}
+
+// One signed-URL request per 100 files instead of one per row -- the CSV
+// exports include a resume link for every person, and per-row requests are
+// far too slow at a thousand rows.
+export async function signedUrlMap(
+    client: SupabaseClient<Database>,
+    bucket: string,
+    paths: string[],
+    ttlSeconds: number
+): Promise<Map<string, string>> {
+    const urls = new Map<string, string>();
+    const unique = [...new Set(paths)];
+    for (let i = 0; i < unique.length; i += 100) {
+        const { data } = await client.storage.from(bucket).createSignedUrls(unique.slice(i, i + 100), ttlSeconds);
+        for (const entry of data ?? []) {
+            if (entry.path && entry.signedUrl) urls.set(entry.path, entry.signedUrl);
+        }
+    }
+    return urls;
+}

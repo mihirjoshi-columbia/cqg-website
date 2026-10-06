@@ -1,12 +1,11 @@
 import { requireAdmin } from "@/lib/admin";
 import { travelLodgingLabel } from "@/lib/ctt-application";
+import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
 import DecisionButtons from "./DecisionButtons";
 import ViewResumeButton from "./ViewResumeButton";
 import type { CttApplication, CqgProfile, CttProfile, CttCycle } from "@/lib/supabase/types";
 
 export const metadata = { title: "CTT Applications — CQG Admin" };
-
-const ID_BATCH_SIZE = 150;
 
 const STATUS_TAG: Record<string, string> = {
     pending: "tag-sky",
@@ -17,42 +16,33 @@ const STATUS_TAG: Record<string, string> = {
 export default async function CttApplicationsPage() {
     const { supabase } = await requireAdmin();
 
-    const { data: applications } = await supabase
-        .from("ctt_applications")
-        .select("*")
-        .order("submitted_at", { ascending: false })
-        .overrideTypes<CttApplication[], { merge: false }>();
-
-    const apps = applications ?? [];
+    const apps = await fetchAllPages<CttApplication>((from, to) =>
+        supabase
+            .from("ctt_applications")
+            .select("*")
+            .order("submitted_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CttApplication[], { merge: false }>()
+    );
     const cqgIds = [...new Set(apps.filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
     const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
     const cycleIds = [...new Set(apps.map((a) => a.cycle_id))];
 
-    // .in() goes into the request URL, so one query for every applicant
-    // overruns the gateway's URI limit once a cycle has a few hundred
-    // applications -- the request fails and every name/resume renders blank.
-    // Fetch in batches that stay well under it, and surface a failure instead
-    // of silently showing empty cells.
-    async function profilesByIds<T>(table: "cqg_profiles" | "ctt_profiles" | "ctt_cycles", ids: string[]): Promise<T[]> {
-        const out: T[] = [];
-        for (let i = 0; i < ids.length; i += ID_BATCH_SIZE) {
-            const { data, error } = await supabase
-                .from(table)
-                .select("*")
-                .in("id", ids.slice(i, i + ID_BATCH_SIZE));
-            if (error) throw error;
-            out.push(...((data ?? []) as unknown as T[]));
-        }
-        return out;
-    }
+    const cqgProfiles = await fetchByIds<CqgProfile>(cqgIds, (chunk) =>
+        supabase.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    );
+    const cttProfiles = await fetchByIds<CttProfile>(cttIds, (chunk) =>
+        supabase.from("ctt_profiles").select("*").in("id", chunk).overrideTypes<CttProfile[], { merge: false }>()
+    );
 
-    const cqgProfiles = await profilesByIds<CqgProfile>("cqg_profiles", cqgIds);
-    const cttProfiles = await profilesByIds<CttProfile>("ctt_profiles", cttIds);
-    const cycles = await profilesByIds<CttCycle>("ctt_cycles", cycleIds);
+    const { data: cycles } = cycleIds.length
+        ? await supabase.from("ctt_cycles").select("*").in("id", cycleIds).overrideTypes<CttCycle[], { merge: false }>()
+        : { data: [] as CttCycle[] };
 
     const cqgMap = new Map(cqgProfiles.map((p) => [p.id, p]));
     const cttMap = new Map(cttProfiles.map((p) => [p.id, p]));
-    const cycleMap = new Map(cycles.map((c) => [c.id, c]));
+    const cycleMap = new Map((cycles ?? []).map((c) => [c.id, c]));
 
     return (
         <div>

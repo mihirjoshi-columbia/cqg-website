@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { fetchAllPages, fetchByIds } from "@/lib/supabase/helpers";
 import DecisionButtons from "./DecisionButtons";
 import type { CqgMembershipApplication, CqgProfile, CqgMembershipCycle } from "@/lib/supabase/types";
 
@@ -13,23 +14,21 @@ const STATUS_TAG: Record<string, string> = {
 export default async function MembershipApplicationsPage() {
     const { supabase } = await requireAdmin();
 
-    const { data: applications } = await supabase
-        .from("cqg_membership_applications")
-        .select("*")
-        .order("submitted_at", { ascending: false })
-        .overrideTypes<CqgMembershipApplication[], { merge: false }>();
-
-    const apps = applications ?? [];
+    const apps = await fetchAllPages<CqgMembershipApplication>((from, to) =>
+        supabase
+            .from("cqg_membership_applications")
+            .select("*")
+            .order("submitted_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CqgMembershipApplication[], { merge: false }>()
+    );
     const profileIds = [...new Set(apps.map((a) => a.profile_id))];
     const cycleIds = [...new Set(apps.map((a) => a.cycle_id))];
 
-    const { data: profiles } = profileIds.length
-        ? await supabase
-              .from("cqg_profiles")
-              .select("*")
-              .in("id", profileIds)
-              .overrideTypes<CqgProfile[], { merge: false }>()
-        : { data: [] as CqgProfile[] };
+    const profiles = await fetchByIds<CqgProfile>(profileIds, (chunk) =>
+        supabase.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    );
 
     const { data: cycles } = cycleIds.length
         ? await supabase
@@ -39,7 +38,7 @@ export default async function MembershipApplicationsPage() {
               .overrideTypes<CqgMembershipCycle[], { merge: false }>()
         : { data: [] as CqgMembershipCycle[] };
 
-    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const profileMap = new Map(profiles.map((p) => [p.id, p]));
     const cycleMap = new Map((cycles ?? []).map((c) => [c.id, c]));
 
     return (

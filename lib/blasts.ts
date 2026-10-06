@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { insertRows, updateRow } from "@/lib/supabase/helpers";
+import { fetchAllPages, fetchByIds, insertRows, updateRow } from "@/lib/supabase/helpers";
 import { sendBlastEmail } from "@/lib/email";
 import type { EmailBlast, EmailBlastRecipient, BlastSegmentType, ProfileKind } from "@/lib/supabase/types";
 
@@ -18,78 +18,86 @@ interface Recipient {
 // before (see the DMARC/burst-pattern investigation).
 const BATCH_SIZE = 200;
 
+type NamedRow = { id: string; email: string; name: string };
+
+// Every query below can match more than 1,000 rows (the API's silent per-request
+// cap) or more ids than fit in a URL, so they page / chunk. Missing recipients
+// here means people silently never get the blast.
 export async function resolveSegment(
     admin: ReturnType<typeof createServiceRoleClient>,
     segmentType: BlastSegmentType,
     params: Record<string, unknown>
 ): Promise<Recipient[]> {
+    const cqgRecipient = (p: NamedRow): Recipient => ({ profileKind: "cqg", profileId: p.id, email: p.email, name: p.name });
+    const cttRecipient = (p: NamedRow): Recipient => ({ profileKind: "ctt", profileId: p.id, email: p.email, name: p.name });
+    const lookupCqg = (ids: string[]) =>
+        fetchByIds<NamedRow>(ids, (chunk) =>
+            admin.from("cqg_profiles").select("id,email,name").in("id", chunk).overrideTypes<NamedRow[], { merge: false }>()
+        );
+    const lookupCtt = (ids: string[]) =>
+        fetchByIds<NamedRow>(ids, (chunk) =>
+            admin.from("ctt_profiles").select("id,email,name").in("id", chunk).overrideTypes<NamedRow[], { merge: false }>()
+        );
+
     if (segmentType === "cqg_tier") {
         const tier = params.tier as string | undefined;
-        let query = admin.from("cqg_profiles").select("id,email,name,tier");
-        if (tier && tier !== "all") query = query.eq("tier", tier);
-        const { data } = await query.overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>();
-        return (data ?? []).map((p) => ({ profileKind: "cqg" as const, profileId: p.id, email: p.email, name: p.name }));
+        const profiles = await fetchAllPages<NamedRow>((from, to) => {
+            let query = admin.from("cqg_profiles").select("id,email,name,tier");
+            if (tier && tier !== "all") query = query.eq("tier", tier);
+            return query.order("id").range(from, to).overrideTypes<NamedRow[], { merge: false }>();
+        });
+        return profiles.map(cqgRecipient);
     }
 
     if (segmentType === "ctt_group") {
         const status = params.status as string | undefined;
 
         if (!status || status === "all") {
-            const { data } = await admin
-                .from("ctt_profiles")
-                .select("id,email,name")
-                .overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>();
-            return (data ?? []).map((p) => ({ profileKind: "ctt" as const, profileId: p.id, email: p.email, name: p.name }));
+            const profiles = await fetchAllPages<NamedRow>((from, to) =>
+                admin.from("ctt_profiles").select("id,email,name").order("id").range(from, to).overrideTypes<NamedRow[], { merge: false }>()
+            );
+            return profiles.map(cttRecipient);
         }
 
-        const { data: apps } = await admin
-            .from("ctt_applications")
-            .select("applicant_type,cqg_profile_id,ctt_profile_id")
-            .eq("status", status)
-            .overrideTypes<{ applicant_type: string; cqg_profile_id: string | null; ctt_profile_id: string | null }[], { merge: false }>();
+        type AppRow = { id: string; cqg_profile_id: string | null; ctt_profile_id: string | null };
+        const apps = await fetchAllPages<AppRow>((from, to) =>
+            admin
+                .from("ctt_applications")
+                .select("id,cqg_profile_id,ctt_profile_id")
+                .eq("status", status)
+                .order("id")
+                .range(from, to)
+                .overrideTypes<AppRow[], { merge: false }>()
+        );
 
-        const cqgIds = [...new Set((apps ?? []).filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
-        const cttIds = [...new Set((apps ?? []).filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
+        const cqgIds = [...new Set(apps.filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
+        const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
 
-        const [{ data: cqgProfiles }, { data: cttProfiles }] = await Promise.all([
-            cqgIds.length
-                ? admin.from("cqg_profiles").select("id,email,name").in("id", cqgIds).overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>()
-                : Promise.resolve({ data: [] as { id: string; email: string; name: string }[] }),
-            cttIds.length
-                ? admin.from("ctt_profiles").select("id,email,name").in("id", cttIds).overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>()
-                : Promise.resolve({ data: [] as { id: string; email: string; name: string }[] }),
-        ]);
-
-        return [
-            ...(cqgProfiles ?? []).map((p) => ({ profileKind: "cqg" as const, profileId: p.id, email: p.email, name: p.name })),
-            ...(cttProfiles ?? []).map((p) => ({ profileKind: "ctt" as const, profileId: p.id, email: p.email, name: p.name })),
-        ];
+        const [cqgProfiles, cttProfiles] = await Promise.all([lookupCqg(cqgIds), lookupCtt(cttIds)]);
+        return [...cqgProfiles.map(cqgRecipient), ...cttProfiles.map(cttRecipient)];
     }
 
     if (segmentType === "event_group") {
         const eventId = params.eventId as string;
         const which = params.which as string; // "applied" | "attended"
 
-        const { data: apps } = await admin
-            .from("cqg_event_applications")
-            .select("profile_id,status,attended")
-            .eq("event_id", eventId)
-            .overrideTypes<{ profile_id: string; status: string; attended: boolean }[], { merge: false }>();
+        type EventAppRow = { id: string; profile_id: string; status: string; attended: boolean };
+        const apps = await fetchAllPages<EventAppRow>((from, to) =>
+            admin
+                .from("cqg_event_applications")
+                .select("id,profile_id,status,attended")
+                .eq("event_id", eventId)
+                .order("id")
+                .range(from, to)
+                .overrideTypes<EventAppRow[], { merge: false }>()
+        );
 
-        const filtered =
-            which === "attended"
-                ? (apps ?? []).filter((a) => a.attended)
-                : (apps ?? []).filter((a) => a.status !== "withdrawn");
+        const filtered = which === "attended" ? apps.filter((a) => a.attended) : apps.filter((a) => a.status !== "withdrawn");
 
         const profileIds = [...new Set(filtered.map((a) => a.profile_id))];
         if (!profileIds.length) return [];
 
-        const { data: profiles } = await admin
-            .from("cqg_profiles")
-            .select("id,email,name")
-            .in("id", profileIds)
-            .overrideTypes<{ id: string; email: string; name: string }[], { merge: false }>();
-        return (profiles ?? []).map((p) => ({ profileKind: "cqg" as const, profileId: p.id, email: p.email, name: p.name }));
+        return (await lookupCqg(profileIds)).map(cqgRecipient);
     }
 
     return [];

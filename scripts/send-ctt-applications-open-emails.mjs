@@ -13,6 +13,7 @@ import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { brandedEmailHtml, brandedEmailText } from "./lib-email-template.mjs";
+import { fetchAllPages } from "./lib-paging.mjs";
 
 const SITE_URL = "https://www.columbiaquantgroup.com";
 const MODE = process.argv.includes("--send") ? "send" : process.argv.includes("--dry-run") ? "dry-run" : "preview";
@@ -53,8 +54,9 @@ function buildContent(person) {
 }
 
 async function loadAudience(supabase) {
-    const { data: profiles, error } = await supabase.from("ctt_profiles").select("id,email,name");
-    if (error) throw error;
+    const profiles = await fetchAllPages((from, to) =>
+        supabase.from("ctt_profiles").select("id,email,name").order("id").range(from, to)
+    );
     const users = [];
     for (let page = 1; ; page++) {
         const { data } = await supabase.auth.admin.listUsers({ page, perPage: 200 });

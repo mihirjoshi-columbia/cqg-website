@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
+import { fetchAllPages, signedUrlMap } from "@/lib/supabase/helpers";
 import { buildCsv, csvResponse } from "@/lib/csv";
 import type { CqgProfile } from "@/lib/supabase/types";
 
@@ -17,25 +18,31 @@ const COLUMNS = [
     "Created At",
 ] as const;
 
+export const maxDuration = 60;
+
 export async function GET() {
     const { admin } = await requireAdmin();
 
-    const { data: members } = await admin
-        .from("cqg_profiles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .overrideTypes<CqgProfile[], { merge: false }>();
+    const members = await fetchAllPages<CqgProfile>((from, to) =>
+        admin
+            .from("cqg_profiles")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CqgProfile[], { merge: false }>()
+    );
+    const resumeUrlByPath = await signedUrlMap(
+        admin,
+        "resumes",
+        members.map((m) => m.resume_path).filter((x): x is string => Boolean(x)),
+        RESUME_LINK_TTL_SECONDS
+    );
 
     const rows: unknown[][] = [];
 
-    for (const m of members ?? []) {
-        let resumeLink = "";
-        if (m.resume_path) {
-            const { data: signed } = await admin.storage
-                .from("resumes")
-                .createSignedUrl(m.resume_path, RESUME_LINK_TTL_SECONDS);
-            resumeLink = signed?.signedUrl ?? "";
-        }
+    for (const m of members) {
+        const resumeLink = (m.resume_path && resumeUrlByPath.get(m.resume_path)) || "";
 
         rows.push([
             m.name,

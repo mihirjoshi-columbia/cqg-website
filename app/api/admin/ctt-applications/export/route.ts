@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { travelLodgingLabel } from "@/lib/ctt-application";
+import { fetchAllPages, fetchByIds, signedUrlMap } from "@/lib/supabase/helpers";
 import { requireAdmin } from "@/lib/admin";
 import { buildCsv, csvResponse, slugify } from "@/lib/csv";
 import type { CqgProfile, CttApplication, CttCycle, CttProfile } from "@/lib/supabase/types";
@@ -26,6 +27,9 @@ const COLUMNS = [
     "Cycle",
 ] as const;
 
+// 1,000+ applications: give the export room to finish.
+export const maxDuration = 60;
+
 export async function GET() {
     const { admin } = await requireAdmin();
 
@@ -41,26 +45,36 @@ export async function GET() {
         return NextResponse.json({ error: "No CTT cycle exists yet." }, { status: 404 });
     }
 
-    const { data: applications } = await admin
-        .from("ctt_applications")
-        .select("*")
-        .eq("cycle_id", cycle.id)
-        .order("submitted_at", { ascending: false })
-        .overrideTypes<CttApplication[], { merge: false }>();
-
-    const apps = applications ?? [];
+    const apps = await fetchAllPages<CttApplication>((from, to) =>
+        admin
+            .from("ctt_applications")
+            .select("*")
+            .eq("cycle_id", cycle.id)
+            .order("submitted_at", { ascending: false })
+            .order("id")
+            .range(from, to)
+            .overrideTypes<CttApplication[], { merge: false }>()
+    );
     const cqgIds = [...new Set(apps.filter((a) => a.cqg_profile_id).map((a) => a.cqg_profile_id as string))];
     const cttIds = [...new Set(apps.filter((a) => a.ctt_profile_id).map((a) => a.ctt_profile_id as string))];
 
-    const { data: cqgProfiles } = cqgIds.length
-        ? await admin.from("cqg_profiles").select("*").in("id", cqgIds).overrideTypes<CqgProfile[], { merge: false }>()
-        : { data: [] as CqgProfile[] };
-    const { data: cttProfiles } = cttIds.length
-        ? await admin.from("ctt_profiles").select("*").in("id", cttIds).overrideTypes<CttProfile[], { merge: false }>()
-        : { data: [] as CttProfile[] };
+    const cqgProfiles = await fetchByIds<CqgProfile>(cqgIds, (chunk) =>
+        admin.from("cqg_profiles").select("*").in("id", chunk).overrideTypes<CqgProfile[], { merge: false }>()
+    );
+    const cttProfiles = await fetchByIds<CttProfile>(cttIds, (chunk) =>
+        admin.from("ctt_profiles").select("*").in("id", chunk).overrideTypes<CttProfile[], { merge: false }>()
+    );
 
-    const cqgMap = new Map((cqgProfiles ?? []).map((p) => [p.id, p]));
-    const cttMap = new Map((cttProfiles ?? []).map((p) => [p.id, p]));
+    const cqgMap = new Map(cqgProfiles.map((p) => [p.id, p]));
+    const cttMap = new Map(cttProfiles.map((p) => [p.id, p]));
+
+    // One batched request per 100 resumes instead of one request per row.
+    const resumeUrlByPath = await signedUrlMap(
+        admin,
+        "resumes",
+        [...cqgProfiles, ...cttProfiles].map((p) => p.resume_path).filter((x): x is string => Boolean(x)),
+        RESUME_LINK_TTL_SECONDS
+    );
 
     const rows: unknown[][] = [];
 
@@ -69,13 +83,7 @@ export async function GET() {
         const ctt = app.ctt_profile_id ? cttMap.get(app.ctt_profile_id) : undefined;
         const applicant = cqg ?? ctt;
 
-        let resumeLink = "";
-        if (applicant?.resume_path) {
-            const { data: signed } = await admin.storage
-                .from("resumes")
-                .createSignedUrl(applicant.resume_path, RESUME_LINK_TTL_SECONDS);
-            resumeLink = signed?.signedUrl ?? "";
-        }
+        const resumeLink = (applicant?.resume_path && resumeUrlByPath.get(applicant.resume_path)) || "";
 
         rows.push([
             applicant?.name ?? "",
