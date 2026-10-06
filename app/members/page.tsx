@@ -29,12 +29,16 @@ const seniorAdvisors = [
 ];
 
 const seniorMembers2627 = [
+    { name: "Ashley Seo", company: "IMC", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
+    { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
     { name: "Johnathan Mo", company: "SIG", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
-    { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
-    { name: "Steven Spasov", company: "Jane Street", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
-    { name: "Ashley Seo", company: "IMC", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
+    { name: "Srirag Tatavarti", company: "Jane Street", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Rohan Timmaraju", company: "Citadel GQS", linkedin: "https://www.linkedin.com/in/rohan-timmaraju/" },
+    { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
+    { name: "Nikas Lukyanov", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/nikaslukyanov/" },
+    { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
 ];
 
 export default function MembersPage() {
