@@ -1,6 +1,6 @@
 interface Advisor {
     name: string;
-    company: string;
+    company?: string;
     linkedin: string;
 }
 
@@ -25,7 +25,7 @@ export default function AdvisorList({ title, advisors }: AdvisorListProps) {
                         className="advisor-btn"
                     >
                         <span className="who">{advisor.name}</span>
-                        <span className="co">{advisor.company || "—"}</span>
+                        {advisor.company && <span className="co">{advisor.company}</span>}
                     </a>
                 ))}
             </div>

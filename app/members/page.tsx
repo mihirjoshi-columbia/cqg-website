@@ -34,7 +34,7 @@ const seniorMembers2627 = [
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
     { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
     { name: "Johnathan Mo", company: "SIG", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
-    { name: "Srirag Tatavarti", company: "Jane Street", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
     { name: "Rohan Timmaraju", company: "Citadel GQS", linkedin: "https://www.linkedin.com/in/rohan-timmaraju/" },
     { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
     { name: "Nikas Lukyanov", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/nikaslukyanov/" },
