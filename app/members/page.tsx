@@ -43,7 +43,30 @@ const underclassmen2627Names = [
     "Cathy Deng",
     "Ryan Kim",
 ];
-const underclassmen2627 = currentMembers.filter((m) => underclassmen2627Names.includes(m.name));
+const newUnderclassmen2627 = [
+    { name: "Ana-Maria Petcu", linkedin: "https://www.linkedin.com/in/anapetcu" },
+    { name: "Carlos Sarkis", linkedin: "https://www.linkedin.com/in/carlossarkis" },
+    { name: "Emily Jo", linkedin: "https://www.linkedin.com/in/emily-jo-b41565265" },
+    { name: "Ethan Lu" },
+    { name: "Jason Xiao", linkedin: "https://www.linkedin.com/in/yuhao7xiao" },
+    { name: "Kevin Dong" },
+    { name: "Leandro Zhang", linkedin: "https://www.linkedin.com/in/leandro-zhang-8b3373348" },
+    { name: "Luke Meng", linkedin: "https://www.linkedin.com/in/luke-meng-00ab5531a" },
+    { name: "Michael Zhu" },
+    { name: "Nathan Zhang", linkedin: "https://www.linkedin.com/in/nathan-zhang-22217b368" },
+    { name: "Petewat Chaoha", linkedin: "https://www.linkedin.com/in/petewat-chaoha-9849b8343" },
+    { name: "Ryan Shanbhag", linkedin: "https://www.linkedin.com/in/ryan-shanbhag-11490a207" },
+    { name: "Sasha Martynov", linkedin: "https://www.linkedin.com/in/aleksandr-martynov-2b696a428" },
+    { name: "Sidharth Sharma", linkedin: "https://www.linkedin.com/in/sidharth-sharma-38134a2aa" },
+    { name: "Sophia Tang", linkedin: "https://www.linkedin.com/in/tang-sophia" },
+    { name: "Tanish Sonone", linkedin: "https://www.linkedin.com/in/tanishsonone" },
+    { name: "Warren Fu", linkedin: "https://www.linkedin.com/in/warren-fu-2554a6267" },
+];
+
+const underclassmen2627 = [
+    ...currentMembers.filter((m) => underclassmen2627Names.includes(m.name)),
+    ...newUnderclassmen2627,
+];
 
 const seniorAdvisors = [
     { name: "Shriya Mahakala", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
