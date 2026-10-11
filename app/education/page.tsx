@@ -76,7 +76,7 @@ export default function EducationPage() {
                     <div className="eyebrow text-navy mb-3">Mentorship</div>
                     <h2 className="font-display font-extrabold text-2xl text-navy">Big &amp; Little Lineage</h2>
                     <p className="text-ink-soft text-[1.05rem] leading-relaxed mt-2.5">
-                        Who mentors whom in the 2025&ndash;2026 class. Bigs on top, their littles below.
+                        CQG began forming big/little lineages in AY 2025&ndash;2026. Here&apos;s how they trace so far.
                     </p>
 
                     <div className="mt-8">

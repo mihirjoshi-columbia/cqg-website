@@ -5,6 +5,7 @@ import { currentMembers, exec2025, seniorAdvisors } from "@/lib/data/members";
 export const bigLittlePairs: { little: string; big: string }[] = [
     { little: "Jinghe Zhang", big: "Aurora Wang" },
     { little: "Lisa Liu", big: "Aurora Wang" },
+    { little: "Cathy Deng", big: "Aurora Wang" },
     { little: "Michelle Zhou", big: "Harris Chen" },
     { little: "Alexandra Duan", big: "Harris Chen" },
     { little: "Anay Garodia", big: "Kshitig Seth" },
@@ -13,6 +14,7 @@ export const bigLittlePairs: { little: string; big: string }[] = [
     { little: "Shreyas Singh", big: "Luke Freed" },
     { little: "Zachary Jeon", big: "Mihir Joshi" },
     { little: "Ryan Kim", big: "Mihir Joshi" },
+    { little: "Sindhu Chalasani", big: "Mihir Joshi" },
     { little: "Evelyn Li", big: "Nicole Pi" },
     { little: "Siddharth Rout", big: "Nicole Pi" },
     { little: "Raymond Zhao", big: "Nikhil Mudumbi" },
