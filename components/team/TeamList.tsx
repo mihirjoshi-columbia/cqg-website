@@ -4,7 +4,7 @@ interface Member {
 }
 
 interface TeamListProps {
-    title: string;
+    title?: string;
     members: Member[];
 }
 
@@ -13,7 +13,7 @@ export default function TeamList({ title, members }: TeamListProps) {
 
     return (
         <div>
-            <h3 className="font-display font-bold text-lg text-navy mb-5">{title}</h3>
+            {title && <h3 className="font-display font-bold text-lg text-navy mb-5">{title}</h3>}
             <div className="flex flex-wrap gap-2.5">
                 {sorted.map((member) => (
                     <a

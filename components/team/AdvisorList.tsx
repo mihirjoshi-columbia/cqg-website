@@ -1,22 +1,25 @@
 interface Advisor {
     name: string;
-    company?: string;
+    /** Small line under the name: a company, or a role for executive boards. */
+    tag?: string;
     linkedin: string;
 }
 
 interface AdvisorListProps {
-    title: string;
+    title?: string;
     advisors: Advisor[];
+    /** Keep the given order instead of sorting by name (executive boards list the President first). */
+    keepOrder?: boolean;
 }
 
-export default function AdvisorList({ title, advisors }: AdvisorListProps) {
-    const sorted = [...advisors].sort((a, b) => a.name.localeCompare(b.name));
+export default function AdvisorList({ title, advisors, keepOrder = false }: AdvisorListProps) {
+    const shown = keepOrder ? advisors : [...advisors].sort((a, b) => a.name.localeCompare(b.name));
 
     return (
         <div>
-            <h3 className="font-display font-bold text-lg text-navy mb-5">{title}</h3>
+            {title && <h3 className="font-display font-bold text-lg text-navy mb-5">{title}</h3>}
             <div className="flex flex-wrap gap-3">
-                {sorted.map((advisor) => (
+                {shown.map((advisor) => (
                     <a
                         key={advisor.name}
                         href={advisor.linkedin}
@@ -25,7 +28,7 @@ export default function AdvisorList({ title, advisors }: AdvisorListProps) {
                         className="advisor-btn"
                     >
                         <span className="who">{advisor.name}</span>
-                        {advisor.company && <span className="co">{advisor.company}</span>}
+                        {advisor.tag && <span className="co">{advisor.tag}</span>}
                     </a>
                 ))}
             </div>
