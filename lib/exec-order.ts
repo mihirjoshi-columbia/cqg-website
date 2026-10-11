@@ -9,8 +9,6 @@ const ROLE_ORDER = [
     "internal vp",
     "vp",
     "treasurer",
-    "co-head",
-    "head of",
     "education",
     "research",
     "events",

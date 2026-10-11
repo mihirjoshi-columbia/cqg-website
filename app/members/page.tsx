@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
@@ -109,14 +109,19 @@ function BoardSection({ title, gray = false, children }: { title: string; gray?:
     );
 }
 
+// Fall 2024 and older: one block per board, newest first.
+const boards = [
+    { label: "Fall 2024", year: 2024, exec: exec2024, junior: members2425 },
+    { label: "AY 2023–2024", year: 2023, exec: exec2023, junior: members2324 },
+    ...pastBoards,
+];
+
 const namesOf = (people: { name: string }[]) => people.map((p) => p.name);
 const firstYears = firstYearByName(
     [
         { year: 2026, names: [...namesOf(execBoard2026), ...namesOf(seniorMembers2627), ...namesOf(underclassmen2627)] },
         { year: 2025, names: [...namesOf(exec2025), ...namesOf(seniorAdvisors), ...namesOf(currentMembers)] },
-        { year: 2024, names: [...namesOf(exec2024), ...namesOf(members2425)] },
-        { year: 2023, names: [...namesOf(exec2023), ...namesOf(members2324)] },
-        ...pastBoards.map((b) => ({ year: b.year, names: [...namesOf(b.exec), ...namesOf(b.junior)] })),
+        ...boards.map((b) => ({ year: b.year, names: [...namesOf(b.exec), ...namesOf(b.junior)] })),
     ]
 );
 const mark = <T extends { name: string }>(people: T[], year: number) => markFirstYear(people, year, firstYears);
@@ -177,31 +182,18 @@ export default function MembersPage() {
                     </p>
                 </div>
             </section>
-            <BoardSection gray title="Fall 2024 Executive Board">
-                <AdvisorList advisors={mark(exec2024, 2024)} byRole />
-            </BoardSection>
-            <BoardSection title="Fall 2024 Junior E-Board">
-                <TeamList members={mark(members2425, 2024)} />
-            </BoardSection>
-            <BoardSection gray title="AY 2023–2024 Executive Board">
-                <AdvisorList advisors={mark(exec2023, 2023)} byRole />
-            </BoardSection>
-            <BoardSection title="AY 2023–2024 Junior E-Board">
-                <TeamList members={mark(members2324, 2023)} />
-            </BoardSection>
-            {pastBoards.map((board) => (
-                <Fragment key={board.label}>
-                    <BoardSection gray title={`${board.label} Executive Board`}>
-                        <AdvisorList advisors={mark(board.exec, board.year)} byRole thenByName />
-                    </BoardSection>
-                    <BoardSection title={`${board.label} Junior E-Board`}>
-                        {board.junior.some((p) => p.tag) ? (
-                            <AdvisorList advisors={mark(board.junior, board.year)} byRole thenByName />
-                        ) : (
-                            <TeamList members={mark(board.junior, board.year)} />
-                        )}
-                    </BoardSection>
-                </Fragment>
+            {boards.map((board, i) => (
+                <BoardSection key={board.label} gray={i % 2 === 0} title={board.label}>
+                    <div className="space-y-10">
+                        <AdvisorList
+                            title="Executive Board"
+                            advisors={mark(board.exec, board.year)}
+                            byRole
+                            thenByName={board.year < 2023}
+                        />
+                        <TeamList title="Junior E-Board" members={mark(board.junior, board.year)} />
+                    </div>
+                </BoardSection>
             ))}
         </div>
     );
