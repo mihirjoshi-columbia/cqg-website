@@ -2,6 +2,8 @@ import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
 import FirmsCollage from "@/components/placements/FirmsCollage";
+import { execBoard2026 } from "@/lib/data/exec-board-2026";
+import { firstYearByName, markFirstYear } from "@/lib/first-year";
 
 const currentMembers = [
     { name: "Michelle Zhou", linkedin: "https://www.linkedin.com/in/michelle-zhou-252119348" },
@@ -139,6 +141,25 @@ const members2324 = [
     { name: "Allison Lin", linkedin: "https://www.linkedin.com/in/yun-tzu-allison-lin/" },
 ];
 
+// Corrections to the automatic first-year guess below: person -> the year they
+// actually joined CQG. A year before 2023 (e.g. 2020) means no asterisk anywhere.
+const FIRST_YEAR_OVERRIDES: Record<string, number> = {
+    "Brian Daley": 2022,
+    "Akash Kumar": 2022,
+};
+
+const namesOf = (people: { name: string }[]) => people.map((p) => p.name);
+const firstYears = firstYearByName(
+    [
+        { year: 2026, names: [...namesOf(execBoard2026), ...namesOf(seniorMembers2627), ...namesOf(underclassmen2627)] },
+        { year: 2025, names: [...namesOf(exec2025), ...namesOf(seniorAdvisors), ...namesOf(currentMembers)] },
+        { year: 2024, names: [...namesOf(exec2024), ...namesOf(members2425)] },
+        { year: 2023, names: [...namesOf(exec2023), ...namesOf(members2324)] },
+    ],
+    FIRST_YEAR_OVERRIDES
+);
+const mark = <T extends { name: string }>(people: T[], year: number) => markFirstYear(people, year, firstYears);
+
 export default function MembersPage() {
     return (
         <div className="min-h-screen bg-white">
@@ -153,57 +174,58 @@ export default function MembersPage() {
                         Internal members are selected every school year; the executive board is elected to
                         serve each calendar year.
                     </p>
+                    <p className="text-[#9FB1CE] text-sm mt-2.5">* First year in CQG</p>
                 </div>
             </section>
 
             <FirmsCollage />
-            <ExecBoard />
+            <ExecBoard firstYearNames={namesOf(execBoard2026).filter((n) => firstYears.get(n) === 2026)} />
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2026–2027 Internal Members</h2>
                     <div className="space-y-10">
-                        <AdvisorList title="Senior Members" advisors={seniorMembers2627} />
-                        <TeamList title="Underclassmen" members={underclassmen2627} />
+                        <AdvisorList title="Senior Members" advisors={mark(seniorMembers2627, 2026)} />
+                        <TeamList title="Underclassmen" members={mark(underclassmen2627, 2026)} />
                     </div>
                 </div>
             </section>
             <section className="bg-paper-alt py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2025 Executive Board</h2>
-                    <AdvisorList advisors={exec2025} byRole />
+                    <AdvisorList advisors={mark(exec2025, 2025)} byRole />
                 </div>
             </section>
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2025–2026 Internal Members</h2>
                     <div className="space-y-10">
-                        <AdvisorList title="Senior Members" advisors={seniorAdvisors} />
-                        <TeamList title="Underclassmen" members={currentMembers} />
+                        <AdvisorList title="Senior Members" advisors={mark(seniorAdvisors, 2025)} />
+                        <TeamList title="Underclassmen" members={mark(currentMembers, 2025)} />
                     </div>
                 </div>
             </section>
             <section className="bg-paper-alt py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2024 Executive Board</h2>
-                    <AdvisorList advisors={exec2024} byRole />
+                    <AdvisorList advisors={mark(exec2024, 2024)} byRole />
                 </div>
             </section>
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2024–2025 Internal Members</h2>
-                    <TeamList members={members2425} />
+                    <TeamList members={mark(members2425, 2024)} />
                 </div>
             </section>
             <section className="bg-paper-alt py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2023 Executive Board</h2>
-                    <AdvisorList advisors={exec2023} byRole />
+                    <AdvisorList advisors={mark(exec2023, 2023)} byRole />
                 </div>
             </section>
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2023–2024 Internal Members</h2>
-                    <TeamList members={members2324} />
+                    <TeamList members={mark(members2324, 2023)} />
                 </div>
             </section>
         </div>

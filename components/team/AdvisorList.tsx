@@ -1,10 +1,13 @@
 import { sortByExecRole } from "@/lib/exec-order";
+import FirstYearMark from "./FirstYearMark";
 
 interface Advisor {
     name: string;
     /** Small line under the name: a company, or a role for executive boards. */
     tag?: string;
     linkedin: string;
+    /** Their first year in CQG: shows an asterisk after the name. */
+    firstYear?: boolean;
 }
 
 interface AdvisorListProps {
@@ -29,7 +32,10 @@ export default function AdvisorList({ title, advisors, byRole = false }: Advisor
                         rel="noopener noreferrer"
                         className="advisor-btn"
                     >
-                        <span className="who">{advisor.name}</span>
+                        <span className="who">
+                            {advisor.name}
+                            {advisor.firstYear && <FirstYearMark />}
+                        </span>
                         {advisor.tag && <span className="co">{advisor.tag}</span>}
                     </a>
                 ))}

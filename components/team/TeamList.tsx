@@ -1,7 +1,11 @@
+import FirstYearMark from "./FirstYearMark";
+
 interface Member {
     name: string;
     /** Omit when we don't have one; the name then shows as a plain, non-clickable chip. */
     linkedin?: string;
+    /** Their first year in CQG: shows an asterisk after the name. */
+    firstYear?: boolean;
 }
 
 interface TeamListProps {
@@ -26,10 +30,12 @@ export default function TeamList({ title, members }: TeamListProps) {
                             className="member-chip hover:text-sky-deep transition-colors"
                         >
                             {member.name}
+                            {member.firstYear && <FirstYearMark />}
                         </a>
                     ) : (
                         <span key={member.name} className="member-chip">
                             {member.name}
+                            {member.firstYear && <FirstYearMark />}
                         </span>
                     )
                 )}
