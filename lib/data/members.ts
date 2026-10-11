@@ -1,0 +1,48 @@
+// Member rosters shared by the Members page and the Education lineage graph.
+
+export const currentMembers = [
+    { name: "Michelle Zhou", linkedin: "https://www.linkedin.com/in/michelle-zhou-252119348" },
+    { name: "Zachary Jeon", linkedin: "https://www.linkedin.com/in/zachary-jeon/" },
+    { name: "Ethan Badner", linkedin: "https://www.linkedin.com/in/ethan-badner-133a29321" },
+    { name: "Anay Garodia", linkedin: "https://www.linkedin.com/in/anay-garodia-a863a6257/" },
+    { name: "Dylan Fei", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
+    { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
+    { name: "Keona Tang", linkedin: "https://www.linkedin.com/in/keonatang/" },
+    { name: "Evelyn Li", linkedin: "https://www.linkedin.com/in/evelynlicolumbia" },
+    { name: "Olivia Huang", linkedin: "https://www.linkedin.com/in/olivia-huang-a13690244/" },
+    { name: "Siddharth Rout", linkedin: "https://www.linkedin.com/in/siddharth-rout-69a0191b9" },
+    { name: "Ethan Schales", linkedin: "https://www.linkedin.com/in/ethan41sch" },
+    { name: "Cathy Deng", linkedin: "https://www.linkedin.com/in/cathy-deng/" },
+    { name: "Victor Robila", linkedin: "https://www.linkedin.com/in/victor-robila/" },
+    { name: "Ivy Hu", linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/" },
+    { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
+    { name: "Lisa Liu", linkedin: "https://www.linkedin.com/in/lisa-liu-2891a62b7/" },
+    { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
+    { name: "Raymond Zhao", linkedin: "https://www.linkedin.com/in/raymond-a-zhao/" },
+    { name: "Kevin Lu", linkedin: "https://www.linkedin.com/in/kevin-lu7/" },
+    { name: "Jinghe Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
+    { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
+    { name: "Ryan Kim", linkedin: "https://www.linkedin.com/in/ryjikim/" },
+    { name: "Frank Liang", linkedin: "https://www.linkedin.com/in/jia-hao-liang-647144349/" },
+];
+
+export const seniorAdvisors = [
+    { name: "Shriya Mahakala", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Kshitig Seth", tag: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
+    { name: "Shobini Iyer", tag: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
+    { name: "Steven Spasov", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Luke Freed", tag: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Harris Chen", tag: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Derek Che", tag: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Nicole Pi", tag: "DRW", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Mihir Joshi", tag: "CTC", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
+];
+
+export const exec2025 = [
+    { name: "Ben Proothi", tag: "President", linkedin: "https://www.linkedin.com/in/bp2715/" },
+    { name: "Srirag Tatavarti", tag: "External VP", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Aryaman Rakhecha", tag: "Internal VP", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
+    { name: "Alison Wu", tag: "Marketing & Communications Chair", linkedin: "https://www.linkedin.com/in/alison-wu-8387961b5/" },
+    { name: "Aurora Wang", tag: "Co-Head of Education", linkedin: "https://www.linkedin.com/in/aurorawang15/" },
+    { name: "Nikhil Mudumbi", tag: "Co-Head of Education", linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/" },
+];

@@ -1,3 +1,4 @@
+import LineageGraph from "@/components/education/LineageGraph";
 import MemoryMatch from "@/components/education/MemoryMatch";
 
 const pillars = [
@@ -66,6 +67,20 @@ export default function EducationPage() {
 
                     <div className="mt-7">
                         <MemoryMatch />
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-16 sm:py-24">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="eyebrow text-navy mb-3">Mentorship</div>
+                    <h2 className="font-display font-extrabold text-2xl text-navy">Big &amp; Little Lineage</h2>
+                    <p className="text-ink-soft text-[1.05rem] leading-relaxed mt-2.5">
+                        Who mentors whom in the 2025&ndash;2026 class. Bigs on top, their littles below.
+                    </p>
+
+                    <div className="mt-8">
+                        <LineageGraph />
                     </div>
                 </div>
             </section>

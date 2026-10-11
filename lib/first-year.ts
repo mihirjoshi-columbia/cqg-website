@@ -3,15 +3,15 @@
 // or executive board). A year means the calendar/academic year it starts in
 // (2026 = the 2026 board and 2026–27 internal members).
 //
-// The page only goes back to 2023 and some older lists are incomplete, so this
-// is a starting point; correct it in FIRST_YEAR_OVERRIDES (app/members/page.tsx).
+// Some older lists are incomplete, so someone may have joined before the first
+// board they appear on.
 
 export interface YearList {
     year: number;
     names: string[];
 }
 
-export function firstYearByName(lists: YearList[], overrides: Record<string, number> = {}): Map<string, number> {
+export function firstYearByName(lists: YearList[]): Map<string, number> {
     const first = new Map<string, number>();
     for (const { year, names } of lists) {
         for (const name of names) {
@@ -19,7 +19,6 @@ export function firstYearByName(lists: YearList[], overrides: Record<string, num
             if (seen === undefined || year < seen) first.set(name, year);
         }
     }
-    for (const [name, year] of Object.entries(overrides)) first.set(name, year);
     return first;
 }
 

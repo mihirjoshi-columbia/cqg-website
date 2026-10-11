@@ -529,11 +529,11 @@ h1, h2, h3, h4 {
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.advisor-btn:hover { background: var(--navy); }
+.advisor-btn:not(.advisor-btn-static):hover { background: var(--navy); }
 .advisor-btn .who { font-weight: 700; color: var(--navy); font-size: 0.9rem; }
-.advisor-btn:hover .who { color: #fff; }
+.advisor-btn:not(.advisor-btn-static):hover .who { color: #fff; }
 .advisor-btn .co { font-family: var(--font-plex-mono), monospace; font-size: 0.72rem; color: var(--ink-faint); }
-.advisor-btn:hover .co { color: var(--sky); }
+.advisor-btn:not(.advisor-btn-static):hover .co { color: var(--sky); }
 
 .member-chip {
   font-family: var(--font-plex-mono), monospace;
@@ -816,3 +816,61 @@ h1, h2, h3, h4 {
   vertical-align: middle;
 }
 .data-table tr:last-child td { border-bottom: none; }
+
+/* ============ Education: big/little lineage ============ */
+.lineage-graph {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: 2.25rem 1.5rem;
+}
+.lineage-family { display: flex; flex-direction: column; align-items: flex-start; }
+.lineage-big {
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.7rem 1.1rem;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+a.lineage-big:hover { background: var(--sky-deep, var(--navy)); }
+.lineage-littles {
+  list-style: none;
+  margin: 0 0 0 1.35rem;
+  padding: 0.9rem 0 0;
+  border-left: 2px solid var(--navy);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.lineage-littles li { position: relative; padding-left: 1.1rem; }
+.lineage-littles li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.9rem;
+  border-top: 2px solid var(--navy);
+}
+.lineage-littles li:last-child::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  bottom: -0.6rem;
+  border-left: 2px solid #fff;
+}
+.lineage-little {
+  display: inline-block;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(--navy)); }
