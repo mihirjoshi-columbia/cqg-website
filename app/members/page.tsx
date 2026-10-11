@@ -30,15 +30,17 @@ const seniorAdvisors = [
 
 const seniorMembers2627 = [
     { name: "Ashley Seo", company: "IMC", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
-    { name: "Shriya Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Shriya Reddy Mahakala", company: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
     { name: "Derek Che", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
-    { name: "Harris Chen", company: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Harris Chen", company: "Prev. Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
     { name: "Johnathan Mo", company: "SIG", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
     { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
     { name: "Rohan Timmaraju", company: "Citadel GQS", linkedin: "https://www.linkedin.com/in/rohan-timmaraju/" },
     { name: "Shobini Iyer", company: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
     { name: "Nikas Lukyanov", company: "Citadel Securities", linkedin: "https://www.linkedin.com/in/nikaslukyanov/" },
     { name: "Luke Freed", company: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Leo Sun", company: "Prev. Optiver", linkedin: "https://www.linkedin.com/in/leoysun/" },
+    { name: "Case Schemmer", company: "Prev. Citadel Securities", linkedin: "https://www.linkedin.com/in/case-schemmer/" },
 ];
 
 export default function MembersPage() {
