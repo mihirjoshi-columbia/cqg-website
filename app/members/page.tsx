@@ -16,7 +16,34 @@ const currentMembers = [
     { name: "Siddharth Rout", linkedin: "https://www.linkedin.com/in/siddharth-rout-69a0191b9" },
     { name: "Ethan Schales", linkedin: "https://www.linkedin.com/in/ethan41sch" },
     { name: "Cathy Deng", linkedin: "https://www.linkedin.com/in/cathy-deng/" },
+    { name: "Victor Robila", linkedin: "https://www.linkedin.com/in/victor-robila/" },
+    { name: "Ivy Hu", linkedin: "https://www.linkedin.com/in/ivy-hu-ab8577342/" },
+    { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
+    { name: "Lisa Liu", linkedin: "https://www.linkedin.com/in/lisa-liu-2891a62b7/" },
+    { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
+    { name: "Raymond Zhao", linkedin: "https://www.linkedin.com/in/raymond-a-zhao/" },
+    { name: "Kevin Lu", linkedin: "https://www.linkedin.com/in/kevin-lu7/" },
+    { name: "Jinghe Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
+    { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
+    { name: "Ryan Kim", linkedin: "https://www.linkedin.com/in/ryjikim/" },
+    { name: "Frank Liang", linkedin: "https://www.linkedin.com/in/jia-hao-liang-647144349/" },
 ];
+
+// Continuing from the 2025-26 underclassmen into 2026-27 as underclassmen.
+// (Dylan Fei and Dylan Sparrow moved up to 2026-27 Senior Members; Olivia Huang is not continuing.)
+const underclassmen2627Names = [
+    "Michelle Zhou",
+    "Zachary Jeon",
+    "Ethan Badner",
+    "Anay Garodia",
+    "Keona Tang",
+    "Evelyn Li",
+    "Siddharth Rout",
+    "Ethan Schales",
+    "Cathy Deng",
+    "Ryan Kim",
+];
+const underclassmen2627 = currentMembers.filter((m) => underclassmen2627Names.includes(m.name));
 
 const seniorAdvisors = [
     { name: "Shriya Mahakala", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
@@ -26,6 +53,8 @@ const seniorAdvisors = [
     { name: "Luke Freed", tag: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Harris Chen", tag: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
     { name: "Derek Che", tag: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Nicole Pi", tag: "DRW", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Mihir Joshi", tag: "CTC", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
 ];
 
 const seniorMembers2627 = [
@@ -41,6 +70,9 @@ const seniorMembers2627 = [
     { name: "Luke Freed", tag: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
     { name: "Leo Sun", tag: "Prev. Optiver", linkedin: "https://www.linkedin.com/in/leoysun/" },
     { name: "Case Schemmer", tag: "Prev. Citadel Securities", linkedin: "https://www.linkedin.com/in/case-schemmer/" },
+    { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
+    { name: "Dylan Fei", tag: "Millennium", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
+    { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
 ];
 
 const exec2025 = [
@@ -53,6 +85,11 @@ const exec2025 = [
 ];
 
 const exec2024 = [
+    { name: "Brian Daley", tag: "Co-President", linkedin: "https://www.linkedin.com/in/briandaley24/" },
+    { name: "Akash Kumar", tag: "Co-President", linkedin: "https://www.linkedin.com/in/akash-kumar-86083022b/" },
+];
+
+const exec2023 = [
     { name: "Brian Daley", tag: "Co-President", linkedin: "https://www.linkedin.com/in/briandaley24/" },
     { name: "Akash Kumar", tag: "Co-President", linkedin: "https://www.linkedin.com/in/akash-kumar-86083022b/" },
 ];
@@ -103,13 +140,14 @@ export default function MembersPage() {
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2026–2027 Internal Members</h2>
                     <div className="space-y-10">
                         <AdvisorList title="Senior Members" advisors={seniorMembers2627} />
+                        <TeamList title="Underclassmen" members={underclassmen2627} />
                     </div>
                 </div>
             </section>
-            <section className="py-16">
+            <section className="bg-paper-alt py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2025 Executive Board</h2>
-                    <AdvisorList advisors={exec2025} keepOrder />
+                    <AdvisorList advisors={exec2025} byRole />
                 </div>
             </section>
             <section className="py-16">
@@ -121,16 +159,22 @@ export default function MembersPage() {
                     </div>
                 </div>
             </section>
-            <section className="py-16">
+            <section className="bg-paper-alt py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2024 Executive Board</h2>
-                    <AdvisorList advisors={exec2024} keepOrder />
+                    <AdvisorList advisors={exec2024} byRole />
                 </div>
             </section>
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2024–2025 Internal Members</h2>
                     <TeamList members={members2425} />
+                </div>
+            </section>
+            <section className="bg-paper-alt py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="font-display font-extrabold text-2xl text-navy mb-8">2023 Executive Board</h2>
+                    <AdvisorList advisors={exec2023} byRole />
                 </div>
             </section>
             <section className="py-16">

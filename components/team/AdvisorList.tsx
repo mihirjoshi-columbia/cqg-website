@@ -1,3 +1,5 @@
+import { sortByExecRole } from "@/lib/exec-order";
+
 interface Advisor {
     name: string;
     /** Small line under the name: a company, or a role for executive boards. */
@@ -8,12 +10,12 @@ interface Advisor {
 interface AdvisorListProps {
     title?: string;
     advisors: Advisor[];
-    /** Keep the given order instead of sorting by name (executive boards list the President first). */
-    keepOrder?: boolean;
+    /** Executive boards: order by role (President first, see lib/exec-order.ts) instead of by name. */
+    byRole?: boolean;
 }
 
-export default function AdvisorList({ title, advisors, keepOrder = false }: AdvisorListProps) {
-    const shown = keepOrder ? advisors : [...advisors].sort((a, b) => a.name.localeCompare(b.name));
+export default function AdvisorList({ title, advisors, byRole = false }: AdvisorListProps) {
+    const shown = byRole ? sortByExecRole(advisors, (a) => a.tag) : [...advisors].sort((a, b) => a.name.localeCompare(b.name));
 
     return (
         <div>

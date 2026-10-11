@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { sortByExecRole } from "@/lib/exec-order";
 
 interface Exec {
     name: string;
@@ -170,7 +171,7 @@ export default function ExecBoard() {
                     className="grid gap-5"
                     style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}
                 >
-                    {execBoard.map((exec) => (
+                    {sortByExecRole(execBoard, (e) => e.role).map((exec) => (
                         <ExecCard key={exec.name} exec={exec} />
                     ))}
                 </div>
