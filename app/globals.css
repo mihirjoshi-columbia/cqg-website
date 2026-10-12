@@ -899,14 +899,14 @@ a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(-
 .exec-face.front .career { margin-top: 0.15rem; font-size: clamp(0.56rem, 2.8cqw, 0.68rem); }
 
 /* Pills in a list where someone has career lines: all the same height (name + --lines
-   extra lines), contents centered. Line heights are fixed so the height is predictable. */
+   extra lines), contents left-aligned and vertically centered. Line heights are fixed so the height is predictable. */
 .member-chip-stacked,
 .lineage-little-stacked {
   display: inline-flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
+  text-align: left;
   border-radius: 1.1rem;
   gap: 0.05rem;
   line-height: 1.3;
