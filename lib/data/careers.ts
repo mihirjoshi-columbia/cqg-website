@@ -2,7 +2,7 @@
 // on the site. Shown as a colored line under the person's name wherever they
 // appear (Members page and the Education lineage graph).
 //
-// Internship: the firm they interned at. Full-time: the first full-time job out of grad.
+// Internship: the firm they interned at. Full-time: their first role after graduating (a job, or a PhD).
 
 export const internshipByName: Record<string, string> = {
     "Case Schemmer": "Citadel Securities",
@@ -27,7 +27,7 @@ export const fullTimeByName: Record<string, string> = {
     "Frank Ruta": "Optiver",
     "HJ Hong": "Bridge Investment Group",
     "Alison Wu": "Goldman Sachs",
-    "Brian Daley": "SIG",
+    "Brian Daley": "Susquehanna",
     "Akash Kumar": "Goldman Sachs",
     "Allison Lin": "Centerview Partners",
     "David Chang": "Amazon",

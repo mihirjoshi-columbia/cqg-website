@@ -907,3 +907,5 @@ a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(-
   gap: 0.05rem;
 }
 .lineage-big { display: inline-flex; flex-direction: column; gap: 0.1rem; }
+.career-intern-dark { color: var(--career-intern-on-dark); }
+.career-fulltime-dark { color: var(--career-fulltime-on-dark); }

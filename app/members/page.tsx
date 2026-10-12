@@ -124,17 +124,17 @@ export default function MembersPage() {
             </section>
 
             <FirmsCollage />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-10">
-                <p className="text-ink-soft text-sm">
-                    Internal members are selected every academic year; the executive board is elected to serve
-                    each calendar year.
-                </p>
-                <p className="text-ink-soft text-sm mt-2">* First year in CQG</p>
-                <p className="text-sm mt-2">
-                    <span className="career-intern">&#9679; Internship</span>
-                    <span className="career-fulltime ml-5">&#9679; First full-time job</span>
-                </p>
-            </div>
+            <section className="bg-navy py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
+                    <p className="text-[#C3D2EA] text-[1.05rem] leading-relaxed max-w-3xl">
+                        Internal members are selected every academic year; the executive board is elected to
+                        serve each calendar year.
+                    </p>
+                    <p className="text-[#C3D2EA] text-sm mt-5">* First year in CQG</p>
+                    <p className="text-sm mt-2 career-intern-dark">&#9679; Internship</p>
+                    <p className="text-sm mt-2 career-fulltime-dark">&#9679; First role after graduating</p>
+                </div>
+            </section>
             <ExecBoard firstYearNames={namesOf(execBoard2026).filter((n) => firstYears.get(n) === 2026)} />
             <section className="py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
