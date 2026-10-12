@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import FirstYearMark from "./FirstYearMark";
+import CareerLines from "./CareerLines";
+import { careerOf } from "@/lib/data/careers";
 import { sortByExecRole } from "@/lib/exec-order";
 import { execBoard2026, type Exec } from "@/lib/data/exec-board-2026";
 
@@ -50,6 +52,7 @@ function ExecCard({ exec, firstYear }: { exec: Exec; firstYear: boolean }) {
                             {firstYear && <FirstYearMark />}
                         </div>
                         <div className="role">{exec.role}</div>
+                        <CareerLines career={careerOf(exec.name)} />
                     </div>
                 </div>
                 <div className="exec-face back">

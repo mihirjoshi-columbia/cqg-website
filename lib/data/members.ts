@@ -27,15 +27,15 @@ export const currentMembers = [
 ];
 
 export const seniorAdvisors = [
-    { name: "Shriya Mahakala", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
-    { name: "Kshitig Seth", tag: "Amazon", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
-    { name: "Shobini Iyer", tag: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
-    { name: "Steven Spasov", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
-    { name: "Luke Freed", tag: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
-    { name: "Harris Chen", tag: "Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
-    { name: "Derek Che", tag: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
-    { name: "Nicole Pi", tag: "DRW", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
-    { name: "Mihir Joshi", tag: "CTC", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
+    { name: "Shriya Mahakala", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Kshitig Seth", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
+    { name: "Shobini Iyer", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
+    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Luke Freed", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Harris Chen", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Derek Che", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Nicole Pi", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Mihir Joshi", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
 ];
 
 export const exec2025 = [
@@ -45,4 +45,22 @@ export const exec2025 = [
     { name: "Alison Wu", tag: "Marketing & Communications Chair", linkedin: "https://www.linkedin.com/in/alison-wu-8387961b5/" },
     { name: "Aurora Wang", tag: "Co-Head of Education", linkedin: "https://www.linkedin.com/in/aurorawang15/" },
     { name: "Nikhil Mudumbi", tag: "Co-Head of Education", linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/" },
+];
+
+export const seniorMembers2627 = [
+    { name: "Ashley Seo", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
+    { name: "Shriya Mahakala", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
+    { name: "Derek Che", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Harris Chen", linkedin: "https://www.linkedin.com/in/harrischen-/" },
+    { name: "Johnathan Mo", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
+    { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Rohan Timmaraju", linkedin: "https://www.linkedin.com/in/rohan-timmaraju/" },
+    { name: "Shobini Iyer", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
+    { name: "Nikas Lukyanov", linkedin: "https://www.linkedin.com/in/nikaslukyanov/" },
+    { name: "Luke Freed", linkedin: "https://www.linkedin.com/in/lukefreed/" },
+    { name: "Leo Sun", linkedin: "https://www.linkedin.com/in/leoysun/" },
+    { name: "Case Schemmer", linkedin: "https://www.linkedin.com/in/case-schemmer/" },
+    { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
+    { name: "Dylan Fei", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
+    { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
 ];

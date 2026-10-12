@@ -1,4 +1,5 @@
-import { currentMembers, exec2025, seniorAdvisors } from "@/lib/data/members";
+import { careerOf, type Career } from "@/lib/data/careers";
+import { currentMembers, exec2025, seniorAdvisors, seniorMembers2627 } from "@/lib/data/members";
 
 // One row per little -> big. Names must match the rosters in lib/data/members.ts.
 // To add another generation later, add rows whose little is an existing big.
@@ -6,6 +7,7 @@ export const bigLittlePairs: { little: string; big: string }[] = [
     { little: "Jinghe Zhang", big: "Aurora Wang" },
     { little: "Lisa Liu", big: "Aurora Wang" },
     { little: "Cathy Deng", big: "Aurora Wang" },
+    { little: "Ashley Seo", big: "Aurora Wang" },
     { little: "Michelle Zhou", big: "Harris Chen" },
     { little: "Alexandra Duan", big: "Harris Chen" },
     { little: "Anay Garodia", big: "Kshitig Seth" },
@@ -29,15 +31,20 @@ export const bigLittlePairs: { little: string; big: string }[] = [
 ];
 
 const linkedinByName = new Map(
-    [...currentMembers, ...seniorAdvisors, ...exec2025].map((p) => [p.name, p.linkedin] as const)
+    [...currentMembers, ...seniorAdvisors, ...seniorMembers2627, ...exec2025].map((p) => [p.name, p.linkedin] as const)
 );
 
-export interface LineageFamily {
-    big: { name: string; linkedin?: string };
-    littles: { name: string; linkedin?: string }[];
+export interface LineagePerson extends Career {
+    name: string;
+    linkedin?: string;
 }
 
-const person = (name: string) => ({ name, linkedin: linkedinByName.get(name) });
+export interface LineageFamily {
+    big: LineagePerson;
+    littles: LineagePerson[];
+}
+
+const person = (name: string): LineagePerson => ({ name, linkedin: linkedinByName.get(name), ...careerOf(name) });
 
 export const lineageFamilies: LineageFamily[] = [...new Set(bigLittlePairs.map((p) => p.big))]
     .sort((a, b) => a.localeCompare(b))

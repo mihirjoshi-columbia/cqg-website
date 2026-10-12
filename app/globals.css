@@ -20,6 +20,10 @@
   --ink-soft: #4B5568;
   --ink-faint: #7B879C;
   --line: #DBE1EB;
+  --career-intern: #1F86CC;
+  --career-fulltime: #2A9A55;
+  --career-intern-on-dark: #6FCBFF;
+  --career-fulltime-on-dark: #6EE39A;
 
   --lime-gradient: linear-gradient(135deg, #FCFF8F 0%, #E8FA0A 52%, #C2D600 100%);
   --sky-gradient: linear-gradient(135deg, #C3ECFF 0%, #6FCBFF 55%, #2482C4 100%);
@@ -467,7 +471,7 @@ h1, h2, h3, h4 {
 }
 .exec-face.front .exec-info {
   flex: none;
-  min-height: 4.6rem;
+  min-height: 6.6rem;
   background: var(--navy);
   padding: clamp(0.6rem, 3.5cqw, 1.1rem) clamp(0.65rem, 4cqw, 1.2rem);
   display: flex;
@@ -874,3 +878,32 @@ a.lineage-big:hover { background: var(--sky-deep, var(--navy)); }
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(--navy)); }
+
+/* ============ Career lines (internship / first full-time job) ============ */
+.career {
+  display: block;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+.career-intern { color: var(--career-intern); }
+.career-fulltime { color: var(--career-fulltime); }
+.advisor-btn:not(.advisor-btn-static):hover .career-intern,
+.lineage-big .career-intern,
+.exec-face.front .career-intern { color: var(--career-intern-on-dark); }
+.advisor-btn:not(.advisor-btn-static):hover .career-fulltime,
+.lineage-big .career-fulltime,
+.exec-face.front .career-fulltime { color: var(--career-fulltime-on-dark); }
+.exec-face.front .career { margin-top: 0.15rem; font-size: clamp(0.56rem, 2.8cqw, 0.68rem); }
+
+.member-chip-stacked,
+.lineage-little:has(.career) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 1.1rem;
+  gap: 0.05rem;
+}
+.lineage-big { display: inline-flex; flex-direction: column; gap: 0.1rem; }

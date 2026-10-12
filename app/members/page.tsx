@@ -3,8 +3,9 @@ import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
 import FirmsCollage from "@/components/placements/FirmsCollage";
-import { currentMembers, seniorAdvisors, exec2025 } from "@/lib/data/members";
-import { pastBoards } from "@/lib/data/past-boards";
+import { currentMembers, seniorAdvisors, seniorMembers2627, exec2025 } from "@/lib/data/members";
+import { withCareer } from "@/lib/data/careers";
+import { pastBoards, type PastBoard } from "@/lib/data/past-boards";
 import { execBoard2026 } from "@/lib/data/exec-board-2026";
 import { firstYearByName, markFirstYear } from "@/lib/first-year";
 
@@ -45,24 +46,6 @@ const newUnderclassmen2627 = [
 const underclassmen2627 = [
     ...currentMembers.filter((m) => underclassmen2627Names.includes(m.name)),
     ...newUnderclassmen2627,
-];
-
-const seniorMembers2627 = [
-    { name: "Ashley Seo", tag: "IMC", linkedin: "https://www.linkedin.com/in/ashley-seo/" },
-    { name: "Shriya Mahakala", tag: "Jane Street", linkedin: "https://www.linkedin.com/in/shriya-mahakala/" },
-    { name: "Derek Che", tag: "Citadel Securities", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
-    { name: "Harris Chen", tag: "Prev. Optiver", linkedin: "https://www.linkedin.com/in/harrischen-/" },
-    { name: "Johnathan Mo", tag: "SIG", linkedin: "https://www.linkedin.com/in/johnathan-mo/" },
-    { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
-    { name: "Rohan Timmaraju", tag: "Citadel GQS", linkedin: "https://www.linkedin.com/in/rohan-timmaraju/" },
-    { name: "Shobini Iyer", tag: "Google", linkedin: "https://www.linkedin.com/in/shobini-iyer/" },
-    { name: "Nikas Lukyanov", tag: "Citadel Securities", linkedin: "https://www.linkedin.com/in/nikaslukyanov/" },
-    { name: "Luke Freed", tag: "Bridgewater", linkedin: "https://www.linkedin.com/in/lukefreed/" },
-    { name: "Leo Sun", tag: "Prev. Optiver", linkedin: "https://www.linkedin.com/in/leoysun/" },
-    { name: "Case Schemmer", tag: "Prev. Citadel Securities", linkedin: "https://www.linkedin.com/in/case-schemmer/" },
-    { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
-    { name: "Dylan Fei", tag: "Millennium", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
-    { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
 ];
 
 const exec2024 = [
@@ -110,7 +93,7 @@ function BoardSection({ title, gray = false, children }: { title: string; gray?:
 }
 
 // Fall 2024 and older: one block per board, newest first.
-const boards = [
+const boards: PastBoard[] = [
     { label: "Fall 2024", year: 2024, exec: exec2024, junior: members2425 },
     { label: "AY 2023–2024", year: 2023, exec: exec2023, junior: members2324 },
     ...pastBoards,
@@ -124,15 +107,16 @@ const firstYears = firstYearByName(
         ...boards.map((b) => ({ year: b.year, names: [...namesOf(b.exec), ...namesOf(b.junior)] })),
     ]
 );
-const mark = <T extends { name: string }>(people: T[], year: number) => markFirstYear(people, year, firstYears);
+const mark = <T extends { name: string }>(people: T[], year: number) =>
+    withCareer(markFirstYear(people, year, firstYears));
 
 export default function MembersPage() {
     return (
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <span className="tag tag-lime mb-2 block w-fit">Internal Membership &middot; Current Members</span>
-                    <div className="chevron chevron-sky mb-4">Current Members</div>
+                    <span className="tag tag-lime mb-2 block w-fit">Internal Membership &middot; Members</span>
+                    <div className="chevron chevron-sky mb-4">Members</div>
                     <p className="text-[#C3D2EA] text-[1.05rem] lg:whitespace-nowrap">
                         Meet the dedicated students and alumni who make up the Columbia Quant Group.
                     </p>
@@ -146,6 +130,10 @@ export default function MembersPage() {
                     each calendar year.
                 </p>
                 <p className="text-ink-soft text-sm mt-2">* First year in CQG</p>
+                <p className="text-sm mt-2">
+                    <span className="career-intern">&#9679; Internship</span>
+                    <span className="career-fulltime ml-5">&#9679; First full-time job</span>
+                </p>
             </div>
             <ExecBoard firstYearNames={namesOf(execBoard2026).filter((n) => firstYears.get(n) === 2026)} />
             <section className="py-16">

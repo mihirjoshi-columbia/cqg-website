@@ -1,7 +1,9 @@
 import { sortByExecRole } from "@/lib/exec-order";
 import FirstYearMark from "./FirstYearMark";
+import CareerLines from "./CareerLines";
+import type { Career } from "@/lib/data/careers";
 
-interface Advisor {
+interface Advisor extends Career {
     name: string;
     /** Small line under the name: a company, or a role for executive boards. */
     tag?: string;
@@ -35,6 +37,7 @@ export default function AdvisorList({ title, advisors, byRole = false, thenByNam
                                 {advisor.firstYear && <FirstYearMark />}
                             </span>
                             {advisor.tag && <span className="co">{advisor.tag}</span>}
+                            <CareerLines career={advisor} />
                         </>
                     );
                     return advisor.linkedin ? (

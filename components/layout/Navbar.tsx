@@ -17,7 +17,7 @@ const navLinks: { name: string; href: string; children?: { name: string; href: s
     children: [
       { name: "Apply", href: "/recruitment" },
       { name: "Program", href: "/education" },
-      { name: "Current Members", href: "/members" },
+      { name: "Members", href: "/members" },
     ],
   },
   { name: "Events", href: "/events" },

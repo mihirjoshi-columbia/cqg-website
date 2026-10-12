@@ -1,6 +1,8 @@
 import FirstYearMark from "./FirstYearMark";
+import CareerLines from "./CareerLines";
+import { careerLineCount, type Career } from "@/lib/data/careers";
 
-interface Member {
+interface Member extends Career {
     name: string;
     /** Omit when we don't have one; the name then shows as a plain, non-clickable chip. */
     linkedin?: string;
@@ -15,6 +17,9 @@ interface TeamListProps {
 
 export default function TeamList({ title, members }: TeamListProps) {
     const sorted = [...members].sort((a, b) => a.name.localeCompare(b.name));
+    // If anyone in the list has career lines, every pill reserves the same number so they line up.
+    const reserve = Math.max(0, ...sorted.map(careerLineCount));
+    const chip = reserve > 0 ? "member-chip member-chip-stacked" : "member-chip";
 
     return (
         <div>
@@ -27,15 +32,21 @@ export default function TeamList({ title, members }: TeamListProps) {
                             href={member.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="member-chip hover:text-sky-deep transition-colors"
+                            className={`${chip} hover:text-sky-deep transition-colors`}
                         >
-                            {member.name}
-                            {member.firstYear && <FirstYearMark />}
+                            <span>
+                                {member.name}
+                                {member.firstYear && <FirstYearMark />}
+                            </span>
+                            <CareerLines career={member} reserve={reserve} />
                         </a>
                     ) : (
-                        <span key={member.name} className="member-chip">
-                            {member.name}
-                            {member.firstYear && <FirstYearMark />}
+                        <span key={member.name} className={chip}>
+                            <span>
+                                {member.name}
+                                {member.firstYear && <FirstYearMark />}
+                            </span>
+                            <CareerLines career={member} reserve={reserve} />
                         </span>
                     )
                 )}
