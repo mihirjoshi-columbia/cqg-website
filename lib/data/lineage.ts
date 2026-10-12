@@ -4,7 +4,7 @@ import { currentMembers, exec2025, seniorAdvisors, seniorMembers2627 } from "@/l
 // One row per little -> big. Names must match the rosters in lib/data/members.ts.
 // To add another generation later, add rows whose little is an existing big.
 export const bigLittlePairs: { little: string; big: string }[] = [
-    { little: "Jinghe Zhang", big: "Aurora Wang" },
+    { little: "Harry Zhang", big: "Aurora Wang" },
     { little: "Lisa Liu", big: "Aurora Wang" },
     { little: "Cathy Deng", big: "Aurora Wang" },
     { little: "Ashley Seo", big: "Aurora Wang" },

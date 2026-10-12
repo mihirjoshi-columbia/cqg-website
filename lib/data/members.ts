@@ -20,7 +20,7 @@ export const currentMembers = [
     { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
     { name: "Raymond Zhao", linkedin: "https://www.linkedin.com/in/raymond-a-zhao/" },
     { name: "Kevin Lu", linkedin: "https://www.linkedin.com/in/kevin-lu7/" },
-    { name: "Jinghe Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
+    { name: "Harry Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
     { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
     { name: "Ryan Kim", linkedin: "https://www.linkedin.com/in/ryjikim/" },
     { name: "Frank Liang", linkedin: "https://www.linkedin.com/in/jia-hao-liang-647144349/" },
@@ -63,4 +63,7 @@ export const seniorMembers2627 = [
     { name: "Shreyas Singh", linkedin: "https://www.linkedin.com/in/shreyas-singh1/" },
     { name: "Dylan Fei", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
     { name: "Dylan Sparrow", linkedin: "https://www.linkedin.com/in/dylan-sparrow-24997638a" },
+    { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
+    { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
+    { name: "Harry Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
 ];
