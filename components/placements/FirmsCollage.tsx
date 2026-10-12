@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 const firms = [
     { name: "AQR", logo: "/logos/aqr.png", url: "https://www.aqr.com" },
     { name: "BlackRock", logo: "/logos/blackrock.png", url: "https://www.blackrock.com" },
@@ -25,18 +27,21 @@ const firms = [
     { name: "Two Sigma", logo: "/logos/two-sigma.png", url: "https://www.twosigma.com" },
 ];
 
-export default function FirmsCollage() {
+export default function FirmsCollage({ aside }: { aside?: ReactNode }) {
     return (
         <section className="py-12 sm:py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="chevron chevron-navy text-[1.4rem]">Where Our Members Land</div>
-                <div className="firm-collage mt-7 mx-auto" style={{ maxWidth: "820px" }}>
-                    {firms.map((firm) => (
-                        <a key={firm.name} href={firm.url} target="_blank" rel="noopener noreferrer" className="firm-tile">
-                            {/* eslint-disable-next-line @next/next/no-img-element -- static mixed-size logo grid */}
-                            <img src={firm.logo} alt={firm.name} />
-                        </a>
-                    ))}
+                <div className={aside ? "mt-7 grid gap-8 lg:grid-cols-2 lg:items-stretch" : "mt-7"}>
+                    <div className="firm-collage mx-auto w-full self-start" style={aside ? undefined : { maxWidth: "820px" }}>
+                        {firms.map((firm) => (
+                            <a key={firm.name} href={firm.url} target="_blank" rel="noopener noreferrer" className="firm-tile">
+                                {/* eslint-disable-next-line @next/next/no-img-element -- static mixed-size logo grid */}
+                                <img src={firm.logo} alt={firm.name} />
+                            </a>
+                        ))}
+                    </div>
+                    {aside}
                 </div>
             </div>
         </section>

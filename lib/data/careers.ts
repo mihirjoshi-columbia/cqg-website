@@ -97,3 +97,24 @@ export const withCareer = <T extends { name: string }>(people: T[]): (T & Career
 
 /** How many career lines the person shows (0-2). */
 export const careerLineCount = (c: Career) => (c.internship ? 1 : 0) + (c.fullTime ? 1 : 0);
+
+export interface CompanyGroup {
+    company: string;
+    people: string[];
+}
+
+/** First roles grouped by company (most people first). PhDs aren't companies, so they're counted separately. */
+export function fullTimeByCompany(): { groups: CompanyGroup[]; phdCount: number } {
+    const byCompany = new Map<string, string[]>();
+    let phdCount = 0;
+    for (const [name, role] of Object.entries(fullTimeByName)) {
+        if (role.startsWith("PhD")) {
+            phdCount++;
+            continue;
+        }
+        byCompany.set(role, [...(byCompany.get(role) ?? []), name]);
+    }
+    const groups = [...byCompany].map(([company, people]) => ({ company, people: people.sort() }));
+    groups.sort((a, b) => b.people.length - a.people.length || a.company.localeCompare(b.company));
+    return { groups, phdCount };
+}

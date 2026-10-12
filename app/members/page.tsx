@@ -3,6 +3,7 @@ import AdvisorList from "@/components/team/AdvisorList";
 import ExecBoard from "@/components/team/ExecBoard";
 import TeamList from "@/components/team/TeamList";
 import FirmsCollage from "@/components/placements/FirmsCollage";
+import CareerTreemap from "@/components/placements/CareerTreemap";
 import { currentMembers, seniorAdvisors, seniorMembers2627, exec2025 } from "@/lib/data/members";
 import { withCareer } from "@/lib/data/careers";
 import { pastBoards, type PastBoard } from "@/lib/data/past-boards";
@@ -123,7 +124,7 @@ export default function MembersPage() {
                 </div>
             </section>
 
-            <FirmsCollage />
+            <FirmsCollage aside={<CareerTreemap />} />
             <section className="bg-navy py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
                     <p className="text-[#C3D2EA] text-[1.05rem] leading-relaxed max-w-3xl">
