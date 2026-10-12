@@ -130,9 +130,11 @@ export default function MembersPage() {
                         Internal members are selected every academic year; the executive board is elected to
                         serve each calendar year.
                     </p>
-                    <p className="text-[#C3D2EA] text-sm mt-5">* First year in CQG</p>
-                    <p className="text-sm mt-2 career-intern-dark">&#9679; Internship</p>
-                    <p className="text-sm mt-2 career-fulltime-dark">&#9679; First role after graduating</p>
+                    <p className="text-sm mt-5 flex flex-wrap gap-x-6 gap-y-1">
+                        <span className="text-[#C3D2EA]">* First year in CQG</span>
+                        <span className="career-intern-dark">&#9679; Internship</span>
+                        <span className="career-fulltime-dark">&#9679; First role after graduating</span>
+                    </p>
                 </div>
             </section>
             <ExecBoard firstYearNames={namesOf(execBoard2026).filter((n) => firstYears.get(n) === 2026)} />

@@ -34,7 +34,7 @@ export default function TeamList({ title, members }: TeamListProps) {
                             href={member.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`${chip} hover:text-sky-deep transition-colors`}
+                            className={chip}
                             style={style}
                         >
                             <span>

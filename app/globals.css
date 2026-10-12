@@ -878,7 +878,6 @@ a.lineage-big:hover { background: var(--sky-deep, var(--navy)); }
   text-decoration: none;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
-a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(--navy)); }
 
 /* ============ Career lines (internship / first full-time job) ============ */
 .career {
@@ -917,3 +916,13 @@ a.lineage-little:hover { border-color: var(--navy); color: var(--sky-deep, var(-
 .lineage-big { display: inline-flex; flex-direction: column; gap: 0.1rem; }
 .career-intern-dark { color: var(--career-intern-on-dark); }
 .career-fulltime-dark { color: var(--career-fulltime-on-dark); }
+
+/* Linked pills fill navy on hover, like the advisor cards. */
+a.member-chip,
+a.lineage-little { transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+a.member-chip:hover,
+a.lineage-little:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+a.member-chip:hover .career-intern,
+a.lineage-little:hover .career-intern { color: var(--career-intern-on-dark); }
+a.member-chip:hover .career-fulltime,
+a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark); }
