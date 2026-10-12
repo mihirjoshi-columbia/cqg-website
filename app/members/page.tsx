@@ -11,7 +11,7 @@ import { execBoard2026 } from "@/lib/data/exec-board-2026";
 import { firstYearByName, markFirstYear } from "@/lib/first-year";
 
 // Continuing from the 2025-26 underclassmen into 2026-27 as underclassmen.
-// (Dylan Fei, Dylan Sparrow, Shreyas Singh, Sindhu Chalasani, Alexandra Duan and Harry Zhang moved up to 2026-27 Senior Members; Olivia Huang is not continuing.)
+// (Dylan Fei, Dylan Sparrow, Shreyas Singh, Sindhu Chalasani, Alexandra Duan, Harry Zhang and Victor Robila moved up to 2026-27 Senior Members; Olivia Huang is not continuing.)
 const underclassmen2627Names = [
     "Michelle Zhou",
     "Zachary Jeon",
@@ -24,6 +24,7 @@ const underclassmen2627Names = [
     "Cathy Deng",
     "Ryan Kim",
     "Lisa Liu",
+    "Ivy Hu",
 ];
 const newUnderclassmen2627 = [
     { name: "Ana-Maria Petcu", linkedin: "https://www.linkedin.com/in/anapetcu" },

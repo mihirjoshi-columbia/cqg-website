@@ -66,4 +66,10 @@ export const seniorMembers2627 = [
     { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
     { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
     { name: "Harry Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
+    // The 2026 executive board also serves as senior members (Ivy Hu is an underclassman).
+    { name: "Aurora Wang", linkedin: "https://www.linkedin.com/in/aurorawang15/" },
+    { name: "Nicole Pi", linkedin: "https://www.linkedin.com/in/nicoleipi/" },
+    { name: "Victor Robila", linkedin: "https://www.linkedin.com/in/victor-robila/" },
+    { name: "Mihir Joshi", linkedin: "https://www.linkedin.com/in/mihirjoshi-columbia/" },
+    { name: "Nikhil Mudumbi", linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/" },
 ];
