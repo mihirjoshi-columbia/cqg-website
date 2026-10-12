@@ -33,7 +33,7 @@ export default function FirmsCollage({ aside }: { aside?: ReactNode }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="chevron chevron-navy text-[1.4rem]">Where Our Members Land</div>
                 <div className={aside ? "mt-7 grid gap-8 lg:grid-cols-2 lg:items-stretch" : "mt-7"}>
-                    <div className="firm-collage mx-auto w-full self-start" style={aside ? undefined : { maxWidth: "820px" }}>
+                    <div className={`firm-collage mx-auto w-full${aside ? " firm-collage-fill" : ""}`} style={aside ? undefined : { maxWidth: "820px" }}>
                         {firms.map((firm) => (
                             <a key={firm.name} href={firm.url} target="_blank" rel="noopener noreferrer" className="firm-tile">
                                 {/* eslint-disable-next-line @next/next/no-img-element -- static mixed-size logo grid */}

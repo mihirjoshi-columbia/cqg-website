@@ -98,23 +98,100 @@ export const withCareer = <T extends { name: string }>(people: T[]): (T & Career
 /** How many career lines the person shows (0-2). */
 export const careerLineCount = (c: Career) => (c.internship ? 1 : 0) + (c.fullTime ? 1 : 0);
 
-export interface CompanyGroup {
-    company: string;
-    people: string[];
+// Industry for each company, used to group small companies in the treemap on the
+// Members page. A company missing here falls under "Other".
+export const industryByCompany: Record<string, string> = {
+    // Trading & quant
+    "Citadel Securities": "Trading & quant firms",
+    "DRW": "Trading & quant firms",
+    "Five Rings": "Trading & quant firms",
+    "Headlands Tech": "Trading & quant firms",
+    "IMC": "Trading & quant firms",
+    "Jane Street": "Trading & quant firms",
+    "Optiver": "Trading & quant firms",
+    "Susquehanna": "Trading & quant firms",
+    "Two Sigma": "Trading & quant firms",
+    // Tech
+    "Amazon": "Tech",
+    "Bloomberg": "Tech",
+    "Google": "Tech",
+    "Meta": "Tech",
+    "Microsoft": "Tech",
+    "Minimap": "Tech",
+    "Next Caller (Pindrop)": "Tech",
+    "Uber": "Tech",
+    "Wayfair": "Tech",
+    // Banks
+    "Centerview Partners": "Banks",
+    "Citi": "Banks",
+    "Goldman Sachs": "Banks",
+    "J.P. Morgan": "Banks",
+    "Morgan Stanley": "Banks",
+    "TD Securities": "Banks",
+    // Investing & asset management
+    "Blackstone": "Investing & asset management",
+    "Bridge Investment Group": "Investing & asset management",
+    "Bridgewater": "Investing & asset management",
+    "Oak Hill Advisors": "Investing & asset management",
+    "Ping An Asset Management": "Investing & asset management",
+    "Quantedge": "Investing & asset management",
+    "Teachers' Retirement System of Illinois": "Investing & asset management",
+};
+
+/** A company with at least this many people gets its own box; smaller ones are grouped by industry. */
+export const OWN_BOX_MIN_PEOPLE = 2;
+
+export interface TreemapBox {
+    key: string;
+    label: string;
+    /** "company" = one company; "industry" = several small companies grouped together; "phd" = everyone who started a PhD. */
+    kind: "company" | "industry" | "phd";
+    /** Everyone in the box, with the company (or school, for PhDs) they started at. */
+    people: { name: string; company: string }[];
+    value: number;
 }
 
-/** First roles grouped by company (most people first). PhDs aren't companies, so they're counted separately. */
-export function fullTimeByCompany(): { groups: CompanyGroup[]; phdCount: number } {
+/**
+ * First roles for the treemap, biggest first. Companies with OWN_BOX_MIN_PEOPLE or more
+ * people get a box; the rest are grouped by industry, so a company moves out of its
+ * industry box automatically once enough people list it. Anyone whose role starts with
+ * "PhD" goes in one PhD box, however many there are.
+ */
+export function fullTimeBoxes(): { boxes: TreemapBox[]; peopleCount: number; companyCount: number } {
     const byCompany = new Map<string, string[]>();
-    let phdCount = 0;
+    const phds: { name: string; company: string }[] = [];
     for (const [name, role] of Object.entries(fullTimeByName)) {
         if (role.startsWith("PhD")) {
-            phdCount++;
+            phds.push({ name, company: role.replace(/^PhD( at)?\s*/, "") });
             continue;
         }
         byCompany.set(role, [...(byCompany.get(role) ?? []), name]);
     }
-    const groups = [...byCompany].map(([company, people]) => ({ company, people: people.sort() }));
-    groups.sort((a, b) => b.people.length - a.people.length || a.company.localeCompare(b.company));
-    return { groups, phdCount };
+
+    const boxes: TreemapBox[] = [];
+    const byIndustry = new Map<string, TreemapBox>();
+    for (const [company, names] of byCompany) {
+        const people = names.sort().map((name) => ({ name, company }));
+        if (names.length >= OWN_BOX_MIN_PEOPLE) {
+            boxes.push({ key: company, label: company, kind: "company", people, value: people.length });
+            continue;
+        }
+        const industry = industryByCompany[company] ?? "Other";
+        const box = byIndustry.get(industry) ?? { key: industry, label: industry, kind: "industry" as const, people: [], value: 0 };
+        box.people.push(...people);
+        box.value = box.people.length;
+        byIndustry.set(industry, box);
+    }
+    boxes.push(...byIndustry.values());
+    if (phds.length) {
+        boxes.push({ key: "PhD", label: "PhD", kind: "phd", people: phds.sort((a, b) => a.name.localeCompare(b.name)), value: phds.length });
+    }
+    for (const box of byIndustry.values()) box.people.sort((a, b) => a.company.localeCompare(b.company));
+
+    boxes.sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+    return {
+        boxes,
+        peopleCount: [...byCompany.values()].reduce((n, names) => n + names.length, phds.length),
+        companyCount: byCompany.size,
+    };
 }
