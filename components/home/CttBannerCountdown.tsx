@@ -32,7 +32,7 @@ export default function CttBannerCountdown({ closesAtIso, dueText }: { closesAtI
   return (
     <Link
       href="/competition"
-      className="sticky top-16 z-40 block bg-pink text-navy px-4 py-2.5 text-center hover:brightness-95 transition"
+      className="ctt-banner sticky top-16 z-40 block bg-pink text-navy px-4 py-2.5 text-center hover:brightness-95 transition lg:flex lg:h-10 lg:items-center lg:justify-center lg:gap-1.5 lg:py-0"
     >
       <span className="text-sm font-bold">CTT applications are open!</span>{" "}
       <span className="block sm:inline text-xs sm:text-sm font-semibold">

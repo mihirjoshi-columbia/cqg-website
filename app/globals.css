@@ -323,6 +323,27 @@ h1, h2, h3, h4 {
   transition: left 0.42s cubic-bezier(0.3, 0.7, 0.2, 1), top 0.42s cubic-bezier(0.3, 0.7, 0.2, 1);
 }
 .card-float.no-float { animation: none; }
+
+/* Home hero: on desktop it fills the window (below the navbar, and the CTT banner when it shows),
+   and the crown game board scales with the height that's left. */
+.crown-board { height: min(420px, 68vw); }
+@media (min-width: 1024px) {
+  .home-hero {
+    --hero-avail: calc(100svh - 4rem);
+    min-height: var(--hero-avail);
+    display: flex;
+    align-items: center;
+  }
+  body:has(.ctt-banner) .home-hero { --hero-avail: calc(100svh - 6.5rem); }
+  .crown-board {
+    --board-h: clamp(240px, calc(var(--hero-avail) - 13rem), 520px);
+    height: var(--board-h);
+  }
+  .crown-board .card-float {
+    height: calc(var(--board-h) * 0.39);
+    width: calc(var(--board-h) * 0.281);
+  }
+}
 .card-float.guessable { cursor: pointer; }
 .card-float.revealed { pointer-events: none; }
 .card-float.revealed .flip-face.front { opacity: 0.35; filter: grayscale(0.5); }
@@ -577,8 +598,13 @@ h1, h2, h3, h4 {
 .firm-tile:hover { background: var(--paper-alt); }
 /* Beside the treemap on desktop: 4 columns x 6 rows, as tall as the chart card. */
 @media (min-width: 1024px) {
-  .firm-collage-fill { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); }
-  .firm-collage-fill .firm-tile { aspect-ratio: auto; }
+  .firm-collage-fill { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); min-height: 0; }
+  .firm-collage-fill .firm-tile { aspect-ratio: auto; min-height: 0; position: relative; }
+  /* Fit each logo to its tile instead of its own pixel size, so the rows share the height evenly. */
+  .firm-collage-fill .firm-tile img { position: absolute; inset: 0.55rem; width: calc(100% - 1.1rem); height: calc(100% - 1.1rem); max-width: none; max-height: none; object-fit: contain; }
+  /* Logos + chart share one height that fits the window: the viewport minus the navbar and the
+     section's own heading and spacing, never shorter than 26rem or taller than 46rem. */
+  .firm-split { height: clamp(26rem, calc(100svh - 13.5rem), 46rem); }
 }
 .firm-tile img { max-width: 92%; max-height: 92%; object-fit: contain; }
 

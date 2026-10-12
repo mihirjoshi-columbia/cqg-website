@@ -9,8 +9,8 @@ const items = boxes.map((box) => ({ ...box }));
 
 // Two layouts so cells stay readable: wide for tablets and up, tall for phones.
 const LAYOUTS = {
-    wide: { w: 600, h: 400, cells: treemap(items, 600, 400), show: "hidden sm:block" },
-    tall: { w: 400, h: 520, cells: treemap(items, 400, 520), show: "sm:hidden" },
+    wide: { w: 600, h: 400, cells: treemap(items, 600, 400), show: "hidden sm:block aspect-[600/400] lg:aspect-auto lg:flex-1 lg:min-h-0" },
+    tall: { w: 400, h: 520, cells: treemap(items, 400, 520), show: "sm:hidden aspect-[400/520]" },
 };
 
 // One blue scale: the more people in a box, the darker it is.
@@ -35,7 +35,7 @@ export default function CareerTreemap() {
     const selected = boxes.find((b) => b.key === active);
 
     return (
-        <div className="bg-white border border-line p-4 sm:p-5 h-full flex flex-col" onMouseLeave={() => setActive(null)}>
+        <div className="bg-white border border-line p-4 sm:p-5 h-full min-h-0 flex flex-col" onMouseLeave={() => setActive(null)}>
             <h3 className="font-display font-bold text-lg text-navy">First role after graduating</h3>
             <p className="text-ink-soft text-sm mt-1">
                 {peopleCount} people across {companyCount} companies and PhD programs. Box size and shade show how many started
@@ -46,7 +46,6 @@ export default function CareerTreemap() {
                 <div
                     key={key}
                     className={`relative mt-4 w-full ${layout.show}`}
-                    style={{ aspectRatio: `${layout.w} / ${layout.h}` }}
                 >
                     {layout.cells.map((cell) => (
                         <button
@@ -87,7 +86,7 @@ export default function CareerTreemap() {
                 </div>
             ))}
 
-            <div className="mt-4 min-h-[4.5rem] text-sm" aria-live="polite">
+            <div className="mt-4 min-h-[4.5rem] text-sm lg:h-28 lg:min-h-0 lg:shrink-0 lg:overflow-y-auto" aria-live="polite">
                 {selected ? (
                     <>
                         <div className="font-semibold text-navy">
