@@ -575,9 +575,9 @@ h1, h2, h3, h4 {
   transition: background 0.15s ease;
 }
 .firm-tile:hover { background: var(--paper-alt); }
-/* Beside the treemap on desktop: a 6 x 4 grid that is as tall as the chart card. */
+/* Beside the treemap on desktop: 4 columns x 6 rows, as tall as the chart card. */
 @media (min-width: 1024px) {
-  .firm-collage-fill { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr); }
+  .firm-collage-fill { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); }
   .firm-collage-fill .firm-tile { aspect-ratio: auto; }
 }
 .firm-tile img { max-width: 92%; max-height: 92%; object-fit: contain; }

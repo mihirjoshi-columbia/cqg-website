@@ -13,13 +13,15 @@ const LAYOUTS = {
     tall: { w: 400, h: 520, cells: treemap(items, 400, 520), show: "sm:hidden" },
 };
 
-// Single companies: bigger groups are darker. Industry boxes (small companies grouped together) are pink; PhDs are lime.
-function tone(kind: "company" | "industry" | "phd", count: number) {
-    if (kind === "industry") return "bg-pink text-navy";
-    if (kind === "phd") return "bg-lime text-navy";
-    if (count >= 5) return "bg-navy text-white";
-    if (count >= 3) return "bg-[#1D4A87] text-white";
-    return "bg-sky-deep text-white";
+// One blue scale: the more people in a box, the darker it is.
+const counts = boxes.map((b) => b.value);
+const [lo, hi] = [Math.min(...counts), Math.max(...counts)];
+function shade(count: number, industry: boolean) {
+    const t = hi === lo ? 1 : (count - lo) / (hi - lo);
+    const dark = t > 0.4;
+    // Industry labels are pink: light pink on the dark boxes, a deep pink on the light ones so it stays readable.
+    const color = industry ? (t >= 0.7 ? "#FF8FC0" : "#6B0C33") : dark ? "#fff" : "#0B2F62";
+    return { background: `color-mix(in srgb, #0B2F62 ${Math.round(t * 100)}%, #8DD6FF)`, color };
 }
 
 // Longest single word in a label. The label shrinks until that word fits the box, so a
@@ -36,8 +38,8 @@ export default function CareerTreemap() {
         <div className="bg-white border border-line p-4 sm:p-5 h-full flex flex-col" onMouseLeave={() => setActive(null)}>
             <h3 className="font-display font-bold text-lg text-navy">First role after graduating</h3>
             <p className="text-ink-soft text-sm mt-1">
-                {peopleCount} people across {companyCount} companies and PhD programs. Box size shows how many started
-                there; pink boxes group smaller companies by industry.
+                {peopleCount} people across {companyCount} companies and PhD programs. Box size and shade show how many started
+                there. Pink labels are industries that group smaller companies.
             </p>
 
             {Object.entries(LAYOUTS).map(([key, layout]) => (
@@ -66,8 +68,11 @@ export default function CareerTreemap() {
                             }}
                         >
                             <span
-                                className={`block w-full h-full overflow-hidden p-1.5 ${tone(cell.kind, cell.value)}`}
-                                style={{ containerType: "inline-size" }}
+                                className="block w-full h-full overflow-hidden p-1.5"
+                                style={{
+                                    containerType: "inline-size",
+                                    ...shade(cell.value, cell.kind === "industry"),
+                                }}
                             >
                                 <span
                                     className="block font-semibold leading-tight"
