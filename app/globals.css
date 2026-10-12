@@ -575,16 +575,10 @@ h1, h2, h3, h4 {
 /* ============ Placements ============ */
 .firm-collage {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
-}
-@media (max-width: 900px) {
-  .firm-collage { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 700px) {
-  .firm-collage { grid-template-columns: repeat(3, 1fr); }
 }
 .firm-tile {
   background: #fff;
@@ -592,21 +586,21 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem;
+  padding: 0.3rem;
   transition: background 0.15s ease;
 }
 .firm-tile:hover { background: var(--paper-alt); }
 /* Beside the treemap on desktop: 4 columns x 6 rows, as tall as the chart card. */
 @media (min-width: 1024px) {
-  .firm-collage-fill { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); min-height: 0; }
+  .firm-collage-fill { grid-template-rows: repeat(6, minmax(0, 1fr)); min-height: 0; }
   .firm-collage-fill .firm-tile { aspect-ratio: auto; min-height: 0; position: relative; }
-  /* Fit each logo to its tile instead of its own pixel size, so the rows share the height evenly. */
-  .firm-collage-fill .firm-tile img { position: absolute; inset: 0.55rem; width: calc(100% - 1.1rem); height: calc(100% - 1.1rem); max-width: none; max-height: none; object-fit: contain; }
   /* Logos + chart share one height that fits the window: the viewport minus the navbar and the
      section's own heading and spacing, never shorter than 26rem or taller than 46rem. */
   .firm-split { height: clamp(26rem, calc(100svh - 13.5rem), 46rem); }
 }
-.firm-tile img { max-width: 92%; max-height: 92%; object-fit: contain; }
+.firm-tile img { width: 92%; height: 76%; object-fit: contain; }
+/* Tiles with their own background color (set inline) brighten on hover instead. */
+.firm-tile[style]:hover { filter: brightness(1.15); }
 
 /* ============ Events ============ */
 .event-card {

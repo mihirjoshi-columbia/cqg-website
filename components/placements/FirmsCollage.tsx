@@ -1,30 +1,33 @@
 import type { ReactNode } from "react";
 
-const firms = [
-    { name: "AQR", logo: "/logos/aqr.png", url: "https://www.aqr.com" },
-    { name: "BlackRock", logo: "/logos/blackrock.png", url: "https://www.blackrock.com" },
-    { name: "Bloomberg", logo: "/logos/bloomberg.png", url: "https://www.bloomberg.com" },
-    { name: "Bridgewater", logo: "/logos/bridgewater.png", url: "https://www.bridgewater.com" },
-    { name: "Citadel", logo: "/logos/citadel.png", url: "https://www.citadel.com" },
-    { name: "Citadel Securities", logo: "/logos/citadel-securities.png", url: "https://www.citadelsecurities.com" },
-    { name: "CTC", logo: "/logos/ctc.png", url: "https://www.chicagotrading.com" },
-    { name: "D.E. Shaw", logo: "/logos/d-e--shaw.png", url: "https://www.deshaw.com" },
-    { name: "DRW", logo: "/logos/drw.png", url: "https://drw.com" },
-    { name: "Five Rings", logo: "/logos/five-rings.png", url: "https://fiverings.com" },
-    { name: "Flow Traders", logo: "/logos/flow-traders.png", url: "https://www.flowtraders.com" },
-    { name: "Goldman Sachs", logo: "/logos/goldman-sachs.png", url: "https://www.goldmansachs.com" },
-    { name: "Hudson River Trading", logo: "/logos/hudson-river-trading.png", url: "https://www.hudsonrivertrading.com" },
-    { name: "IMC", logo: "/logos/imc.png", url: "https://www.imc.com" },
-    { name: "J.P. Morgan", logo: "/logos/j-p--morgan.png", url: "https://www.jpmorgan.com" },
-    { name: "Jane Street", logo: "/logos/jane-street.png", url: "https://www.janestreet.com" },
-    { name: "Jump Trading", logo: "/logos/jump-trading.png", url: "https://www.jumptrading.com" },
-    { name: "Man Group", logo: "/logos/man-group.png", url: "https://www.man.com" },
-    { name: "Millennium", logo: "/logos/millennium.png", url: "https://www.millennium.com" },
-    { name: "Morgan Stanley", logo: "/logos/morgan-stanley.png", url: "https://www.morganstanley.com" },
-    { name: "Optiver", logo: "/logos/optiver.png", url: "https://www.optiver.com" },
-    { name: "Point72", logo: "/logos/point72.png", url: "https://www.point72.com" },
-    { name: "SIG", logo: "/logos/sig.png", url: "https://www.sig.com" },
-    { name: "Two Sigma", logo: "/logos/two-sigma.png", url: "https://www.twosigma.com" },
+// Logos in /logos/collage are transparent and trimmed to the artwork. The grid alternates like a
+// checkerboard (4 columns, in this order): tiles with a `bg` color hold a white logo (AQR keeps its cyan),
+// the others hold a colored logo on white. Changing the order or column count changes the pattern.
+const firms: { name: string; logo: string; url: string; bg?: string }[] = [
+    { name: "AQR", bg: "#02153D", logo: "/logos/collage/aqr.png", url: "https://www.aqr.com" },
+    { name: "BlackRock", logo: "/logos/collage/blackrock.png", url: "https://www.blackrock.com" },
+    { name: "Bloomberg", bg: "#000000", logo: "/logos/collage/bloomberg.png", url: "https://www.bloomberg.com" },
+    { name: "Bridgewater", logo: "/logos/collage/bridgewater.png", url: "https://www.bridgewater.com" },
+    { name: "Citadel", logo: "/logos/collage/citadel.png", url: "https://www.citadel.com" },
+    { name: "Citadel Securities", bg: "#171628", logo: "/logos/collage/citadel-securities.png", url: "https://www.citadelsecurities.com" },
+    { name: "CTC", logo: "/logos/collage/ctc.png", url: "https://www.chicagotrading.com" },
+    { name: "D.E. Shaw", bg: "#231F20", logo: "/logos/collage/d-e--shaw.png", url: "https://www.deshaw.com" },
+    { name: "DRW", bg: "#233B57", logo: "/logos/collage/drw.png", url: "https://drw.com" },
+    { name: "Five Rings", logo: "/logos/collage/five-rings.png", url: "https://fiverings.com" },
+    { name: "Flow Traders", bg: "#000000", logo: "/logos/collage/flow-traders.png", url: "https://www.flowtraders.com" },
+    { name: "Goldman Sachs", logo: "/logos/collage/goldman-sachs.png", url: "https://www.goldmansachs.com" },
+    { name: "Hudson River Trading", logo: "/logos/collage/hudson-river-trading.png", url: "https://www.hudsonrivertrading.com" },
+    { name: "IMC", bg: "#1F76B8", logo: "/logos/collage/imc.png", url: "https://www.imc.com" },
+    { name: "J.P. Morgan", logo: "/logos/collage/j-p--morgan.png", url: "https://www.jpmorgan.com" },
+    { name: "Jane Street", bg: "#1B459A", logo: "/logos/collage/jane-street.png", url: "https://www.janestreet.com" },
+    { name: "Jump Trading", bg: "#BA194A", logo: "/logos/collage/jump-trading.png", url: "https://www.jumptrading.com" },
+    { name: "Man Group", logo: "/logos/collage/man-group.png", url: "https://www.man.com" },
+    { name: "Millennium", bg: "#0032FF", logo: "/logos/collage/millennium.png", url: "https://www.millennium.com" },
+    { name: "Morgan Stanley", logo: "/logos/collage/morgan-stanley.png", url: "https://www.morganstanley.com" },
+    { name: "Optiver", logo: "/logos/collage/optiver.png", url: "https://www.optiver.com" },
+    { name: "Point72", bg: "#2877C0", logo: "/logos/collage/point72.png", url: "https://www.point72.com" },
+    { name: "SIG", logo: "/logos/collage/sig.png", url: "https://www.sig.com" },
+    { name: "Two Sigma", bg: "#17A5A8", logo: "/logos/collage/two-sigma.png", url: "https://www.twosigma.com" },
 ];
 
 export default function FirmsCollage({ aside }: { aside?: ReactNode }) {
@@ -35,7 +38,14 @@ export default function FirmsCollage({ aside }: { aside?: ReactNode }) {
                 <div className={aside ? "firm-split mt-7 grid gap-8 lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)]" : "mt-7"}>
                     <div className={`firm-collage mx-auto w-full${aside ? " firm-collage-fill" : ""}`} style={aside ? undefined : { maxWidth: "820px" }}>
                         {firms.map((firm) => (
-                            <a key={firm.name} href={firm.url} target="_blank" rel="noopener noreferrer" className="firm-tile">
+                            <a
+                                key={firm.name}
+                                href={firm.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="firm-tile"
+                                style={firm.bg ? { background: firm.bg } : undefined}
+                            >
                                 {/* eslint-disable-next-line @next/next/no-img-element -- static mixed-size logo grid */}
                                 <img src={firm.logo} alt={firm.name} />
                             </a>
