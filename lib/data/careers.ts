@@ -17,6 +17,7 @@ export const internshipByName: Record<string, string> = {
     "Nikhil Mudumbi": "Jane Street",
     "Kshitig Seth": "Amazon",
     "Steven Spasov": "Jane Street",
+    "Victor Robila": "Bridgewater",
 };
 
 export const fullTimeByName: Record<string, string> = {
@@ -78,7 +79,7 @@ export const fullTimeByName: Record<string, string> = {
     "Johnathan Mo": "Susquehanna",
     "Luke Freed": "Bridgewater",
     "Nicole Pi": "DRW",
-    "Mihir Joshi": "Headlands",
+    "Mihir Joshi": "Headlands Tech",
 };
 
 export interface Career {

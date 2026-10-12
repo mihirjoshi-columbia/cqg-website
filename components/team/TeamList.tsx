@@ -17,9 +17,11 @@ interface TeamListProps {
 
 export default function TeamList({ title, members }: TeamListProps) {
     const sorted = [...members].sort((a, b) => a.name.localeCompare(b.name));
-    // If anyone in the list has career lines, every pill reserves the same number so they line up.
-    const reserve = Math.max(0, ...sorted.map(careerLineCount));
-    const chip = reserve > 0 ? "member-chip member-chip-stacked" : "member-chip";
+    // If anyone in the list has career lines, every pill is as tall as the tallest and
+    // its contents are centered, so names without lines sit in the middle.
+    const lines = Math.max(0, ...sorted.map(careerLineCount));
+    const chip = lines > 0 ? "member-chip member-chip-stacked" : "member-chip";
+    const style = lines > 0 ? ({ "--lines": lines } as React.CSSProperties) : undefined;
 
     return (
         <div>
@@ -33,20 +35,21 @@ export default function TeamList({ title, members }: TeamListProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`${chip} hover:text-sky-deep transition-colors`}
+                            style={style}
                         >
                             <span>
                                 {member.name}
                                 {member.firstYear && <FirstYearMark />}
                             </span>
-                            <CareerLines career={member} reserve={reserve} />
+                            <CareerLines career={member} />
                         </a>
                     ) : (
-                        <span key={member.name} className={chip}>
+                        <span key={member.name} className={chip} style={style}>
                             <span>
                                 {member.name}
                                 {member.firstYear && <FirstYearMark />}
                             </span>
-                            <CareerLines career={member} reserve={reserve} />
+                            <CareerLines career={member} />
                         </span>
                     )
                 )}
