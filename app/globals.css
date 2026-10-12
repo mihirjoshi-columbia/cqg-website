@@ -598,7 +598,7 @@ h1, h2, h3, h4 {
      section's own heading and spacing, never shorter than 26rem or taller than 46rem. */
   .firm-split { height: clamp(26rem, calc(100svh - 13.5rem), 46rem); }
 }
-.firm-tile img { width: 92%; height: 76%; object-fit: contain; }
+.firm-tile img { width: 76%; height: 58%; object-fit: contain; }
 /* Tiles with their own background color (set inline) brighten on hover instead. */
 .firm-tile[style]:hover { filter: brightness(1.15); }
 
