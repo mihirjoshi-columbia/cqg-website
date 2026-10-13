@@ -1221,6 +1221,13 @@ a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark);
 .mtm-notice--warn { border-left-color: var(--mtm-warn); }
 .mtm-notice--error { border-left-color: var(--mtm-sell); color: #FFD9DF; }
 
+/* ---- score submission ---- */
+.mtm-submit {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mtm-line);
+}
+
 /* ---- log & misc ---- */
 .mtm-log {
   font-family: var(--font-plex-mono), monospace;

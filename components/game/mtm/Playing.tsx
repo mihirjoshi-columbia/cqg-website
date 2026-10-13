@@ -1,8 +1,7 @@
 "use client";
 
-import { COMMUNITY_COUNT, TOTAL_ROUNDS } from "@/lib/game/mtm/deck";
-import { isLastRound, markPnl, playerFair, roundComplete, type GameState } from "@/lib/game/mtm/engine";
 import { fmt } from "@/lib/game/mtm/format";
+import type { MtmPublicState } from "@/lib/game/mtm/project";
 import type { Side } from "@/lib/game/mtm/types";
 import { CardBack, PlayingCard } from "./Card";
 
@@ -11,16 +10,17 @@ export default function Playing({
     onTrade,
     onPass,
     onAdvance,
+    busy,
 }: {
-    state: GameState;
+    state: MtmPublicState;
     onTrade: (makerIndex: number, side: Side) => void;
     onPass: (makerIndex: number) => void;
     onAdvance: () => void;
+    busy: boolean;
 }) {
-    const { config, quotes, makers, roundActions, activeMaker } = state;
-    const done = roundComplete(state);
-    const last = isLastRound(state);
-    const pnl = markPnl(state);
+    const { quotes, makers, roundActions, activeMaker, hardMode, expertMode, showEstimate } = state;
+    const done = state.roundComplete;
+    const last = state.isLastRound;
 
     return (
         <div className="mtm-stack">
@@ -28,53 +28,58 @@ export default function Playing({
                 <div className="mtm-stat">
                     <div className="mtm-stat__label">Round</div>
                     <div className="mtm-stat__value">
-                        {state.round + 1} / {TOTAL_ROUNDS}
+                        {state.round + 1} / {state.totalRounds}
                     </div>
                 </div>
 
-                {!config.hardMode && (
+                {/* In hard mode the server does not even send these. */}
+                {!hardMode && (
                     <>
                         <div className="mtm-stat">
                             <div className="mtm-stat__label">Position</div>
                             <div
                                 className={`mtm-stat__value ${
-                                    state.position > 0
+                                    (state.position ?? 0) > 0
                                         ? "mtm-buy"
-                                        : state.position < 0
+                                        : (state.position ?? 0) < 0
                                           ? "mtm-sell"
                                           : ""
                                 }`}
                             >
-                                {state.position > 0 ? "+" : ""}
-                                {state.position}
+                                {(state.position ?? 0) > 0 ? "+" : ""}
+                                {state.position ?? 0}
                             </div>
                         </div>
                         <div className="mtm-stat">
                             <div className="mtm-stat__label">Cash</div>
-                            <div className="mtm-stat__value">{fmt(state.cash)}</div>
+                            <div className="mtm-stat__value">{fmt(state.cash ?? 0)}</div>
                         </div>
                         <div className="mtm-stat">
                             <div className="mtm-stat__label">Avg entry</div>
                             <div className="mtm-stat__value">
-                                {state.position === 0 ? "—" : fmt(state.avgEntry)}
+                                {(state.position ?? 0) === 0 ? "—" : fmt(state.avgEntry ?? 0)}
                             </div>
                         </div>
                         <div className="mtm-stat">
                             <div className="mtm-stat__label">Est. mark P&amp;L</div>
-                            <div className={`mtm-stat__value ${pnl >= 0 ? "mtm-buy" : "mtm-sell"}`}>
-                                {fmt(pnl)}
+                            <div
+                                className={`mtm-stat__value ${
+                                    (state.markPnl ?? 0) >= 0 ? "mtm-buy" : "mtm-sell"
+                                }`}
+                            >
+                                {fmt(state.markPnl ?? 0)}
                             </div>
                             <div className="mtm-stat__note">vs your est. fair</div>
                         </div>
                     </>
                 )}
 
-                {config.hardMode && !config.expertMode && (
+                {hardMode && !expertMode && (
                     <div className="mtm-stat mtm-stat--note mtm-warn">
                         Hard — trading blind until settlement.
                     </div>
                 )}
-                {config.expertMode && (
+                {expertMode && (
                     <div className="mtm-stat mtm-stat--note mtm-warn">
                         Expert — blind, tighter markets, sharper makers.
                     </div>
@@ -90,11 +95,11 @@ export default function Playing({
                             <div>
                                 Value: <span className="mtm-strong">{state.playerCard.value}</span>
                             </div>
-                            {config.showEstimate && (
+                            {showEstimate && state.fairEstimate !== undefined && (
                                 <div className="mtm-spaced">
                                     Your est. fair:{" "}
                                     <span className="mtm-accent mtm-strong">
-                                        {Math.round(playerFair(state))}
+                                        {state.fairEstimate}
                                     </span>
                                 </div>
                             )}
@@ -106,15 +111,11 @@ export default function Playing({
                     <div className="mtm-panel__label">Face-down cards</div>
                     <div className="mtm-row mtm-row--wrap">
                         {state.community.map((card, i) =>
-                            i < state.revealed ? (
-                                <PlayingCard key={i} card={card} />
-                            ) : (
-                                <CardBack key={i} />
-                            )
+                            card ? <PlayingCard key={i} card={card} /> : <CardBack key={i} />
                         )}
                     </div>
                     <p className="mtm-muted mtm-small mtm-spaced">
-                        {state.revealed} of {COMMUNITY_COUNT} revealed.
+                        {state.revealed} of {state.communityCount} revealed.
                     </p>
                 </div>
             </div>
@@ -130,7 +131,9 @@ export default function Playing({
                 <div className="mtm-quotes">
                     {makers.map((maker, i) => {
                         const quote = quotes[i];
-                        if (!quote || i > activeMaker) return null;
+                        // The server sends nothing past the live maker, so
+                        // there is no reading ahead even from the console.
+                        if (!quote) return null;
                         const live = i === activeMaker;
                         const action = roundActions[i];
                         return (
@@ -162,6 +165,7 @@ export default function Playing({
                                             <button
                                                 type="button"
                                                 className="mtm-btn mtm-btn--sell"
+                                                disabled={busy}
                                                 onClick={() => onTrade(i, "sell")}
                                             >
                                                 Sell {quote.bidSize} @ {quote.bid}
@@ -169,6 +173,7 @@ export default function Playing({
                                             <button
                                                 type="button"
                                                 className="mtm-btn mtm-btn--buy"
+                                                disabled={busy}
                                                 onClick={() => onTrade(i, "buy")}
                                             >
                                                 Buy {quote.askSize} @ {quote.ask}
@@ -176,6 +181,7 @@ export default function Playing({
                                             <button
                                                 type="button"
                                                 className="mtm-btn mtm-btn--neutral"
+                                                disabled={busy}
                                                 onClick={() => onPass(i)}
                                             >
                                                 Pass
@@ -218,14 +224,14 @@ export default function Playing({
                 <button
                     type="button"
                     className="mtm-btn mtm-btn--primary"
-                    disabled={!done}
+                    disabled={!done || busy}
                     onClick={onAdvance}
                 >
                     {last ? "Settle →" : "Flip community card →"}
                 </button>
             </div>
 
-            {state.trades.length > 0 && !config.hardMode && (
+            {state.trades && state.trades.length > 0 && (
                 <div className="mtm-panel">
                     <div className="mtm-panel__label">Trade log</div>
                     <div className="mtm-log">

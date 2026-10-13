@@ -295,3 +295,90 @@ export async function getEmailStatus(id: string): Promise<unknown> {
         return { error: String(err) };
     }
 }
+
+// ===========================================================================
+// Make the Market score reports.
+//
+// The recipient is HARDCODED on purpose. If the client could name it, this
+// endpoint would be an open relay that sends CQG-branded mail to arbitrary
+// addresses -- a spam vector and a phishing one. The only thing a player can
+// influence is the score, and that is computed server-side from their sealed
+// session before it ever reaches here.
+// ===========================================================================
+export const MTM_SCORE_RECIPIENT = "mnj2122@columbia.edu";
+
+export interface MtmScoreReport {
+    playerName: string;
+    playerEmail: string;
+    difficulty: string;
+    finalPnl: number;
+    trueValue: number;
+    position: number;
+    trades: { round: number; side: string; qty: number; price: number; counterparty: string }[];
+}
+
+// Split out from the send so the message can be rendered and inspected
+// without a Resend key, which is the only way to check the formatting in
+// local development.
+export function buildMtmScoreEmail(opts: MtmScoreReport): {
+    subject: string;
+    html: string;
+    text: string;
+} {
+    const { playerName, playerEmail, difficulty, finalPnl, trueValue, position, trades } = opts;
+    const pnlLabel = `${finalPnl >= 0 ? "+" : ""}${Math.round(finalPnl)}`;
+    const heading = `${playerName} scored ${pnlLabel} on ${difficulty}`;
+
+    const tradeRows = trades.length
+        ? trades
+              .map(
+                  (t) =>
+                      `<tr><td style="padding:2px 10px 2px 0;">R${t.round + 1}</td>` +
+                      `<td style="padding:2px 10px 2px 0;color:${t.side === "buy" ? "#2A9A55" : "#C23B4A"};">${t.side.toUpperCase()}</td>` +
+                      `<td style="padding:2px 10px 2px 0;">${t.qty} @ ${t.price}</td>` +
+                      `<td style="padding:2px 0;color:#7B879C;">${t.counterparty}</td></tr>`
+              )
+              .join("")
+        : `<tr><td colspan="4" style="color:#7B879C;">No trades — passed every market.</td></tr>`;
+
+    const bodyHtml =
+        `<p style="margin:0 0 12px;"><strong>${playerName}</strong> (${playerEmail}) finished a hand of Make the Market.</p>` +
+        `<table style="font-size:14px;border-collapse:collapse;margin:0 0 16px;">` +
+        `<tr><td style="padding:2px 12px 2px 0;color:#7B879C;">Difficulty</td><td><strong>${difficulty}</strong></td></tr>` +
+        `<tr><td style="padding:2px 12px 2px 0;color:#7B879C;">Final P&amp;L</td><td><strong>${pnlLabel}</strong></td></tr>` +
+        `<tr><td style="padding:2px 12px 2px 0;color:#7B879C;">Settlement</td><td>${trueValue}</td></tr>` +
+        `<tr><td style="padding:2px 12px 2px 0;color:#7B879C;">Final position</td><td>${position > 0 ? "long" : position < 0 ? "short" : "flat"} ${Math.abs(position)}</td></tr>` +
+        `</table>` +
+        `<p style="margin:0 0 6px;font-size:12px;color:#7B879C;text-transform:uppercase;letter-spacing:0.08em;">Trade log</p>` +
+        `<table style="font-size:13px;border-collapse:collapse;font-family:monospace;">${tradeRows}</table>` +
+        `<p style="margin:16px 0 0;font-size:12px;color:#7B879C;">Scored server-side from a sealed session, so the P&amp;L above is the hand as actually played.</p>`;
+
+    const bodyText = [
+        `${playerName} (${playerEmail}) finished a hand of Make the Market.`,
+        "",
+        `Difficulty:      ${difficulty}`,
+        `Final P&L:       ${pnlLabel}`,
+        `Settlement:      ${trueValue}`,
+        `Final position:  ${position > 0 ? "long" : position < 0 ? "short" : "flat"} ${Math.abs(position)}`,
+        "",
+        "Trade log",
+        ...(trades.length
+            ? trades.map(
+                  (t) =>
+                      `  R${t.round + 1}  ${t.side.toUpperCase().padEnd(4)} ${t.qty} @ ${t.price}  ${t.counterparty}`
+              )
+            : ["  No trades — passed every market."]),
+        "",
+        "Scored server-side from a sealed session, so the P&L above is the hand as actually played.",
+    ].join("\n");
+
+    return {
+        subject: `Make the Market — ${playerName} · ${difficulty} · ${pnlLabel}`,
+        html: brandedEmailHtml({ heading, bodyHtml }),
+        text: brandedEmailText({ heading, bodyText }),
+    };
+}
+
+export async function sendMtmScoreEmail(opts: MtmScoreReport): Promise<void> {
+    await send({ to: MTM_SCORE_RECIPIENT, ...buildMtmScoreEmail(opts) });
+}

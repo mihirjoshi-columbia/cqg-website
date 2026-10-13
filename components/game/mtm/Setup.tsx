@@ -8,10 +8,12 @@ export default function Setup({
     preset,
     onPresetChange,
     onStart,
+    busy,
 }: {
     preset: MtmPreset;
     onPresetChange: (preset: MtmPreset) => void;
     onStart: () => void;
+    busy: boolean;
 }) {
     return (
         <div className="mtm-setup">
@@ -68,13 +70,14 @@ export default function Setup({
 
             <section className="mtm-panel">
                 <h2 className="mtm-h2">Difficulty</h2>
-                <PresetPicker value={preset} onChange={onPresetChange} />
+                <PresetPicker value={preset} onChange={onPresetChange} disabled={busy} />
                 <button
                     type="button"
                     className="mtm-btn mtm-btn--primary mtm-btn--block"
                     onClick={onStart}
+                    disabled={busy}
                 >
-                    Deal &amp; start
+                    {busy ? "Dealing…" : "Deal & start"}
                 </button>
             </section>
         </div>
