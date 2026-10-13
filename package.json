@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:mtm": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-mtm-game.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

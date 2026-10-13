@@ -951,3 +951,306 @@ a.member-chip:hover .career-intern,
 a.lineage-little:hover .career-intern { color: var(--career-intern-on-dark); }
 a.member-chip:hover .career-fulltime,
 a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark); }
+
+/* ============ Make the Market (internal members' game) ============
+   Ported from the standalone app's styles.css. Two deliberate changes:
+
+   1. Everything is scoped under .mtm-root and prefixed .mtm-*. The source
+      used generic names (.panel, .btn, .card, .row, .log) that would collide
+      with the site's own classes, and its dark theme must not leak into the
+      light portal chrome around it.
+   2. The palette is retinted from near-black/indigo to CQG navy + lime. The
+      dark trading-terminal look is kept on purpose -- it suits a
+      market-making game and reads as a distinct tool rather than another
+      portal form -- but it now belongs to this site. Buy/sell stay
+      green/red, which is the one convention a market UI shouldn't restyle.
+   ================================================================== */
+.mtm-root {
+  --mtm-bg: var(--navy-deep);
+  --mtm-panel: #0E3365;
+  --mtm-sunken: #09254A;
+  --mtm-line: var(--navy-line);
+  --mtm-text: #EAF1FB;
+  --mtm-muted: #9DB4D4;
+  --mtm-dim: #6E8CB4;
+  --mtm-buy: #34D399;
+  --mtm-sell: #FB7185;
+  --mtm-accent: var(--lime);
+  --mtm-accent-solid: var(--lime-deep);
+  --mtm-warn: #FCD34D;
+  --mtm-radius: 10px;
+
+  color-scheme: dark;
+  background: var(--mtm-bg);
+  color: var(--mtm-text);
+  font-size: 15px;
+  line-height: 1.5;
+  border: 1.5px solid var(--mtm-line);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mtm-root *, .mtm-root *::before, .mtm-root *::after { box-sizing: border-box; }
+
+.mtm-masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--mtm-line);
+}
+.mtm-h1 {
+  margin: 2px 0 0;
+  font-family: var(--font-archivo), "Arial Black", sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--mtm-text);
+}
+.mtm-h2 { margin: 0 0 12px; font-size: 17px; font-weight: 700; color: var(--mtm-text); }
+.mtm-eyebrow {
+  margin: 0;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+}
+
+.mtm-stack { display: flex; flex-direction: column; gap: 20px; }
+
+.mtm-panel {
+  background: var(--mtm-panel);
+  border: 1px solid var(--mtm-line);
+  border-radius: var(--mtm-radius);
+  padding: 18px;
+}
+.mtm-panel__label {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+  margin-bottom: 10px;
+}
+
+/* ---- setup ---- */
+.mtm-setup { display: grid; gap: 20px; grid-template-columns: 1.4fr 1fr; align-items: start; }
+.mtm-rules { margin: 0; padding-left: 20px; color: var(--mtm-muted); font-size: 14px; }
+.mtm-rules li { margin-bottom: 6px; }
+
+.mtm-roster { margin-top: 16px; display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mtm-roster > div {
+  background: var(--mtm-sunken);
+  border: 1px solid var(--mtm-line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mtm-roster span { font-weight: 600; font-size: 14px; }
+.mtm-roster strong {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mtm-accent);
+  font-weight: 500;
+}
+.mtm-roster small { color: var(--mtm-dim); font-size: 12px; line-height: 1.4; }
+
+/* ---- difficulty presets (replaces the source's three checkboxes) ---- */
+.mtm-presets { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 18px; }
+.mtm-preset {
+  text-align: left;
+  font: inherit;
+  background: var(--mtm-sunken);
+  border: 1.5px solid var(--mtm-line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.mtm-preset:hover:not(:disabled) { border-color: var(--mtm-dim); }
+.mtm-preset:disabled { opacity: 0.45; cursor: not-allowed; }
+.mtm-preset--active { border-color: var(--mtm-accent); background: #0C2E5C; }
+.mtm-preset__label { font-weight: 700; font-size: 14px; color: var(--mtm-text); }
+.mtm-preset--active .mtm-preset__label { color: var(--mtm-accent); }
+.mtm-preset__blurb { font-size: 12px; color: var(--mtm-dim); line-height: 1.4; }
+
+/* ---- status ---- */
+.mtm-statusbar { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mtm-stat {
+  background: var(--mtm-panel);
+  border: 1px solid var(--mtm-line);
+  border-radius: var(--mtm-radius);
+  padding: 10px 12px;
+}
+.mtm-stat__label {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+}
+.mtm-stat__value { font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mtm-stat__note { font-size: 10px; color: var(--mtm-dim); }
+.mtm-stat--note { display: flex; align-items: center; font-size: 12px; grid-column: span 2; }
+
+.mtm-grid-2 { display: grid; gap: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mtm-row { display: flex; align-items: center; gap: 10px; }
+.mtm-row--gap { gap: 16px; }
+.mtm-row--wrap { flex-wrap: wrap; }
+.mtm-row--between { justify-content: space-between; gap: 16px; }
+
+/* ---- cards ---- */
+.mtm-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FAFAFA;
+  color: #111827;
+  border-radius: 8px;
+  font-weight: 700;
+  line-height: 1.05;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.5);
+}
+.mtm-card--big { width: 64px; height: 96px; font-size: 24px; }
+.mtm-card--mid { width: 48px; height: 64px; font-size: 18px; }
+.mtm-card--red { color: #E11D48; }
+.mtm-card__suit { font-weight: 500; }
+.mtm-card--back {
+  background: var(--navy-mid);
+  color: var(--mtm-accent);
+  border: 2px solid var(--mtm-line);
+  box-shadow: none;
+  font-size: 20px;
+}
+.mtm-reveal { margin: 0; text-align: center; }
+.mtm-reveal figcaption { font-size: 10px; color: var(--mtm-muted); margin-top: 4px; }
+
+/* ---- quotes ---- */
+.mtm-quotes { display: flex; flex-direction: column; gap: 8px; }
+.mtm-quote {
+  display: grid;
+  grid-template-columns: 1.1fr 1.6fr 1.6fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mtm-sunken);
+  border: 1px solid transparent;
+  opacity: 0.6;
+}
+.mtm-quote--live { opacity: 1; border-color: var(--mtm-accent); background: #0C2E5C; }
+.mtm-quote__style {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+}
+.mtm-quote__market { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; }
+.mtm-quote__actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+
+/* ---- buttons ---- */
+.mtm-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 120ms ease, opacity 120ms ease;
+}
+.mtm-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.mtm-btn--buy { background: #047857; }
+.mtm-btn--buy:hover:not(:disabled) { background: #059669; }
+.mtm-btn--sell { background: #9F1239; }
+.mtm-btn--sell:hover:not(:disabled) { background: #BE123C; }
+.mtm-btn--neutral { background: var(--navy-mid); }
+.mtm-btn--neutral:hover:not(:disabled) { background: #1B4C93; }
+.mtm-btn--primary {
+  background: var(--mtm-accent);
+  color: var(--navy);
+  padding: 9px 18px;
+  align-self: flex-start;
+}
+.mtm-btn--primary:hover:not(:disabled) { background: #F3FF4D; }
+.mtm-btn--block { width: 100%; padding: 12px; justify-content: center; }
+
+.mtm-link {
+  background: none;
+  border: 0;
+  color: var(--mtm-muted);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+.mtm-link:hover { color: #fff; }
+
+/* ---- notices ---- */
+.mtm-notice {
+  border: 1px solid var(--mtm-line);
+  border-left: 3px solid var(--mtm-accent);
+  background: var(--mtm-sunken);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--mtm-muted);
+  margin: 14px 0;
+}
+.mtm-notice strong { color: var(--mtm-text); }
+.mtm-notice__actions { margin-top: 10px; }
+.mtm-notice--warn { border-left-color: var(--mtm-warn); }
+.mtm-notice--error { border-left-color: var(--mtm-sell); color: #FFD9DF; }
+
+/* ---- log & misc ---- */
+.mtm-log {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 160px;
+  overflow: auto;
+}
+.mtm-log--tall { max-height: 224px; }
+.mtm-headline { font-size: 38px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.mtm-mono { font-family: var(--font-plex-mono), monospace; }
+.mtm-muted { color: var(--mtm-muted); }
+.mtm-dim { color: var(--mtm-dim); }
+.mtm-small { font-size: 12px; }
+.mtm-strong { font-weight: 600; color: var(--mtm-text); }
+.mtm-spaced { margin-top: 8px; }
+.mtm-buy { color: var(--mtm-buy); }
+.mtm-sell { color: var(--mtm-sell); }
+.mtm-red { color: var(--mtm-sell); }
+.mtm-accent { color: var(--mtm-accent); }
+.mtm-warn { color: var(--mtm-warn); }
+
+@media (max-width: 860px) {
+  .mtm-root { padding: 16px; }
+  .mtm-setup, .mtm-grid-2 { grid-template-columns: 1fr; }
+  .mtm-statusbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mtm-roster { grid-template-columns: 1fr; }
+  .mtm-quote { grid-template-columns: 1fr; text-align: left; }
+  .mtm-quote__market, .mtm-quote__actions { justify-content: flex-start; flex-wrap: wrap; }
+}

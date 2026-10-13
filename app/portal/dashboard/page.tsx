@@ -6,6 +6,7 @@ import ResumeUpload from "./ResumeUpload";
 import MembershipCard from "./MembershipCard";
 import CttCard from "./CttCard";
 import DangerZone from "./DangerZone";
+import GameCard from "./GameCard";
 import type { CqgProfile } from "@/lib/supabase/types";
 
 export const metadata = { title: "Dashboard — CQG Portal" };
@@ -61,6 +62,11 @@ export default async function DashboardPage() {
                     <a href="/portal/events" className="btn-cqg btn-outline-navy btn-sm">
                         Events
                     </a>
+                    {(profile.tier === "member" || profile.tier === "admin") && (
+                        <a href="/portal/game" className="btn-cqg btn-outline-navy btn-sm">
+                            Make the Market
+                        </a>
+                    )}
                     {profile.tier === "admin" && (
                         <a href="/portal/admin" className="btn-cqg btn-outline-navy btn-sm">
                             Admin dashboard
@@ -96,6 +102,13 @@ export default async function DashboardPage() {
                     <h2 className="eyebrow mb-3 block">Internal Membership</h2>
                     <MembershipCard profile={profile} />
                 </section>
+
+                {(profile.tier === "member" || profile.tier === "admin") && (
+                    <section>
+                        <h2 className="eyebrow mb-3 block">Make the Market</h2>
+                        <GameCard profile={profile} />
+                    </section>
+                )}
 
                 <section>
                     <h2 className="eyebrow mb-3 block">CTT</h2>
