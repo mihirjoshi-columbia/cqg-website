@@ -63,14 +63,25 @@ const exec2023 = [
 
 const members2425 = [
     { name: "Alison Wu", linkedin: "https://www.linkedin.com/in/alison-wu-8387961b5/" },
-    { name: "Aurora Wang", linkedin: "https://www.linkedin.com/in/aurorawang15/" },
-    { name: "Nikhil Mudumbi", linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/" },
-    { name: "Brianna Wang", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
-    { name: "Ben Proothi", linkedin: "https://www.linkedin.com/in/bp2715/" },
-    { name: "Luke Early", linkedin: "https://www.linkedin.com/in/lukeearly/" },
     { name: "Aryaman Rakhecha", linkedin: "https://www.linkedin.com/in/aryaman-rakhecha/" },
-    { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Aurora Wang", linkedin: "https://www.linkedin.com/in/aurorawang15/" },
+    { name: "Ben Proothi", linkedin: "https://www.linkedin.com/in/bp2715/" },
+    { name: "Brianna Wang", linkedin: "https://www.linkedin.com/in/brianna-wang-9b674b287/" },
+    { name: "Derek Che", linkedin: "https://www.linkedin.com/in/yuyao-c-379a71290/" },
+    { name: "Dylan Fei", linkedin: "http://www.linkedin.com/in/dylan-fei-067247313" },
     { name: "Julia Ding", linkedin: "https://www.linkedin.com/in/julialding/" },
+    { name: "Kshitig Seth", linkedin: "https://www.linkedin.com/in/kshitig-seth/" },
+    { name: "Leo Sun", linkedin: "https://www.linkedin.com/in/leoysun/" },
+    { name: "Luke Early", linkedin: "https://www.linkedin.com/in/lukeearly/" },
+    { name: "Matthew Weng", linkedin: "https://www.linkedin.com/in/matthewweng/" },
+    { name: "Navia Zhang", linkedin: "https://www.linkedin.com/in/navia-zhang/" },
+    { name: "Nikhil Mudumbi", linkedin: "https://www.linkedin.com/in/nikhil-mudumbi-614b17247/" },
+    { name: "Rahul Ram", linkedin: "https://www.linkedin.com/in/rahulram1064/" },
+    { name: "Ryan Kim", linkedin: "https://www.linkedin.com/in/ryjikim/" },
+    { name: "Srirag Tatavarti", linkedin: "https://www.linkedin.com/in/srirag-tatavarti/" },
+    { name: "Steven Spasov", linkedin: "https://www.linkedin.com/in/steven-spasov-24bb43257/" },
+    { name: "Trevor Semeraro", linkedin: "https://www.linkedin.com/in/trevor-semeraro/" },
+    { name: "Victor Robila", linkedin: "https://www.linkedin.com/in/victor-robila/" },
 ];
 
 const members2324 = [
