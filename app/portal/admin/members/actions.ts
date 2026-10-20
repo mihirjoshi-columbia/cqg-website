@@ -10,7 +10,7 @@ export interface TierUpdateState {
     success?: boolean;
 }
 
-const VALID_TIERS: CqgTier[] = ["general_body", "member", "admin"];
+const VALID_TIERS: CqgTier[] = ["general_body", "member", "senior_advisor", "admin"];
 
 export async function updateMemberTierAction(
     _prev: TierUpdateState,

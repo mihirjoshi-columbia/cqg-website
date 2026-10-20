@@ -1,0 +1,18 @@
+-- Adds a 'senior_advisor' tier for people who stay involved after their
+-- Internal Membership (graduating seniors, former e-board) without holding
+-- internal privileges.
+--
+-- Deliberately NOT an internal tier: the `tier in ('member', 'admin')` checks
+-- in apply_to_event (0001_init.sql) and the Make the Market gate
+-- (lib/game/require-internal-member.ts) are left alone, so a senior advisor
+-- applies to events and lands in 'pending' exactly like General Body.
+--
+-- They are out of the running for both selective programs, though:
+--   * Internal Membership — applyForMembershipAction already requires
+--     tier = 'general_body', so this tier is blocked by that existing check.
+--   * CTT — applyForCttAction is widened alongside this migration to block
+--     'senior_advisor' the same way it blocks 'member'.
+--
+-- Added after 'member' so `order by tier` reads general_body → member →
+-- senior_advisor → admin.
+alter type cqg_tier add value if not exists 'senior_advisor' after 'member';

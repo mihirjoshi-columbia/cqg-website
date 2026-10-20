@@ -250,11 +250,16 @@ export async function applyForCttAction(formData: FormData) {
         .maybeSingle()
         .overrideTypes<CqgProfile, { merge: false }>();
 
-    // Internal Members can't apply while they hold that tier — re-checked
-    // live against current tier, so stepping back to general_body reopens
-    // eligibility automatically. Grad students are never eligible, same as
-    // Internal Membership.
-    if (!profile || profile.tier === "member" || profile.school === "GRAD") {
+    // Internal Members and Senior Advisors can't apply while they hold that
+    // tier — re-checked live against current tier, so stepping back to
+    // general_body reopens eligibility automatically. Grad students are never
+    // eligible, same as Internal Membership.
+    if (
+        !profile ||
+        profile.tier === "member" ||
+        profile.tier === "senior_advisor" ||
+        profile.school === "GRAD"
+    ) {
         return;
     }
 

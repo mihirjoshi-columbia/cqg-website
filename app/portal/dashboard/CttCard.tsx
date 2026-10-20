@@ -5,13 +5,14 @@ import { cqgSchoolToCollegeName } from "@/lib/domains";
 import type { CqgProfile, CttCycle, CttApplication } from "@/lib/supabase/types";
 
 export default async function CttCard({ profile }: { profile: CqgProfile }) {
-    if (profile.tier === "member") {
+    if (profile.tier === "member" || profile.tier === "senior_advisor") {
+        const role = profile.tier === "member" ? "Internal Members" : "Senior Advisors";
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
                     <span className="tag tag-outline w-fit">CTT</span>
                     <p className="text-ink-soft text-sm">
-                        Internal Members aren&apos;t eligible to compete in CTT while holding that role.
+                        {role} aren&apos;t eligible to compete in CTT while holding that role.
                     </p>
                 </div>
             </div>

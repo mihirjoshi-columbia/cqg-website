@@ -9,6 +9,7 @@ const initialState: TierUpdateState = {};
 const TIER_OPTIONS: { value: CqgTier; label: string }[] = [
     { value: "general_body", label: "General Body" },
     { value: "member", label: "Internal Member" },
+    { value: "senior_advisor", label: "Senior Advisor" },
     { value: "admin", label: "Admin" },
 ];
 

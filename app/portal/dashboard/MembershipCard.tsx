@@ -16,6 +16,20 @@ export default async function MembershipCard({ profile }: { profile: CqgProfile 
         );
     }
 
+    if (profile.tier === "senior_advisor") {
+        return (
+            <div className="event-card" style={{ maxWidth: 560 }}>
+                <div className="event-card-body">
+                    <span className="tag tag-sky w-fit">Senior Advisor</span>
+                    <p className="text-ink-soft text-sm">
+                        Senior Advisors aren&apos;t in the running for Internal Membership — thanks for
+                        staying involved with CQG.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     if (profile.school === "GRAD") {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>

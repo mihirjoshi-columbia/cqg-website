@@ -2,7 +2,7 @@
 // changes, update this alongside the migration (no live project to run
 // `supabase gen types` against yet).
 
-export type CqgTier = "general_body" | "member" | "admin";
+export type CqgTier = "general_body" | "member" | "senior_advisor" | "admin";
 export type CqgSchool = "CC" | "SEAS" | "Barnard" | "GS" | "GRAD";
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 export type EventApplicationStatus =

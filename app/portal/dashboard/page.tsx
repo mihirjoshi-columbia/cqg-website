@@ -14,12 +14,14 @@ export const metadata = { title: "Dashboard — CQG Portal" };
 const TIER_LABEL: Record<string, string> = {
     general_body: "General Body",
     member: "Internal Member",
+    senior_advisor: "Senior Advisor",
     admin: "Admin",
 };
 
 const TIER_TAG_CLASS: Record<string, string> = {
     general_body: "tag-outline",
     member: "tag-lime",
+    senior_advisor: "tag-sky",
     admin: "tag-pink",
 };
 

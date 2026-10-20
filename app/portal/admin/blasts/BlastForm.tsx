@@ -48,6 +48,7 @@ export default function BlastForm({ events }: { events: CqgEvent[] }) {
                         <option value="all">All CQG accounts</option>
                         <option value="general_body">General Body</option>
                         <option value="member">Internal Members</option>
+                        <option value="senior_advisor">Senior Advisors</option>
                         <option value="admin">Admins</option>
                     </select>
                 </div>
