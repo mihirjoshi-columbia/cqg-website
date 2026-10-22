@@ -16,6 +16,7 @@ export default function LoginForm() {
     const params = useSearchParams();
     const next = params.get("next") || "/ctt/apply/dashboard";
     const justSignedUp = params.get("justSignedUp") === "1";
+    const accountReady = params.get("accountReady") === "1";
 
     return (
         <div className="flex flex-col gap-4">
@@ -24,6 +25,9 @@ export default function LoginForm() {
                     <div className="form-banner form-banner-success">
                         Account created — check your email for a verification link before logging in.
                     </div>
+                )}
+                {accountReady && !state.error && (
+                    <div className="form-banner form-banner-success">Account created — you can log in now.</div>
                 )}
                 {state.error && <div className="form-banner form-banner-error">{state.error}</div>}
                 {resendState.resent && (

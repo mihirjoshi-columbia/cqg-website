@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { insertRow } from "@/lib/supabase/helpers";
-import { isCttEmail } from "@/lib/domains";
+import { isCttEmail, skipsEmailVerification } from "@/lib/domains";
 import { sendVerificationEmail } from "@/lib/email";
 
 export interface SignupState {
@@ -52,19 +52,33 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-        type: "signup",
-        email,
-        password,
-        options: { redirectTo: `${siteUrl}/ctt/apply/verify` },
-    });
+    // Most addresses get a verification link; exempt domains are created already confirmed.
+    const skipVerification = skipsEmailVerification(email);
+    let userId: string;
+    let verifyLink: string | null = null;
 
-    if (linkError || !linkData?.user) {
-        return { error: linkError?.message || "Could not create your account. Please try again." };
+    if (skipVerification) {
+        const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+        if (error || !data?.user) {
+            return { error: error?.message || "Could not create your account. Please try again." };
+        }
+        userId = data.user.id;
+    } else {
+        const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+            type: "signup",
+            email,
+            password,
+            options: { redirectTo: `${siteUrl}/ctt/apply/verify` },
+        });
+        if (linkError || !linkData?.user) {
+            return { error: linkError?.message || "Could not create your account. Please try again." };
+        }
+        userId = linkData.user.id;
+        verifyLink = linkData.properties.action_link;
     }
 
     const { error: profileError } = await insertRow(admin, "ctt_profiles", {
-        id: linkData.user.id,
+        id: userId,
         email,
         name,
         attestation,
@@ -72,12 +86,16 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
 
     if (profileError) {
         console.error("[ctt signup] profile insert failed:", profileError);
-        await admin.auth.admin.deleteUser(linkData.user.id);
+        await admin.auth.admin.deleteUser(userId);
         return { error: "Could not create your profile. Please try again." };
     }
 
+    if (!verifyLink) {
+        redirect("/ctt/apply/login?accountReady=1");
+    }
+
     try {
-        await sendVerificationEmail(email, name, linkData.properties.action_link);
+        await sendVerificationEmail(email, name, verifyLink);
     } catch (err) {
         // The account exists at this point, so don't roll it back -- the send
         // may well have gone out before whatever failed. Say so plainly

@@ -44,6 +44,17 @@ function isAcademicEmail(email: string): boolean {
     return ACADEMIC_PATTERNS.some((p) => p.test(domain));
 }
 
+// Domains whose CTT signups skip the "click the emailed link" step: their accounts are
+// created already confirmed and can log in right away. Ownership of the address is not
+// checked for these, so the student attestation and admin review of applications are the
+// only gates. Subdomains (cs.stonybrook.edu) count.
+const VERIFICATION_EXEMPT_DOMAINS = ["stonybrook.edu"];
+
+export function skipsEmailVerification(email: string): boolean {
+    const domain = emailDomain(email);
+    return VERIFICATION_EXEMPT_DOMAINS.some((d) => domain === d || domain.endsWith(`.${d}`));
+}
+
 // Signup-time gate for CTT: an academic address that isn't a CQG one.
 export function isCttEmail(email: string): boolean {
     return isAcademicEmail(email) && !isCqgDomain(email);
