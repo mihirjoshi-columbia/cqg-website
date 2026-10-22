@@ -66,4 +66,5 @@ export const seniorMembers2627 = [
     { name: "Sindhu Chalasani", linkedin: "https://www.linkedin.com/in/sindhu-chalasani/" },
     { name: "Alexandra Duan", linkedin: "https://www.linkedin.com/in/alexandra-duan/" },
     { name: "Harry Zhang", linkedin: "https://www.linkedin.com/in/jinghe-zhang/" },
+    { name: "Julia Ding", linkedin: "https://www.linkedin.com/in/julialding/" },
 ];

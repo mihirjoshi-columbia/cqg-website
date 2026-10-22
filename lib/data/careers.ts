@@ -17,6 +17,7 @@ export const internshipByName: Record<string, string> = {
     "Nikhil Mudumbi": "Jane Street",
     "Kshitig Seth": "Amazon",
     "Steven Spasov": "Jane Street",
+    "Julia Ding": "Google",
     "Victor Robila": "Bridgewater",
 };
 
