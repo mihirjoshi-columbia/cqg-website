@@ -1263,3 +1263,187 @@ a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark);
   .mtm-quote { grid-template-columns: 1fr; text-align: left; }
   .mtm-quote__market, .mtm-quote__actions { justify-content: flex-start; flex-wrap: wrap; }
 }
+
+/* ===========================================================================
+   Distribution Desk (components/game/dd)
+
+   Deliberately NOT a second design system. The markup reuses .mtm-root and
+   its panels, stats, buttons and notices, so everything below is only what
+   Distribution Desk genuinely adds: quote entry, the per-quote clock, the
+   sub-score bars and the results table.
+   =========================================================================== */
+.dd-root .dd-prose {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mtm-muted);
+}
+.dd-root .dd-prose:last-child { margin-bottom: 0; }
+.dd-root .dd-prose--warn { color: var(--mtm-warn); }
+.dd-root .dd-prose--lesson {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--mtm-accent);
+  background: var(--mtm-sunken);
+  border-radius: 0 var(--mtm-radius) var(--mtm-radius) 0;
+  color: var(--mtm-text);
+  font-size: 13px;
+}
+.dd-root .dd-pos { color: var(--mtm-buy); }
+.dd-root .dd-neg { color: var(--mtm-sell); }
+.dd-root .dd-start { margin-top: 16px; }
+
+/* The contract statement. This is the thing being priced, so it is the
+   loudest text on the screen. */
+.dd-root .dd-contract {
+  margin: 4px 0 0;
+  font-size: 19px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--mtm-text);
+}
+.dd-root .dd-contract-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dd-root .dd-reveal {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  background: var(--mtm-sunken);
+  border: 1px solid var(--mtm-line);
+  border-radius: var(--mtm-radius);
+  font-size: 14px;
+  color: var(--mtm-text);
+}
+.dd-root .dd-reveal span {
+  display: inline-block;
+  margin-right: 8px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mtm-accent);
+}
+
+.dd-root .dd-clock {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--mtm-dim);
+}
+.dd-root .dd-clock--low { color: var(--mtm-sell); font-weight: 700; }
+
+.dd-root .dd-statusbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.dd-root .dd-fills {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--mtm-muted);
+}
+.dd-root .dd-fills li { margin-bottom: 4px; }
+
+.dd-root .dd-quote-entry {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 12px;
+  align-items: end;
+}
+.dd-root .dd-quote-entry label { display: flex; flex-direction: column; gap: 6px; }
+.dd-root .dd-quote-entry label span,
+.dd-root .dd-width span {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+}
+.dd-root .dd-quote-entry input {
+  background: var(--mtm-sunken);
+  border: 1.5px solid var(--mtm-line);
+  border-radius: var(--mtm-radius);
+  padding: 10px 12px;
+  color: var(--mtm-text);
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 18px;
+  width: 100%;
+}
+.dd-root .dd-quote-entry input:focus {
+  outline: none;
+  border-color: var(--mtm-accent);
+}
+.dd-root .dd-width { display: flex; flex-direction: column; gap: 6px; padding-bottom: 10px; }
+.dd-root .dd-width strong {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 18px;
+  color: var(--mtm-text);
+}
+
+.dd-root .dd-total {
+  margin: 4px 0 10px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dd-root .dd-bars { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dd-root .dd-bar__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--mtm-text);
+}
+.dd-root .dd-bar__head strong { font-family: var(--font-plex-mono), monospace; }
+.dd-root .dd-bar__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mtm-sunken);
+  overflow: hidden;
+}
+.dd-root .dd-bar__fill { height: 100%; background: var(--mtm-accent); }
+.dd-root .dd-bar__hint { margin: 6px 0 0; font-size: 12px; color: var(--mtm-dim); line-height: 1.45; }
+
+.dd-root .dd-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.dd-root .dd-table th {
+  text-align: left;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mtm-dim);
+  padding: 0 10px 6px 0;
+  font-weight: 500;
+}
+.dd-root .dd-table td {
+  padding: 6px 10px 6px 0;
+  border-top: 1px solid var(--mtm-line);
+  color: var(--mtm-muted);
+}
+.dd-root .dd-chip {
+  display: inline-block;
+  margin-right: 6px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mtm-accent);
+}
+.dd-root .dd-coaching { border-left: 2px solid var(--mtm-accent); }
+
+@media (max-width: 860px) {
+  .dd-root .dd-quote-entry { grid-template-columns: 1fr 1fr; }
+  .dd-root .dd-bars { grid-template-columns: 1fr; }
+  .dd-root .dd-statusbar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dd-root .dd-contract { font-size: 17px; }
+}

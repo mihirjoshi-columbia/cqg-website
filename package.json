@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:mtm": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-mtm-game.mts"
+    "check:mtm": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-mtm-game.mts",
+    "check:dd": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-dd-game.mts",
+    "seeds:dd": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/pick-dd-seeds.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",

@@ -2,6 +2,9 @@
 // changes, update this alongside the migration (no live project to run
 // `supabase gen types` against yet).
 
+/** Mirrors Postgres jsonb, for columns the app round-trips as structured data. */
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
 export type CqgTier = "general_body" | "member" | "senior_advisor" | "admin";
 export type CqgSchool = "CC" | "SEAS" | "Barnard" | "GS" | "GRAD";
 export type ApplicationStatus = "pending" | "approved" | "rejected";
@@ -157,6 +160,42 @@ export interface EmailBlastRecipient {
     error: string | null;
 }
 
+export interface CqgGameContest {
+    id: string;
+    slug: string;
+    game: string;
+    /** Preset name inside that game (lib/game/dd/presets.ts). */
+    preset: string;
+    label: string;
+    opens_at: string;
+    closes_at: string;
+    leaderboard_visible_at: string;
+    attempts_allowed: number;
+    created_at: string;
+}
+
+export interface CqgGameAttempt {
+    id: string;
+    contest_id: string;
+    profile_id: string;
+    /** Set when the run is DEALT, so abandoning it burns the attempt. */
+    started_at: string;
+    completed_at: string | null;
+    score: number | null;
+    /** DdBreakdown from lib/game/dd/scoring.ts. */
+    breakdown: Json | null;
+    /** The player's quotes, so any score can be recomputed by replay. */
+    quotes: Json | null;
+}
+
+export interface DdLeaderboardRow {
+    rank: number;
+    profile_id: string;
+    name: string;
+    score: number;
+    completed_at: string;
+}
+
 export interface Database {
     __InternalSupabase: {
         PostgrestVersion: "13";
@@ -240,6 +279,28 @@ export interface Database {
                 Update: Partial<EmailBlast>;
                 Relationships: [];
             };
+            cqg_game_contests: {
+                Row: CqgGameContest;
+                Insert: Omit<CqgGameContest, "id" | "game" | "attempts_allowed" | "created_at"> &
+                    Partial<Pick<CqgGameContest, "id" | "game" | "attempts_allowed">>;
+                Update: Partial<CqgGameContest>;
+                Relationships: [];
+            };
+            cqg_game_attempts: {
+                Row: CqgGameAttempt;
+                Insert: {
+                    id?: string;
+                    contest_id: string;
+                    profile_id: string;
+                    started_at?: string;
+                    completed_at?: string | null;
+                    score?: number | null;
+                    breakdown?: Json | null;
+                    quotes?: Json | null;
+                };
+                Update: Partial<CqgGameAttempt>;
+                Relationships: [];
+            };
             email_blast_recipients: {
                 Row: EmailBlastRecipient;
                 Insert: Omit<EmailBlastRecipient, "id" | "status" | "sent_at" | "error"> &
@@ -261,6 +322,10 @@ export interface Database {
             cqg_event_decide: {
                 Args: { p_application_id: string; p_approve: boolean };
                 Returns: undefined;
+            };
+            dd_leaderboard: {
+                Args: { p_slug: string };
+                Returns: DdLeaderboardRow[];
             };
             cqg_event_set_attendance: {
                 Args: { p_application_id: string; p_attended: boolean };
