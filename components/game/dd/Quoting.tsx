@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PublicContract, SettledContract } from "@/lib/game/dd/project";
+import type { PublicContract } from "@/lib/game/dd/project";
 
 function money(value: number): string {
     return value.toFixed(2);
@@ -42,12 +42,10 @@ function useCountdown(seconds: number, onExpire: () => void) {
 
 export default function Quoting({
     contract,
-    coaching,
     busy,
     onSubmit,
 }: {
     contract: PublicContract;
-    coaching: SettledContract | null;
     busy: boolean;
     onSubmit: (bid: number, ask: number) => void;
 }) {
@@ -78,35 +76,6 @@ export default function Quoting({
 
     return (
         <div className="mtm-stack">
-            {coaching && (
-                <div className="mtm-panel dd-coaching">
-                    <p className="mtm-panel__label">Last contract</p>
-                    <p className="dd-prose">
-                        <strong>{coaching.description}</strong>
-                    </p>
-                    <p className="dd-prose">
-                        It settled at <strong>{money(coaching.settlement)}</strong>. Your P&amp;L:{" "}
-                        <strong className={coaching.pnl >= 0 ? "dd-pos" : "dd-neg"}>
-                            {money(coaching.pnl)}
-                        </strong>
-                        .
-                    </p>
-                    <ul className="mtm-rules">
-                        {coaching.stages.map((stage) => (
-                            <li key={stage.stage}>
-                                {stage.stage === 0 ? "Before the reveal" : "After the reveal"}: fair{" "}
-                                <strong>{money(stage.fair)}</strong>, SD{" "}
-                                <strong>{money(stage.sd)}</strong>
-                                {stage.quote
-                                    ? ` — you quoted ${money(stage.quote.bid)} / ${money(stage.quote.ask)}`
-                                    : ""}
-                            </li>
-                        ))}
-                    </ul>
-                    <p className="dd-prose dd-prose--lesson">{coaching.lesson}</p>
-                </div>
-            )}
-
             <div className="mtm-panel">
                 <div className="dd-contract-head">
                     <p className="mtm-panel__label">

@@ -3,12 +3,17 @@
 export default function Setup({
     onStart,
     busy,
-    contest,
+    attemptsUsed,
+    attemptsAllowed,
+    bestScore,
 }: {
     onStart: () => void;
     busy: boolean;
-    contest: boolean;
+    attemptsUsed: number;
+    attemptsAllowed: number;
+    bestScore: number | null;
 }) {
+    const left = Math.max(0, attemptsAllowed - attemptsUsed);
     return (
         <div className="mtm-panel">
             <p className="mtm-panel__label">How it works</p>
@@ -32,13 +37,20 @@ export default function Setup({
                 </li>
             </ol>
 
-            {contest && (
-                <p className="dd-prose dd-prose--warn">
-                    This is a ranked run. Everyone is dealt the same contracts, you get one
-                    attempt, and it is recorded the moment you start &mdash; walking away does not
-                    give you a fresh deal.
-                </p>
-            )}
+            <p className="dd-prose dd-prose--warn">
+                This is graded. Everyone is dealt the same seven contracts, you get{" "}
+                <strong>
+                    {attemptsAllowed} attempt{attemptsAllowed === 1 ? "" : "s"}
+                </strong>
+                , and your <strong>best</strong> one counts. An attempt is spent the moment you
+                start it &mdash; walking away or closing the tab does not give you a fresh deal,
+                so finish what you start.
+            </p>
+
+            <p className="dd-prose">
+                {left} of {attemptsAllowed} remaining
+                {bestScore !== null && <> &middot; best so far {bestScore.toFixed(2)}</>}
+            </p>
 
             <button
                 type="button"
@@ -46,7 +58,11 @@ export default function Setup({
                 onClick={onStart}
                 disabled={busy}
             >
-                {busy ? "Dealing…" : contest ? "Start my one attempt" : "Deal a practice run"}
+                {busy
+                    ? "Dealing…"
+                    : attemptsUsed === 0
+                      ? "Start my first attempt"
+                      : `Start attempt ${attemptsUsed + 1} of ${attemptsAllowed}`}
             </button>
         </div>
     );

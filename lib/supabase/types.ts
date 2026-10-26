@@ -178,6 +178,8 @@ export interface CqgGameAttempt {
     id: string;
     contest_id: string;
     profile_id: string;
+    /** 1-based, unique per (contest, profile). See migration 0015. */
+    attempt_number: number;
     /** Set when the run is DEALT, so abandoning it burns the attempt. */
     started_at: string;
     completed_at: string | null;
@@ -292,6 +294,7 @@ export interface Database {
                     id?: string;
                     contest_id: string;
                     profile_id: string;
+                    attempt_number?: number;
                     started_at?: string;
                     completed_at?: string | null;
                     score?: number | null;

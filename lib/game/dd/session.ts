@@ -1,7 +1,7 @@
 import { randomInt } from "node:crypto";
 import { createSealedTokenCodec } from "../sealed-token";
 import { contractsFor, configFor, isDdPreset, type DdPreset } from "./presets";
-import { fixedSeedsFor } from "./seeds";
+import { seedsFor } from "./seeds";
 import { DD_STAGES, type Quote } from "./types";
 
 // Stateless run sessions for Distribution Desk.
@@ -36,6 +36,12 @@ export interface DdSession {
     stageOpenedAt: number;
     /** Set for contest runs, so the attempt row can be matched on submit. */
     contestSlug: string | null;
+    /**
+     * The attempt row this run writes its result to. Carried in the sealed
+     * token rather than looked up on submit, so a run can never land on a
+     * different attempt than the one it was dealt for.
+     */
+    attemptId: string | null;
 }
 
 function isQuote(value: unknown): value is Quote {
@@ -60,11 +66,11 @@ const codec = createSealedTokenCodec<DdSession>({
         if (!isDdPreset(candidate.preset)) {
             throw new DdSessionError("invalid session token");
         }
-        const maxQuotes = contractsFor(candidate.preset).length * DD_STAGES;
+        const maxQuotes = contractsFor().length * DD_STAGES;
 
         if (
             !Array.isArray(candidate.seeds) ||
-            candidate.seeds.length !== contractsFor(candidate.preset).length ||
+            candidate.seeds.length !== contractsFor().length ||
             !candidate.seeds.every((s) => typeof s === "number" && Number.isInteger(s))
         ) {
             throw new DdSessionError("invalid session token");
@@ -85,6 +91,9 @@ const codec = createSealedTokenCodec<DdSession>({
         if (candidate.contestSlug !== null && typeof candidate.contestSlug !== "string") {
             throw new DdSessionError("invalid session token");
         }
+        if (candidate.attemptId !== null && typeof candidate.attemptId !== "string") {
+            throw new DdSessionError("invalid session token");
+        }
 
         return {
             seeds: candidate.seeds as number[],
@@ -93,6 +102,7 @@ const codec = createSealedTokenCodec<DdSession>({
             issuedAt: candidate.issuedAt,
             stageOpenedAt: candidate.stageOpenedAt,
             contestSlug: candidate.contestSlug ?? null,
+            attemptId: candidate.attemptId ?? null,
         };
     },
 });
@@ -101,27 +111,37 @@ export function newSeed(): number {
     return randomInt(0, 2 ** 32);
 }
 
-export function createSession(preset: DdPreset, contestSlug: string | null = null): DdSession {
-    // A contest is played on its fixed, curated seed set so every student is
-    // dealt identical contracts; practice deals fresh ones every time.
-    const fixed = fixedSeedsFor(preset);
-    const seeds = fixed
-        ? [...fixed]
-        : contractsFor(preset).map(() => newSeed());
+export function createSession(
+    preset: DdPreset,
+    contestSlug: string | null = null,
+    attemptId: string | null = null
+): DdSession {
+    // Always the fixed, curated seed set: every student is dealt identical
+    // contracts, which is what makes the ranking skill rather than luck.
+    const seeds = [...seedsFor()];
 
     const now = Date.now();
-    return { seeds, preset, quotes: [], issuedAt: now, stageOpenedAt: now, contestSlug };
+    return {
+        seeds,
+        preset,
+        quotes: [],
+        issuedAt: now,
+        stageOpenedAt: now,
+        contestSlug,
+        attemptId,
+    };
 }
 
 export const seal = codec.seal;
 export const open = codec.open;
 
-export function totalQuotes(session: DdSession): number {
-    return contractsFor(session.preset).length * DD_STAGES;
+/** Quotes in a complete run: two per contract. */
+export function totalQuotes(): number {
+    return contractsFor().length * DD_STAGES;
 }
 
 export function isComplete(session: DdSession): boolean {
-    return session.quotes.length >= totalQuotes(session);
+    return session.quotes.length >= totalQuotes();
 }
 
 /**

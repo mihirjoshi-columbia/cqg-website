@@ -44,17 +44,10 @@ export interface PublicContract {
 export interface PublicRun {
     preset: DdPreset;
     presetLabel: string;
-    coaching: boolean;
     complete: boolean;
     contract: PublicContract | null;
     /** Settled contracts, oldest first. Populated only once complete. */
     results: SettledContract[] | null;
-    /**
-     * Practice only: the contract that just settled, so the player is told
-     * what it was really worth before quoting the next one. Null in a
-     * contest, where nothing is given away until the run is over.
-     */
-    previousResult: SettledContract | null;
     breakdown: DdBreakdown | null;
 }
 
@@ -122,25 +115,19 @@ function projectSettled(state: ContractState): SettledContract {
 
 export function projectRun(run: RunState): PublicRun {
     const info = DD_PRESETS[run.preset];
-    const total = contractsFor(run.preset).length;
+    const total = contractsFor().length;
     const live = run.complete ? null : run.contracts[run.contracts.length - 1];
-
-    // The contract before the live one has, by construction, settled.
-    const justSettled =
-        info.coaching && !run.complete && run.contracts.length >= 2
-            ? run.contracts[run.contracts.length - 2]!
-            : null;
 
     return {
         preset: run.preset,
         presetLabel: info.label,
-        coaching: info.coaching,
         complete: run.complete,
         contract: live
             ? projectContract(live, run.contracts.length - 1, total, info.config.secondsPerQuote)
             : null,
+        // Nothing is given away until the whole run is over: a settled
+        // contract's true fair would otherwise hint at the next one.
         results: run.complete ? run.contracts.map(projectSettled) : null,
-        previousResult: justSettled ? projectSettled(justSettled) : null,
         breakdown: run.complete ? score(run) : null,
     };
 }

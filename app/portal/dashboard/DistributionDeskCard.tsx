@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import type { CqgGameAttempt, CqgGameContest, CqgProfile } from "@/lib/supabase/types";
+import { listAttempts, summarise, type AttemptSummary } from "@/lib/game/dd/contests";
+import type { CqgGameContest, CqgProfile } from "@/lib/supabase/types";
 
 /**
  * Distribution Desk entry point. Internal Members only, for the same reason
@@ -25,22 +26,15 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
 
     const contest = contests?.[0] ?? null;
 
-    let attempt: CqgGameAttempt | null = null;
+    let attempts: AttemptSummary | null = null;
     if (contest) {
-        const { data } = await admin
-            .from("cqg_game_attempts")
-            .select("*")
-            .eq("contest_id", contest.id)
-            .eq("profile_id", profile.id)
-            .maybeSingle<CqgGameAttempt>();
-        attempt = data;
+        attempts = summarise(contest, await listAttempts(contest.id, profile.id));
     }
 
     // Started counts as used. Runs are stateless by design -- nothing stores
     // an in-flight run -- so there is no resume, and offering one would be a
     // lie. The warning before starting says so.
-    const used = Boolean(attempt);
-    const done = Boolean(attempt?.completed_at);
+    const exhausted = attempts ? attempts.remaining === 0 : false;
 
     return (
         <div className="event-card" style={{ maxWidth: 560 }}>
@@ -49,23 +43,34 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
                 <p className="text-ink-soft text-sm">
                     Price contracts that settle on a binomial, geometric or normal process, then
                     quote a market wide enough for the risk and no wider. Information arrives
-                    halfway through each contract.
+                    halfway through each contract. Graded, best of three attempts.
                 </p>
 
                 {contest ? (
                     <>
                         <p className="text-ink-faint text-xs">
                             {contest.label} &middot; closes{" "}
-                            {new Date(contest.closes_at).toLocaleString()} &middot; one attempt
-                            {done ? " · completed" : used ? " · attempt used" : ""}
+                            {new Date(contest.closes_at).toLocaleString()}
+                            {attempts && (
+                                <>
+                                    {" "}
+                                    &middot; {attempts.remaining} of {attempts.allowed} attempts
+                                    left
+                                    {attempts.bestScore !== null && (
+                                        <> &middot; best {attempts.bestScore.toFixed(2)}</>
+                                    )}
+                                </>
+                            )}
                         </p>
                         <div className="flex gap-2 flex-wrap">
-                            {!used && (
+                            {!exhausted && (
                                 <a
                                     href={`/portal/game/dd?contest=${contest.slug}`}
                                     className="btn-cqg btn-lime btn-sm w-fit"
                                 >
-                                    Start the contest
+                                    {attempts && attempts.used > 0
+                                        ? "Use another attempt"
+                                        : "Start the homework"}
                                 </a>
                             )}
                             <a
@@ -74,15 +79,12 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
                             >
                                 Leaderboard
                             </a>
-                            <a href="/portal/game/dd" className="btn-cqg btn-outline-navy btn-sm w-fit">
-                                Practice
-                            </a>
                         </div>
                     </>
                 ) : (
-                    <a href="/portal/game/dd" className="btn-cqg btn-lime btn-sm w-fit">
-                        Practice a run
-                    </a>
+                    <p className="text-ink-faint text-xs">
+                        Nothing is open right now.
+                    </p>
                 )}
             </div>
         </div>

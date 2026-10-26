@@ -1,5 +1,5 @@
 -- Contests and attempts for the portal games, added for Distribution Desk
--- (lib/game/dd) and its Week 3 / midpoint leaderboards.
+-- (lib/game/dd) and its Week 3 homework leaderboard.
 --
 -- Make the Market was deliberately databaseless: the hand rode with the
 -- client in a sealed token and nothing was stored. Its own session.ts names
@@ -24,10 +24,11 @@ create table cqg_game_contests (
   label text not null,
   opens_at timestamptz not null,
   closes_at timestamptz not null,
-  -- Standings stay hidden until this moment. For the midpoint evaluation this
-  -- is set to the close, so nobody can watch the field and infer outcomes
-  -- before playing; everyone is dealt the same contracts, which is what makes
-  -- the ranking luck-free and also what makes early standings a leak.
+  -- Standings stay hidden until this moment. For homework it is set to the
+  -- open, so students can watch the field move. Set it to the close instead
+  -- for anything graded competitively: everyone is dealt the same contracts,
+  -- which is what makes the ranking luck-free and also what makes early
+  -- standings a leak.
   leaderboard_visible_at timestamptz not null,
   attempts_allowed integer not null default 1,
   created_at timestamptz not null default now(),

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireSignedInMember } from "@/lib/game/require-internal-member";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import type { CqgGameAttempt, CqgGameContest } from "@/lib/supabase/types";
+import { listAttempts, summarise, type AttemptSummary } from "@/lib/game/dd/contests";
+import type { CqgGameContest } from "@/lib/supabase/types";
 import DdGame from "@/components/game/dd/DdGame";
 
 export const metadata = { title: "Distribution Desk — CQG Portal" };
@@ -17,11 +18,14 @@ function hasNotOpened(contest: CqgGameContest): boolean {
 }
 
 /**
- * ?contest=<slug> plays a ranked run; with no slug it is unlimited practice.
+ * The graded Week 3 homework run. There is no ungraded mode.
  *
- * The attempt check here only decides what to RENDER. The real gate is in
- * the start route, which re-checks and inserts the attempt row -- a page
- * cannot be trusted to have hidden a button, the same reasoning
+ * With no ?contest= the page finds the open one itself, so the link students
+ * are given is just /portal/game/dd.
+ *
+ * The attempt check here only decides what to RENDER. The real gate is in the
+ * start route, which re-checks and inserts the attempt row -- a page cannot be
+ * trusted to have hidden a button, the same reasoning
  * lib/game/require-internal-member.ts gives for route handlers.
  */
 export default async function DistributionDeskPage({
@@ -33,39 +37,41 @@ export default async function DistributionDeskPage({
     const { contest: slug } = await searchParams;
 
     let contest: CqgGameContest | null = null;
-    let attempt: CqgGameAttempt | null = null;
+    let attempts: AttemptSummary | null = null;
 
-    if (isInternal && slug) {
+    if (isInternal) {
         const admin = createServiceRoleClient();
-        const { data } = await admin
+        const { data: all } = await admin
             .from("cqg_game_contests")
             .select("*")
-            .eq("slug", slug)
-            .maybeSingle<CqgGameContest>();
-        contest = data;
+            .order("opens_at", { ascending: false })
+            .overrideTypes<CqgGameContest[], { merge: false }>();
+
+        const contests = all ?? [];
+        contest = slug
+            ? (contests.find((c) => c.slug === slug) ?? null)
+            : // Default to whichever one is live, falling back to the newest
+              // so a closed contest still shows its result rather than 404.
+              (contests.find((c) => !hasClosed(c) && !hasNotOpened(c)) ?? contests[0] ?? null);
 
         if (contest) {
-            const { data: row } = await admin
-                .from("cqg_game_attempts")
-                .select("*")
-                .eq("contest_id", contest.id)
-                .eq("profile_id", profile.id)
-                .maybeSingle<CqgGameAttempt>();
-            attempt = row;
+            attempts = summarise(contest, await listAttempts(contest.id, profile.id));
         }
     }
 
-    const closed = contest ? hasClosed(contest) : false;
-    const notYetOpen = contest ? hasNotOpened(contest) : false;
+    const best =
+        attempts?.bestScore !== null && attempts?.bestScore !== undefined
+            ? ` Your best score so far is ${attempts.bestScore.toFixed(2)}.`
+            : "";
 
-    const lockedReason = attempt?.completed_at
-        ? `You finished this contest on ${new Date(attempt.completed_at).toLocaleString()} with a P&L of ${Number(attempt.score).toFixed(2)}. One attempt only, so that result stands.`
-        : attempt
-          ? "You already started this contest. It allows one attempt, and the attempt is recorded when the run is dealt rather than when it is submitted, so starting again is not possible."
-          : closed
-            ? "This contest has closed."
-            : notYetOpen
-              ? `This contest opens ${new Date(contest!.opens_at).toLocaleString()}.`
+    const lockedReason = !contest || !attempts
+        ? undefined
+        : hasClosed(contest)
+          ? `This homework has closed.${best}`
+          : hasNotOpened(contest)
+            ? `This opens ${new Date(contest.opens_at).toLocaleString()}.`
+            : attempts.remaining === 0
+              ? `You have used all ${attempts.allowed} of your attempts.${best}`
               : undefined;
 
     return (
@@ -107,16 +113,21 @@ export default async function DistributionDeskPage({
                         <p className="text-ink-faint text-xs">Signed in as {profile.email}.</p>
                     </div>
                 </div>
-            ) : slug && !contest ? (
+            ) : !contest ? (
                 <div className="event-card" style={{ maxWidth: 560 }}>
                     <div className="event-card-body">
-                        <p className="text-ink-soft text-sm">That contest does not exist.</p>
+                        <p className="text-ink-soft text-sm">
+                            No homework has been set up yet.
+                        </p>
                     </div>
                 </div>
             ) : (
                 <DdGame
-                    contestSlug={contest?.slug}
-                    contestLabel={contest?.label}
+                    contestSlug={contest.slug}
+                    contestLabel={contest.label}
+                    attemptsUsed={attempts?.used ?? 0}
+                    attemptsAllowed={attempts?.allowed ?? contest.attempts_allowed}
+                    bestScore={attempts?.bestScore ?? null}
                     locked={Boolean(lockedReason)}
                     lockedReason={lockedReason}
                 />

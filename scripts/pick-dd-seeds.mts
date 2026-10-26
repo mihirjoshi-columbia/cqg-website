@@ -48,8 +48,7 @@ function acceptable(contract: Contract, seed: number): boolean {
 }
 
 for (const preset of DD_PRESET_ORDER) {
-    if (preset === "practice") continue; // practice deals fresh seeds every run
-    const contracts = contractsFor(preset);
+    const contracts = contractsFor();
     const seeds: number[] = [];
 
     contracts.forEach((contract, index) => {
@@ -65,7 +64,7 @@ for (const preset of DD_PRESET_ORDER) {
     });
 
     console.log(`\n${preset}:`);
-    console.log(`export const ${preset.toUpperCase()}_SEEDS: number[] = [${seeds.join(", ")}];`);
+    console.log(`export const HOMEWORK_SEEDS: readonly number[] = [${seeds.join(", ")}];`);
     contracts.forEach((contract, i) => {
         const realisation = realise(contract, mulberry32(seeds[i]!));
         const prior = moments(contract, realisation, nothingSeen(contract));

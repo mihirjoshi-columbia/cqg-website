@@ -23,12 +23,8 @@ export interface RunState {
     complete: boolean;
 }
 
-export function totalQuotesFor(preset: DdPreset): number {
-    return contractsFor(preset).length * DD_STAGES;
-}
-
 export function replay(seeds: readonly number[], preset: DdPreset, quotes: readonly Quote[]): RunState {
-    const library = contractsFor(preset);
+    const library = contractsFor();
     const config = configFor(preset);
 
     if (quotes.length > library.length * DD_STAGES) {

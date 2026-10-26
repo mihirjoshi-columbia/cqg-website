@@ -21,7 +21,7 @@ const SUBSCORES: { key: "pricing" | "widthCalibration" | "revealResponse" | "ris
     { key: "riskControl", label: "Risk control", hint: "How much inventory you carried into settlement." },
 ];
 
-export default function Done({ run, onReset }: { run: PublicRun; onReset: (() => void) | null }) {
+export default function Done({ run, attemptsLeft }: { run: PublicRun; attemptsLeft: number }) {
     const breakdown = run.breakdown;
     const results = run.results;
     if (!breakdown || !results) return null;
@@ -39,6 +39,22 @@ export default function Done({ run, onReset }: { run: PublicRun; onReset: (() =>
                     Total P&amp;L across {results.length} contracts. Spread of P&amp;L between
                     contracts: {money(breakdown.pnlSd)}. Largest position carried into a
                     settlement: {breakdown.maxInventory}.
+                </p>
+                <p className="dd-prose">
+                    {attemptsLeft > 0 ? (
+                        <>
+                            You have <strong>{attemptsLeft}</strong> attempt
+                            {attemptsLeft === 1 ? "" : "s"} left, and your best one counts. Read
+                            the contract notes below before you use one &mdash; the deal does not
+                            change, so the only thing that can improve is your pricing.{" "}
+                            <a href="." className="mtm-link">
+                                Reload to start another
+                            </a>
+                            .
+                        </>
+                    ) : (
+                        <>That was your last attempt, so this result is the one that counts.</>
+                    )}
                 </p>
             </div>
 
@@ -124,11 +140,6 @@ export default function Done({ run, onReset }: { run: PublicRun; onReset: (() =>
                 );
             })}
 
-            {onReset && (
-                <button type="button" className="mtm-btn mtm-btn--primary dd-start" onClick={onReset}>
-                    Deal another practice run
-                </button>
-            )}
         </div>
     );
 }

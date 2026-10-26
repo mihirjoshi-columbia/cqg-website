@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { checkInternalMember } from "@/lib/game/require-internal-member";
-import { isDdPreset } from "@/lib/game/dd/presets";
 import { createSession, seal, DdSessionError } from "@/lib/game/dd/session";
 import { replay } from "@/lib/game/dd/replay";
 import { projectRun } from "@/lib/game/dd/project";
@@ -16,42 +15,25 @@ export async function POST(request: Request) {
     if (!gate.ok) return NextResponse.json({ error: gate.message }, { status: gate.status });
 
     const body = (await request.json().catch(() => null)) as {
-        preset?: unknown;
         contestSlug?: unknown;
     } | null;
 
+    // There is no ungraded mode. Every run belongs to a contest, which is
+    // what makes it an attempt that can be recorded.
     const slug = body?.contestSlug;
-    if (slug !== undefined && typeof slug !== "string") {
+    if (typeof slug !== "string" || slug.length === 0) {
         return NextResponse.json({ error: "Bad contest." }, { status: 400 });
     }
 
     try {
-        // A contest names its own preset. The client cannot choose one for a
-        // ranked run, or it could play the forgiving practice settings and
-        // land on the midpoint leaderboard.
-        let preset;
-        let contestSlug: string | null = null;
+        // The contest names its own preset; the client never chooses one.
+        const contest = await loadContest(slug);
+        const preset = presetForContest(contest);
 
-        if (typeof slug === "string") {
-            const contest = await loadContest(slug);
-            preset = presetForContest(contest);
-            // Burns the attempt now, so abandoning the run cannot be retried.
-            await openAttempt(contest, gate.profile.id);
-            contestSlug = contest.slug;
-        } else {
-            if (!isDdPreset(body?.preset)) {
-                return NextResponse.json({ error: "Unknown difficulty." }, { status: 400 });
-            }
-            if (body.preset !== "practice") {
-                return NextResponse.json(
-                    { error: "That mode is only playable as a contest." },
-                    { status: 403 }
-                );
-            }
-            preset = body.preset;
-        }
+        // Spends one attempt now, so abandoning the run cannot be retried.
+        const attemptId = await openAttempt(contest, gate.profile.id);
 
-        const session = createSession(preset, contestSlug);
+        const session = createSession(preset, contest.slug, attemptId);
         const run = replay(session.seeds, preset, []);
         return NextResponse.json({ run: projectRun(run), token: seal(session) });
     } catch (error) {

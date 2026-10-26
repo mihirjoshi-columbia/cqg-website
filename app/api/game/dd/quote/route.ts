@@ -12,11 +12,7 @@ import {
 import { projectRun } from "@/lib/game/dd/project";
 import { DdQuoteError, validateQuote } from "@/lib/game/dd/engine";
 import { score } from "@/lib/game/dd/scoring";
-import {
-    DdContestError,
-    completeAttempt,
-    loadContest,
-} from "@/lib/game/dd/contests";
+import { DdContestError, completeAttempt } from "@/lib/game/dd/contests";
 import type { Json } from "@/lib/supabase/types";
 
 export async function POST(request: Request) {
@@ -42,7 +38,7 @@ export async function POST(request: Request) {
     try {
         // Any edit to the token fails the GCM auth tag here.
         const session = open(body.token);
-        if (index >= totalQuotes(session)) {
+        if (index >= totalQuotes()) {
             return NextResponse.json({ error: "Bad quote index." }, { status: 400 });
         }
 
@@ -54,11 +50,10 @@ export async function POST(request: Request) {
         // A contest result is derived here, from a server-side replay of the
         // seeds and quotes. The client never sends a score and is never asked
         // to; it could not produce one that would be believed.
-        if (finished && next.contestSlug) {
-            const contest = await loadContest(next.contestSlug);
+        if (finished && next.attemptId) {
             const breakdown = score(run);
             await completeAttempt(
-                contest,
+                next.attemptId,
                 gate.profile.id,
                 breakdown.totalPnl,
                 breakdown as unknown as Json,

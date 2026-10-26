@@ -34,15 +34,27 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 type StepResponse = { run: PublicRun; token: string; lateQuote?: boolean };
 
 export interface DdGameProps {
-    /** When set, the run is a ranked contest and the server picks the preset. */
-    contestSlug?: string;
-    contestLabel?: string;
-    /** Already used their one attempt. */
+    /** The contest this run is graded against. Every run has one. */
+    contestSlug: string;
+    contestLabel: string;
+    attemptsUsed: number;
+    attemptsAllowed: number;
+    /** Best completed score so far, or null if none finished. */
+    bestScore: number | null;
+    /** No attempts left, or the window is shut. */
     locked?: boolean;
     lockedReason?: string;
 }
 
-export default function DdGame({ contestSlug, contestLabel, locked, lockedReason }: DdGameProps) {
+export default function DdGame({
+    contestSlug,
+    contestLabel,
+    attemptsUsed,
+    attemptsAllowed,
+    bestScore,
+    locked,
+    lockedReason,
+}: DdGameProps) {
     const [run, setRun] = useState<PublicRun | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
@@ -69,10 +81,7 @@ export default function DdGame({ contestSlug, contestLabel, locked, lockedReason
 
     const start = () =>
         guard(async () => {
-            apply(
-                await post<StepResponse>("/api/game/dd/start",
-                    contestSlug ? { contestSlug } : { preset: "practice" })
-            );
+            apply(await post<StepResponse>("/api/game/dd/start", { contestSlug }));
         });
 
     // The next quote index is simply how many quotes already exist: two per
@@ -95,13 +104,6 @@ export default function DdGame({ contestSlug, contestLabel, locked, lockedReason
             );
         });
 
-    const reset = () => {
-        setToken(null);
-        setError(null);
-        setLateNotice(false);
-        setRun(null);
-    };
-
     return (
         <div className="mtm-root dd-root">
             <header className="mtm-masthead">
@@ -111,15 +113,10 @@ export default function DdGame({ contestSlug, contestLabel, locked, lockedReason
                             ? `${run.presetLabel} / Contract ${run.contract.index + 1} of ${run.contract.total}`
                             : run?.complete
                               ? `${run.presetLabel} / Settled`
-                              : contestLabel ?? "Probability & risk / Internal homework"}
+                              : contestLabel}
                     </p>
                     <h1 className="mtm-h1">Distribution Desk</h1>
                 </div>
-                {run && !contestSlug && (
-                    <button type="button" className="mtm-link" onClick={reset}>
-                        Quit to setup
-                    </button>
-                )}
             </header>
 
             {error && <div className="mtm-notice mtm-notice--error">{error}</div>}
@@ -137,7 +134,13 @@ export default function DdGame({ contestSlug, contestLabel, locked, lockedReason
                         <p className="dd-prose">{lockedReason}</p>
                     </div>
                 ) : (
-                    <Setup onStart={start} busy={busy} contest={Boolean(contestSlug)} />
+                    <Setup
+                        onStart={start}
+                        busy={busy}
+                        attemptsUsed={attemptsUsed}
+                        attemptsAllowed={attemptsAllowed}
+                        bestScore={bestScore}
+                    />
                 ))}
 
             {run?.contract && (
@@ -146,13 +149,14 @@ export default function DdGame({ contestSlug, contestLabel, locked, lockedReason
                     // effect that calls setState.
                     key={`${run.contract.id}-${run.contract.stage}`}
                     contract={run.contract}
-                    coaching={run.coaching ? run.previousResult : null}
                     busy={busy}
                     onSubmit={submitQuote}
                 />
             )}
 
-            {run?.complete && <Done run={run} onReset={contestSlug ? null : reset} />}
+            {run?.complete && (
+                <Done run={run} attemptsLeft={Math.max(0, attemptsAllowed - attemptsUsed - 1)} />
+            )}
         </div>
     );
 }

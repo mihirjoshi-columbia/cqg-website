@@ -24,7 +24,7 @@ import {
     type Contract,
     type LegUnits,
 } from "../lib/game/dd/contracts";
-import { MIDPOINT_CONTRACTS, WEEK3_CONTRACTS } from "../lib/game/dd/library";
+import { HOMEWORK_CONTRACTS } from "../lib/game/dd/library";
 import {
     applyQuote,
     contractPnl,
@@ -33,11 +33,11 @@ import {
     openContract,
     validateQuote,
 } from "../lib/game/dd/engine";
-import { DD_PRESET_ORDER, configFor, contractsFor } from "../lib/game/dd/presets";
+import { DD_PRESET_ORDER, configFor, contractsFor, type DdPreset } from "../lib/game/dd/presets";
 import { replay } from "../lib/game/dd/replay";
 import { score } from "../lib/game/dd/scoring";
 import { projectRun } from "../lib/game/dd/project";
-import { CONTEST_SEEDS, MIDPOINT_SEEDS, fixedSeedsFor } from "../lib/game/dd/seeds";
+import { HOMEWORK_SEEDS, seedsFor } from "../lib/game/dd/seeds";
 import {
     DdSessionError,
     createSession,
@@ -53,7 +53,7 @@ import { DD_STAGES, type Quote } from "../lib/game/dd/types";
 // this is NOT a fallback in the app itself, which still fails loudly.
 process.env.DD_SESSION_SECRET ??= randomBytes(32).toString("hex");
 
-const ALL_CONTRACTS = [...WEEK3_CONTRACTS, ...MIDPOINT_CONTRACTS];
+const ALL_CONTRACTS = HOMEWORK_CONTRACTS;
 
 let checks = 0;
 function check(label: string, fn: () => void) {
@@ -175,7 +175,7 @@ check("a geometric reveal moves the fair but leaves the SD untouched", () => {
 
 check("variances add across independent legs, standard deviations do not", () => {
     const composites = ALL_CONTRACTS.filter((c) => c.legs.length > 1);
-    assert.ok(composites.length >= 2, "expected at least two composite contracts");
+    assert.ok(composites.length >= 1, "expected at least one composite contract");
 
     for (const contract of composites) {
         const realisation = realise(contract, mulberry32(321));
@@ -206,8 +206,8 @@ check("variances add across independent legs, standard deviations do not", () =>
 // ---------------------------------------------------------------------------
 
 check("the whole realisation is drawn before the first quote", () => {
-    for (const contract of WEEK3_CONTRACTS) {
-        const config = configFor("contest");
+    for (const contract of HOMEWORK_CONTRACTS) {
+        const config = configFor("homework");
         let draws = 0;
         const base = mulberry32(55);
         const counting = () => {
@@ -232,7 +232,7 @@ check("the whole realisation is drawn before the first quote", () => {
 });
 
 check("draw count is independent of the quote (the core invariant)", () => {
-    const config = configFor("contest");
+    const config = configFor("homework");
     const counts = [0.5, 1, 4].map((mult) => {
         let draws = 0;
         const base = mulberry32(909);
@@ -240,7 +240,7 @@ check("draw count is independent of the quote (the core invariant)", () => {
             draws++;
             return base();
         };
-        let state = openContract(WEEK3_CONTRACTS[0]!, config, random);
+        let state = openContract(HOMEWORK_CONTRACTS[0]!, config, random);
         const { fair, sd } = momentsAt(state, 0);
         for (let stage = 0; stage < DD_STAGES; stage++) {
             state = applyQuote(state, { bid: fair - mult * sd, ask: fair + mult * sd }, config);
@@ -251,22 +251,22 @@ check("draw count is independent of the quote (the core invariant)", () => {
 });
 
 check("replay is reproducible: same seeds and quotes, same P&L", () => {
-    const seeds = [...CONTEST_SEEDS];
+    const seeds = [...HOMEWORK_SEEDS];
     const quotes: Quote[] = [];
-    const contracts = contractsFor("contest");
+    const contracts = contractsFor();
     for (let i = 0; i < contracts.length * DD_STAGES; i++) {
         quotes.push({ bid: 100 + i, ask: 140 + i });
     }
 
-    const a = score(replay(seeds, "contest", quotes));
-    const b = score(replay(seeds, "contest", quotes));
+    const a = score(replay(seeds, "homework", quotes));
+    const b = score(replay(seeds, "homework", quotes));
     assert.deepEqual(a, b);
     assert.ok(Number.isFinite(a.totalPnl));
 });
 
 check("a partial run exposes exactly one live contract", () => {
-    const seeds = [...CONTEST_SEEDS];
-    const run = replay(seeds, "contest", [{ bid: 130, ask: 150 }]);
+    const seeds = [...HOMEWORK_SEEDS];
+    const run = replay(seeds, "homework", [{ bid: 130, ask: 150 }]);
     assert.equal(run.complete, false);
     assert.equal(run.contracts.length, 1);
     assert.equal(run.contracts[0]!.stage, 1);
@@ -274,20 +274,20 @@ check("a partial run exposes exactly one live contract", () => {
 });
 
 check("a full run settles every contract", () => {
-    const contracts = contractsFor("contest");
+    const contracts = contractsFor();
     const quotes: Quote[] = Array.from({ length: contracts.length * DD_STAGES }, () => ({
         bid: 0,
         ask: 1000,
     }));
-    const run = replay([...CONTEST_SEEDS], "contest", quotes);
+    const run = replay([...HOMEWORK_SEEDS], "homework", quotes);
     assert.equal(run.complete, true);
     assert.equal(run.contracts.length, contracts.length);
     assert.ok(run.contracts.every((c) => c.settled));
 });
 
 check("settlement P&L is cash plus inventory marked at the settlement price", () => {
-    const config = configFor("contest");
-    let state = openContract(WEEK3_CONTRACTS[0]!, config, mulberry32(17));
+    const config = configFor("homework");
+    let state = openContract(HOMEWORK_CONTRACTS[0]!, config, mulberry32(17));
     const { fair, sd } = momentsAt(state, 0);
     for (let stage = 0; stage < DD_STAGES; stage++) {
         state = applyQuote(state, { bid: fair - sd / 2, ask: fair + sd / 2 }, config);
@@ -313,7 +313,7 @@ check("a crossed or zero-width quote is refused", () => {
 check("inventory never breaches the position limit", () => {
     for (const preset of DD_PRESET_ORDER) {
         const config = configFor(preset);
-        for (const contract of contractsFor(preset)) {
+        for (const contract of contractsFor()) {
             for (let seed = 0; seed < 40; seed++) {
                 let state = openContract(contract, config, mulberry32(seed));
                 // A one-sided market invites maximum directional flow.
@@ -339,7 +339,7 @@ check("expected P&L peaks at a width near one SD, and over-wide earns nothing", 
 
     for (const preset of DD_PRESET_ORDER) {
         const config = configFor(preset);
-        const contracts = contractsFor(preset);
+        const contracts = contractsFor();
 
         const curve = multiples.map((mult) => {
             let total = 0;
@@ -388,20 +388,20 @@ check("expected P&L peaks at a width near one SD, and over-wide earns nothing", 
 // ---------------------------------------------------------------------------
 
 check("a well-calibrated run outscores a careless one on every sub-score", () => {
-    const seeds = [...CONTEST_SEEDS];
-    const contracts = contractsFor("contest");
+    const seeds = [...HOMEWORK_SEEDS];
+    const contracts = contractsFor();
 
     function runWith(build: (fair: number, sd: number) => Quote) {
         const quotes: Quote[] = [];
         for (let i = 0; i < contracts.length; i++) {
             for (let stage = 0; stage < DD_STAGES; stage++) {
-                const partial = replay(seeds, "contest", quotes);
+                const partial = replay(seeds, "homework", quotes);
                 const live = partial.contracts[partial.contracts.length - 1]!;
                 const { fair, sd } = momentsAt(live, live.stage);
                 quotes.push(build(fair, sd));
             }
         }
-        return score(replay(seeds, "contest", quotes));
+        return score(replay(seeds, "homework", quotes));
     }
 
     const sharp = runWith((fair, sd) => ({ bid: fair - sd / 2, ask: fair + sd / 2 }));
@@ -420,19 +420,19 @@ check("a well-calibrated run outscores a careless one on every sub-score", () =>
 });
 
 check("tightening across a geometric reveal is marked down", () => {
-    // The lesson the midpoint is built to test: information that moves the
+    // The lesson the homework is built to test: information that moves the
     // price without removing risk must not narrow the market.
-    const contract = WEEK3_CONTRACTS.find((c) => c.id === "w3-geometric-die")!;
-    const seeds = contractsFor("contest").map(
-        (c) => CONTEST_SEEDS[contractsFor("contest").indexOf(c)]!
+    const contract = HOMEWORK_CONTRACTS.find((c) => c.id === "w3-geometric-die")!;
+    const seeds = contractsFor().map(
+        (c) => HOMEWORK_SEEDS[contractsFor().indexOf(c)]!
     );
-    const index = contractsFor("contest").findIndex((c) => c.id === contract.id);
+    const index = contractsFor().findIndex((c) => c.id === contract.id);
 
     function revealScoreFor(secondWidthMultiple: number) {
         const quotes: Quote[] = [];
-        for (let i = 0; i < contractsFor("contest").length; i++) {
+        for (let i = 0; i < contractsFor().length; i++) {
             for (let stage = 0; stage < DD_STAGES; stage++) {
-                const partial = replay(seeds, "contest", quotes);
+                const partial = replay(seeds, "homework", quotes);
                 const live = partial.contracts[partial.contracts.length - 1]!;
                 const { fair, sd } = momentsAt(live, live.stage);
                 const mult = i === index && stage === 1 ? secondWidthMultiple : 1;
@@ -440,7 +440,7 @@ check("tightening across a geometric reveal is marked down", () => {
                 quotes.push({ bid: fair - half, ask: fair + half });
             }
         }
-        const breakdown = score(replay(seeds, "contest", quotes));
+        const breakdown = score(replay(seeds, "homework", quotes));
         return breakdown.contracts.find((c) => c.contractId === contract.id)!.revealScore!;
     }
 
@@ -469,11 +469,11 @@ check("on the fixed contest seeds, correct play beats each classic mistake", () 
         { label: "adding SDs, not variances", width: 1.42, bias: 0 },
     ];
 
-    function pnlFor(preset: "contest" | "midpoint", width: number, bias: number): number {
-        const seeds = fixedSeedsFor(preset)!;
+    function pnlFor(preset: DdPreset, width: number, bias: number): number {
+        const seeds = seedsFor();
         const config = configFor(preset);
         let total = 0;
-        contractsFor(preset).forEach((contract, i) => {
+        contractsFor().forEach((contract, i) => {
             let state = openContract(contract, config, mulberry32(seeds[i]!));
             for (let stage = 0; stage < DD_STAGES; stage++) {
                 const { fair, sd } = momentsAt(state, state.stage);
@@ -486,7 +486,7 @@ check("on the fixed contest seeds, correct play beats each classic mistake", () 
         return total;
     }
 
-    for (const preset of ["contest", "midpoint"] as const) {
+    for (const preset of DD_PRESET_ORDER) {
         const perfect = pnlFor(preset, 1, 0);
         assert.ok(perfect > 0, `${preset}: correct play does not even make money`);
 
@@ -505,13 +505,12 @@ check("on the fixed contest seeds, correct play beats each classic mistake", () 
 // ---------------------------------------------------------------------------
 
 check("an in-flight projection leaks no hidden information", () => {
-    const run = replay([...CONTEST_SEEDS], "contest", [{ bid: 130, ask: 150 }]);
+    const run = replay([...HOMEWORK_SEEDS], "homework", [{ bid: 130, ask: 150 }]);
     const projected = projectRun(run);
     const json = JSON.stringify(projected);
 
     assert.equal(projected.results, null);
     assert.equal(projected.breakdown, null);
-    assert.equal(projected.previousResult, null, "contests must not coach mid-run");
     assert.ok(projected.contract, "expected a live contract");
 
     for (const forbidden of ["settlement", "units", "lesson", "informed", "realisation"]) {
@@ -526,12 +525,12 @@ check("an in-flight projection leaks no hidden information", () => {
 });
 
 check("a settled projection reveals everything and matches the engine", () => {
-    const contracts = contractsFor("contest");
+    const contracts = contractsFor();
     const quotes: Quote[] = Array.from({ length: contracts.length * DD_STAGES }, () => ({
         bid: 50,
         ask: 90,
     }));
-    const run = replay([...CONTEST_SEEDS], "contest", quotes);
+    const run = replay([...HOMEWORK_SEEDS], "homework", quotes);
     const projected = projectRun(run);
 
     assert.ok(projected.complete);
@@ -547,25 +546,12 @@ check("a settled projection reveals everything and matches the engine", () => {
     );
 });
 
-check("practice coaches between contracts, a contest does not", () => {
-    const practiceContracts = contractsFor("practice");
-    const seeds = practiceContracts.map((_, i) => 1000 + i);
-    // Two full stages settles contract 0 and opens contract 1.
-    const run = replay(seeds, "practice", [
-        { bid: 100, ask: 180 },
-        { bid: 100, ask: 180 },
-    ]);
-    const projected = projectRun(run);
-    assert.ok(projected.previousResult, "practice should report the contract that just settled");
-    assert.equal(projected.previousResult!.id, practiceContracts[0]!.id);
-});
-
 // ---------------------------------------------------------------------------
 // Sessions
 // ---------------------------------------------------------------------------
 
 check("a sealed token round-trips and hides the seeds", () => {
-    const session = createSession("contest", "week3");
+    const session = createSession("homework", "week3");
     const token = seal(session);
     assert.deepEqual(openSession(token), session);
 
@@ -576,7 +562,7 @@ check("a sealed token round-trips and hides the seeds", () => {
 });
 
 check("any edit to a token is rejected", () => {
-    const token = seal(createSession("contest"));
+    const token = seal(createSession("homework"));
     const raw = Buffer.from(token, "base64url");
     for (const index of [0, 15, raw.length - 1]) {
         const tampered = Buffer.from(raw);
@@ -589,7 +575,7 @@ check("any edit to a token is rejected", () => {
 });
 
 check("out-of-order and duplicate quotes are refused", () => {
-    const session = createSession("contest");
+    const session = createSession("homework");
     const quote: Quote = { bid: 100, ask: 140 };
     assert.throws(() => withQuote(session, 1, quote), DdSessionError);
     assert.throws(() => withQuote(session, 5, quote), DdSessionError);
@@ -600,8 +586,8 @@ check("out-of-order and duplicate quotes are refused", () => {
 });
 
 check("a run only reports complete after every contract has two quotes", () => {
-    let session = createSession("contest");
-    const total = contractsFor("contest").length * DD_STAGES;
+    let session = createSession("homework");
+    const total = contractsFor().length * DD_STAGES;
     for (let i = 0; i < total; i++) {
         assert.equal(isComplete(session), false);
         session = withQuote(session, i, { bid: 100, ask: 140 }).session;
@@ -611,34 +597,31 @@ check("a run only reports complete after every contract has two quotes", () => {
 });
 
 check("a quote past the clock is recorded as an unfillable market", () => {
-    const session = createSession("contest");
+    const session = createSession("homework");
     const stale = {
         ...session,
-        stageOpenedAt: Date.now() - (configFor("contest").secondsPerQuote + 60) * 1000,
+        stageOpenedAt: Date.now() - (configFor("homework").secondsPerQuote + 60) * 1000,
     };
     const { session: next, lateQuote } = withQuote(stale, 0, { bid: 100, ask: 140 });
     assert.equal(lateQuote, true);
     assert.notDeepEqual(next.quotes[0], { bid: 100, ask: 140 });
 
     // And it must actually fill nothing, rather than merely being flagged.
-    const run = replay([...CONTEST_SEEDS], "contest", [next.quotes[0]!]);
+    const run = replay([...HOMEWORK_SEEDS], "homework", [next.quotes[0]!]);
     assert.equal(run.contracts[0]!.fills.length, 0);
 });
 
-check("a contest always deals its fixed seed set, practice never does", () => {
-    assert.deepEqual(createSession("contest").seeds, [...CONTEST_SEEDS]);
-    assert.deepEqual(createSession("midpoint").seeds, [...MIDPOINT_SEEDS]);
-    assert.equal(fixedSeedsFor("practice"), null);
-
-    const a = createSession("practice").seeds;
-    const b = createSession("practice").seeds;
-    assert.notDeepEqual(a, b, "practice should deal fresh seeds each run");
+check("every run is dealt the same fixed seed set", () => {
+    // There is no ungraded mode and no fresh deal: two sessions must be
+    // identical, or abandoning a run and starting again would be a re-roll.
+    assert.deepEqual(createSession("homework").seeds, [...HOMEWORK_SEEDS]);
+    assert.deepEqual(createSession("homework").seeds, createSession("homework").seeds);
 });
 
-check("every contest seed set is the right length and curated", () => {
-    for (const preset of ["contest", "midpoint"] as const) {
-        const contracts = contractsFor(preset);
-        const seeds = fixedSeedsFor(preset)!;
+check("the seed set is the right length and curated", () => {
+    for (const preset of DD_PRESET_ORDER) {
+        const contracts = contractsFor();
+        const seeds = seedsFor();
         assert.equal(seeds.length, contracts.length, `${preset}: seed count does not match contracts`);
 
         contracts.forEach((contract, i) => {
