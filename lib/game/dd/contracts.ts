@@ -66,8 +66,6 @@ export interface Contract {
     legs: Leg[];
     /** Which leg is partially exposed between the two quotes, and how much. */
     reveal: { legIndex: number; units: number };
-    /** One line shown after settlement explaining the intended reasoning. */
-    lesson: string;
 }
 
 // --------------------------------------------------------------------------

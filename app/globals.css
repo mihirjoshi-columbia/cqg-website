@@ -1280,7 +1280,9 @@ a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark);
 }
 .dd-root .dd-prose:last-child { margin-bottom: 0; }
 .dd-root .dd-prose--warn { color: var(--mtm-warn); }
-.dd-root .dd-prose--lesson {
+/* A standing note, not a per-contract explanation: the results screen no
+   longer prints worked answers, so this says so once. */
+.dd-root .dd-prose--note {
   margin-top: 12px;
   padding: 10px 12px;
   border-left: 2px solid var(--mtm-accent);
@@ -1399,14 +1401,27 @@ a.lineage-little:hover .career-fulltime { color: var(--career-fulltime-on-dark);
   color: var(--mtm-text);
 }
 .dd-root .dd-bar__head strong { font-family: var(--font-plex-mono), monospace; }
-.dd-root .dd-bar__track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--mtm-sunken);
-  overflow: hidden;
-}
-.dd-root .dd-bar__fill { height: 100%; background: var(--mtm-accent); }
 .dd-root .dd-bar__hint { margin: 6px 0 0; font-size: 12px; color: var(--mtm-dim); line-height: 1.45; }
+
+/* The verdict pill. This replaced a percentage bar: a number that close to
+   the answer is itself a hint, and three named buckets are what a player can
+   actually act on. */
+.dd-root .dd-verdict {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dd-root .dd-verdict--correct { color: var(--mtm-buy); }
+.dd-root .dd-verdict--close { color: var(--mtm-warn); }
+.dd-root .dd-verdict--off { color: var(--mtm-sell); }
+.dd-root .dd-verdict--none { color: var(--mtm-dim); }
 
 .dd-root .dd-table {
   width: 100%;

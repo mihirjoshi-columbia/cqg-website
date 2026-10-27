@@ -3,6 +3,7 @@ import { requireSignedInMember } from "@/lib/game/require-internal-member";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { callRpc } from "@/lib/supabase/helpers";
 import type { CqgGameContest, DdLeaderboardRow } from "@/lib/supabase/types";
+import { RANKED_RUNS } from "@/lib/game/dd/types";
 
 export const metadata = { title: "Leaderboard — CQG Portal" };
 
@@ -44,7 +45,7 @@ export default async function LeaderboardPage({
         });
         if (error) {
             unavailable = !isPublished(contest)
-                    ? `Standings are published ${new Date(contest.leaderboard_visible_at).toLocaleString()}. Everyone plays the identical set of contracts, so showing the field early would give away the outcomes.`
+                    ? `Standings are published ${new Date(contest.leaderboard_visible_at).toLocaleString()}.`
                     : "The leaderboard could not be loaded.";
         } else {
             rows = data ?? [];
@@ -107,19 +108,30 @@ export default async function LeaderboardPage({
                         <div className="event-card" style={{ maxWidth: 560 }}>
                             <div className="event-card-body">
                                 <p className="text-ink-soft text-sm">
-                                    Nobody has finished this contest yet.
+                                    Nobody has finished a run yet.
                                 </p>
                             </div>
                         </div>
                     ) : (
                         <div className="event-card">
                             <div className="event-card-body">
+                                {/* Each run is dealt its own contracts, so a single
+                                    total would rank the luckiest deal. The ranked
+                                    number is the mean of someone's last few finished
+                                    runs -- see migration 0016. */}
+                                <p className="text-ink-faint text-xs mb-4">
+                                    Ranked on the average score of each member&apos;s last{" "}
+                                    {RANKED_RUNS} finished runs. A score is P&amp;L measured
+                                    against the risk the deal carried, so runs dealt different
+                                    contracts stay comparable.
+                                </p>
                                 <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr className="text-ink-faint text-xs uppercase tracking-wider">
                                             <th className="text-left pb-2 pr-4">#</th>
                                             <th className="text-left pb-2 pr-4">Member</th>
-                                            <th className="text-right pb-2">Total P&amp;L</th>
+                                            <th className="text-right pb-2 pr-4">Runs</th>
+                                            <th className="text-right pb-2">Average score</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -135,6 +147,9 @@ export default async function LeaderboardPage({
                                                     <td className="py-2 pr-4">
                                                         {row.name}
                                                         {you && " (you)"}
+                                                    </td>
+                                                    <td className="py-2 pr-4 text-right tabular-nums">
+                                                        {row.runs}
                                                     </td>
                                                     <td className="py-2 text-right tabular-nums">
                                                         {Number(row.score).toFixed(2)}

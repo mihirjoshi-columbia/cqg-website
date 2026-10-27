@@ -1,7 +1,7 @@
 import { randomInt } from "node:crypto";
 import { createSealedTokenCodec } from "../sealed-token";
-import { contractsFor, configFor, isDdPreset, type DdPreset } from "./presets";
-import { seedsFor } from "./seeds";
+import { DD_CONTRACT_COUNT } from "./deal";
+import { configFor, isDdPreset, type DdPreset } from "./presets";
 import { DD_STAGES, type Quote } from "./types";
 
 // Stateless run sessions for Distribution Desk.
@@ -10,9 +10,10 @@ import { DD_STAGES, type Quote } from "./types";
 // lib/game/sealed-token.ts. This file is only the DD-shaped part: what a run
 // session contains, what counts as a well-formed one, and the per-quote clock.
 //
-// The seeds are the thing that must stay secret. A seed determines the whole
-// realisation of a contract, so a readable token would hand the player the
-// settlement value of a market they have not quoted yet.
+// The deal seed is the thing that must stay secret. It determines the whole
+// deal -- every contract's parameters AND its realisation -- so a readable
+// token would hand the player the settlement value of a market they have not
+// quoted yet.
 
 /** Runs older than this stop being playable, to bound token reuse. */
 const MAX_AGE_MS = 12 * 60 * 60 * 1000;
@@ -28,7 +29,8 @@ export class DdSessionError extends Error {
 }
 
 export interface DdSession {
-    seeds: number[];
+    /** Generates the whole deal. See lib/game/dd/deal.ts. */
+    dealSeed: number;
     preset: DdPreset;
     quotes: Quote[];
     issuedAt: number;
@@ -66,13 +68,9 @@ const codec = createSealedTokenCodec<DdSession>({
         if (!isDdPreset(candidate.preset)) {
             throw new DdSessionError("invalid session token");
         }
-        const maxQuotes = contractsFor().length * DD_STAGES;
+        const maxQuotes = DD_CONTRACT_COUNT * DD_STAGES;
 
-        if (
-            !Array.isArray(candidate.seeds) ||
-            candidate.seeds.length !== contractsFor().length ||
-            !candidate.seeds.every((s) => typeof s === "number" && Number.isInteger(s))
-        ) {
+        if (typeof candidate.dealSeed !== "number" || !Number.isInteger(candidate.dealSeed)) {
             throw new DdSessionError("invalid session token");
         }
         if (
@@ -96,7 +94,7 @@ const codec = createSealedTokenCodec<DdSession>({
         }
 
         return {
-            seeds: candidate.seeds as number[],
+            dealSeed: candidate.dealSeed,
             preset: candidate.preset,
             quotes: candidate.quotes as Quote[],
             issuedAt: candidate.issuedAt,
@@ -116,13 +114,12 @@ export function createSession(
     contestSlug: string | null = null,
     attemptId: string | null = null
 ): DdSession {
-    // Always the fixed, curated seed set: every student is dealt identical
-    // contracts, which is what makes the ranking skill rather than luck.
-    const seeds = [...seedsFor()];
-
+    // A fresh deal every time. The contracts themselves are generated from
+    // this seed, so no two runs face the same seven markets and there is
+    // nothing to memorise between attempts.
     const now = Date.now();
     return {
-        seeds,
+        dealSeed: newSeed(),
         preset,
         quotes: [],
         issuedAt: now,
@@ -137,7 +134,7 @@ export const open = codec.open;
 
 /** Quotes in a complete run: two per contract. */
 export function totalQuotes(): number {
-    return contractsFor().length * DD_STAGES;
+    return DD_CONTRACT_COUNT * DD_STAGES;
 }
 
 export function isComplete(session: DdSession): boolean {

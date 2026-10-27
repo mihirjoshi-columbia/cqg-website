@@ -44,18 +44,20 @@ export async function POST(request: Request) {
 
         const quote = validateQuote({ bid: body.bid, ask: body.ask });
         const { session: next, lateQuote } = withQuote(session, index, quote);
-        const run = replay(next.seeds, next.preset, next.quotes);
+        const run = replay(next.dealSeed, next.preset, next.quotes);
         const finished = isComplete(next);
 
         // A contest result is derived here, from a server-side replay of the
-        // seeds and quotes. The client never sends a score and is never asked
+        // deal seed and quotes. The client never sends a score and is never asked
         // to; it could not produce one that would be believed.
         if (finished && next.attemptId) {
             const breakdown = score(run);
             await completeAttempt(
                 next.attemptId,
                 gate.profile.id,
-                breakdown.totalPnl,
+                // The SD-scaled score, not the raw P&L: deals differ per run,
+                // so raw P&L would rank the richest deal. See scoring.ts.
+                breakdown.scaledPnl,
                 breakdown as unknown as Json,
                 next.quotes as unknown as Json
             );

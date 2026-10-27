@@ -34,14 +34,18 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 type StepResponse = { run: PublicRun; token: string; lateQuote?: boolean };
 
 export interface DdGameProps {
-    /** The contest this run is graded against. Every run has one. */
+    /** The contest this run is recorded against. Every run has one. */
     contestSlug: string;
     contestLabel: string;
     attemptsUsed: number;
-    attemptsAllowed: number;
+    /** Null means unlimited, which is the normal case. */
+    attemptsAllowed: number | null;
+    /** Runs actually finished, which is what the ranking averages. */
+    completed: number;
+    recentAverage: number | null;
     /** Best completed score so far, or null if none finished. */
     bestScore: number | null;
-    /** No attempts left, or the window is shut. */
+    /** The window is shut, or a capped contest has run out of attempts. */
     locked?: boolean;
     lockedReason?: string;
 }
@@ -51,6 +55,8 @@ export default function DdGame({
     contestLabel,
     attemptsUsed,
     attemptsAllowed,
+    completed,
+    recentAverage,
     bestScore,
     locked,
     lockedReason,
@@ -130,7 +136,7 @@ export default function DdGame({
             {!run &&
                 (locked ? (
                     <div className="mtm-panel">
-                        <p className="mtm-panel__label">Attempt used</p>
+                        <p className="mtm-panel__label">Closed</p>
                         <p className="dd-prose">{lockedReason}</p>
                     </div>
                 ) : (
@@ -139,6 +145,8 @@ export default function DdGame({
                         busy={busy}
                         attemptsUsed={attemptsUsed}
                         attemptsAllowed={attemptsAllowed}
+                        completed={completed}
+                        recentAverage={recentAverage}
                         bestScore={bestScore}
                     />
                 ))}
@@ -154,9 +162,7 @@ export default function DdGame({
                 />
             )}
 
-            {run?.complete && (
-                <Done run={run} attemptsLeft={Math.max(0, attemptsAllowed - attemptsUsed - 1)} />
-            )}
+            {run?.complete && <Done run={run} />}
         </div>
     );
 }

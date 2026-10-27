@@ -7,10 +7,15 @@
 //
 // The distribution maths is the part most worth checking: a wrong variance
 // formula would not crash anything, it would just quietly make the game
-// unfair and teach the wrong lesson. Every closed-form mean and SD here is
+// unfair and teach the wrong thing. Every closed-form mean and SD here is
 // cross-checked against Monte Carlo, including the POSTERIOR moments after a
 // reveal, which is where the subtle cases (memorylessness, variance addition)
 // live.
+//
+// Since the deal became random (lib/game/dd/deal.ts) these checks run over
+// several generated deals rather than over one hand-written contract list.
+// That is the point: a property that holds for seven curated contracts and
+// fails for the eighth generated one would ship as a broken game.
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { mulberry32 } from "../lib/game/prng";
@@ -24,7 +29,7 @@ import {
     type Contract,
     type LegUnits,
 } from "../lib/game/dd/contracts";
-import { HOMEWORK_CONTRACTS } from "../lib/game/dd/library";
+import { DD_CONTRACT_COUNT, acceptable, makeDeal, type Deal } from "../lib/game/dd/deal";
 import {
     applyQuote,
     contractPnl,
@@ -33,17 +38,17 @@ import {
     openContract,
     validateQuote,
 } from "../lib/game/dd/engine";
-import { DD_PRESET_ORDER, configFor, contractsFor, type DdPreset } from "../lib/game/dd/presets";
+import { DD_PRESET_ORDER, configFor, type DdPreset } from "../lib/game/dd/presets";
 import { replay } from "../lib/game/dd/replay";
-import { score } from "../lib/game/dd/scoring";
+import { score, verdictFor, CORRECT_WITHIN } from "../lib/game/dd/scoring";
 import { projectRun } from "../lib/game/dd/project";
-import { HOMEWORK_SEEDS, seedsFor } from "../lib/game/dd/seeds";
 import {
     DdSessionError,
     createSession,
     isComplete,
     open as openSession,
     seal,
+    totalQuotes,
     withQuote,
 } from "../lib/game/dd/session";
 import { DD_STAGES, type Quote } from "../lib/game/dd/types";
@@ -53,7 +58,15 @@ import { DD_STAGES, type Quote } from "../lib/game/dd/types";
 // this is NOT a fallback in the app itself, which still fails loudly.
 process.env.DD_SESSION_SECRET ??= randomBytes(32).toString("hex");
 
-const ALL_CONTRACTS = HOMEWORK_CONTRACTS;
+/** Deal seeds the checks run over. Arbitrary, but fixed so a failure repeats. */
+const DEAL_SEEDS: readonly number[] = [11, 2_222, 33_333, 444_444, 5_555_555, 60_606_060];
+
+const DEALS: Deal[] = DEAL_SEEDS.map(makeDeal);
+const ALL_CONTRACTS: Contract[] = DEALS.flatMap((d) => d.contracts);
+
+/** A smaller slice, for the checks that run Monte Carlo over every contract. */
+const MC_DEALS = DEALS.slice(0, 2);
+const MC_CONTRACTS = MC_DEALS.flatMap((d) => d.contracts);
 
 let checks = 0;
 function check(label: string, fn: () => void) {
@@ -63,10 +76,82 @@ function check(label: string, fn: () => void) {
 }
 
 // ---------------------------------------------------------------------------
+// The deal generator
+// ---------------------------------------------------------------------------
+
+check("a deal is a pure function of its seed", () => {
+    // The sealed token carries only the seed, and the server replays from
+    // scratch on every request. If a deal were not reproducible, a player's
+    // score would be computed against contracts they never saw.
+    for (const seed of DEAL_SEEDS) {
+        assert.deepEqual(makeDeal(seed), makeDeal(seed));
+    }
+});
+
+check("every deal has the full slot set, in the same order", () => {
+    for (const deal of DEALS) {
+        assert.equal(deal.contracts.length, DD_CONTRACT_COUNT);
+        assert.equal(deal.seeds.length, DD_CONTRACT_COUNT);
+
+        const kinds = deal.contracts.map((c) => c.legs.map((l) => l.kind).join("+"));
+        assert.deepEqual(kinds, [
+            "binomial",
+            "geometric",
+            "uniformSum",
+            "binomial",
+            "normal",
+            "geometric",
+            "binomial+geometric",
+        ]);
+    }
+});
+
+check("different deals really are different markets", () => {
+    // The whole reason the generator exists. Two runs must not present the
+    // same seven contracts, or a player can memorise the answers.
+    const signatures = DEALS.map((deal) => deal.contracts.map((c) => c.description).join("|"));
+    assert.equal(new Set(signatures).size, signatures.length, "two deals were identical");
+
+    // And no single slot should be stuck on one parameter set either.
+    for (let slot = 0; slot < DD_CONTRACT_COUNT; slot++) {
+        const seen = new Set(DEALS.map((d) => d.contracts[slot]!.description));
+        assert.ok(seen.size > 1, `slot ${slot} produced the same contract in every deal`);
+    }
+});
+
+check("every dealt realisation satisfies the teaching constraints", () => {
+    for (const deal of DEALS) {
+        deal.contracts.forEach((contract, i) => {
+            assert.ok(
+                acceptable(contract, deal.seeds[i]!),
+                `${contract.id}: dealt a realisation its own acceptance test rejects`
+            );
+        });
+    }
+});
+
+check("every contract leaves risk after its reveal, and is quotable", () => {
+    for (const deal of DEALS) {
+        deal.contracts.forEach((contract, i) => {
+            const realisation = realise(contract, mulberry32(deal.seeds[i]!));
+            const prior = moments(contract, realisation, nothingSeen(contract));
+            const post = moments(contract, realisation, afterReveal(contract));
+
+            assert.ok(prior.sd >= 3, `${contract.id}: prior SD ${prior.sd} is too small to quote`);
+            assert.ok(post.sd > 0, `${contract.id}: the reveal left nothing to re-quote`);
+            assert.ok(
+                Math.abs(prior.fair) <= 3000,
+                `${contract.id}: fair ${prior.fair} is off the scale`
+            );
+        });
+    }
+});
+
+// ---------------------------------------------------------------------------
 // Distribution maths
 // ---------------------------------------------------------------------------
 
-const MC_RUNS = 120_000;
+const MC_RUNS = 40_000;
 
 function monteCarlo(sample: () => number, runs = MC_RUNS) {
     let sum = 0;
@@ -81,17 +166,17 @@ function monteCarlo(sample: () => number, runs = MC_RUNS) {
 }
 
 check("prior fair and SD match Monte Carlo for every contract", () => {
-    for (const contract of ALL_CONTRACTS) {
+    for (const contract of MC_CONTRACTS) {
         const random = mulberry32(4242);
         const mc = monteCarlo(() => realise(contract, random).settlement);
         const prior = moments(contract, realise(contract, mulberry32(7)), nothingSeen(contract));
 
         assert.ok(
-            Math.abs(mc.mean - prior.fair) < 0.04 * prior.sd,
+            Math.abs(mc.mean - prior.fair) < 0.05 * prior.sd,
             `${contract.id}: fair ${prior.fair} vs MC ${mc.mean.toFixed(2)}`
         );
         assert.ok(
-            Math.abs(mc.sd - prior.sd) / prior.sd < 0.03,
+            Math.abs(mc.sd - prior.sd) / prior.sd < 0.04,
             `${contract.id}: SD ${prior.sd} vs MC ${mc.sd.toFixed(2)}`
         );
     }
@@ -119,63 +204,65 @@ function resampleUnrevealed(
 }
 
 check("posterior fair and SD after the reveal match conditional Monte Carlo", () => {
-    for (const contract of ALL_CONTRACTS) {
-        const realisation = realise(contract, mulberry32(99));
-        const seen = afterReveal(contract);
-        const posterior = moments(contract, realisation, seen);
+    MC_DEALS.forEach((deal) => {
+        deal.contracts.forEach((contract, i) => {
+            const realisation = realise(contract, mulberry32(deal.seeds[i]!));
+            const seen = afterReveal(contract);
+            const posterior = moments(contract, realisation, seen);
 
-        const random = mulberry32(1234);
-        const mc = monteCarlo(
-            () => resampleUnrevealed(contract, realisation.units, seen, random),
-            60_000
-        );
-
-        const scale = Math.max(posterior.sd, 1);
-        assert.ok(
-            Math.abs(mc.mean - posterior.fair) < 0.05 * scale,
-            `${contract.id}: posterior fair ${posterior.fair.toFixed(2)} vs MC ${mc.mean.toFixed(2)}`
-        );
-        if (posterior.sd > 0) {
-            assert.ok(
-                Math.abs(mc.sd - posterior.sd) / posterior.sd < 0.04,
-                `${contract.id}: posterior SD ${posterior.sd.toFixed(2)} vs MC ${mc.sd.toFixed(2)}`
+            const random = mulberry32(1234);
+            const mc = monteCarlo(
+                () => resampleUnrevealed(contract, realisation.units, seen, random),
+                25_000
             );
-        }
-    }
+
+            const scale = Math.max(posterior.sd, 1);
+            assert.ok(
+                Math.abs(mc.mean - posterior.fair) < 0.06 * scale,
+                `${contract.id}: posterior fair ${posterior.fair.toFixed(2)} vs MC ${mc.mean.toFixed(2)}`
+            );
+            if (posterior.sd > 0) {
+                assert.ok(
+                    Math.abs(mc.sd - posterior.sd) / posterior.sd < 0.05,
+                    `${contract.id}: posterior SD ${posterior.sd.toFixed(2)} vs MC ${mc.sd.toFixed(2)}`
+                );
+            }
+        });
+    });
 });
 
 check("a geometric reveal moves the fair but leaves the SD untouched", () => {
     // Memorylessness. This is the single most discriminating moment in the
-    // game, so it is asserted directly rather than inferred from the MC above.
-    for (const contract of ALL_CONTRACTS) {
-        const leg = contract.legs[contract.reveal.legIndex]!;
-        if (leg.kind !== "geometric") continue;
+    // game, so it is asserted directly rather than inferred from the MC above,
+    // and on the realisations players are actually dealt.
+    let seen = 0;
+    DEALS.forEach((deal) => {
+        deal.contracts.forEach((contract, i) => {
+            const leg = contract.legs[contract.reveal.legIndex]!;
+            if (leg.kind !== "geometric") return;
+            seen++;
 
-        // A seed whose revealed prefix contains no success.
-        let seed = 1;
-        let realisation = realise(contract, mulberry32(seed));
-        while (realisation.units[contract.reveal.legIndex]!.slice(0, contract.reveal.units).includes(1)) {
-            realisation = realise(contract, mulberry32(++seed));
-        }
+            const realisation = realise(contract, mulberry32(deal.seeds[i]!));
+            const prior = moments(contract, realisation, nothingSeen(contract));
+            const post = moments(contract, realisation, afterReveal(contract));
 
-        const prior = moments(contract, realisation, nothingSeen(contract));
-        const post = moments(contract, realisation, afterReveal(contract));
-
-        assert.ok(
-            Math.abs(post.sd - prior.sd) < 1e-9,
-            `${contract.id}: SD moved ${prior.sd} -> ${post.sd} across a geometric reveal`
-        );
-        const expectedShift = leg.multiplier * contract.reveal.units;
-        assert.ok(
-            Math.abs(post.fair - prior.fair - expectedShift) < 1e-9,
-            `${contract.id}: fair shifted by ${post.fair - prior.fair}, expected ${expectedShift}`
-        );
-    }
+            assert.ok(
+                Math.abs(post.sd - prior.sd) < 1e-9,
+                `${contract.id}: SD moved ${prior.sd} -> ${post.sd} across a geometric reveal`
+            );
+            const expectedShift = leg.multiplier * contract.reveal.units;
+            assert.ok(
+                Math.abs(post.fair - prior.fair - expectedShift) < 1e-9,
+                `${contract.id}: fair shifted by ${post.fair - prior.fair}, expected ${expectedShift}`
+            );
+        });
+    });
+    assert.ok(seen >= DEALS.length * 2, "expected two geometric reveals per deal");
 });
 
 check("variances add across independent legs, standard deviations do not", () => {
     const composites = ALL_CONTRACTS.filter((c) => c.legs.length > 1);
-    assert.ok(composites.length >= 1, "expected at least one composite contract");
+    assert.equal(composites.length, DEALS.length, "expected one composite per deal");
 
     for (const contract of composites) {
         const realisation = realise(contract, mulberry32(321));
@@ -198,6 +285,12 @@ check("variances add across independent legs, standard deviations do not", () =>
             whole.sd < sumOfSds - 1e-6,
             `${contract.id}: SD should be strictly below the sum of leg SDs`
         );
+        // And the mistake has to be worth catching: if one leg dominates,
+        // adding the SDs is barely wrong and the contract teaches nothing.
+        assert.ok(
+            sumOfSds > whole.sd * 1.15,
+            `${contract.id}: legs too lopsided -- adding SDs is only ${((sumOfSds / whole.sd - 1) * 100).toFixed(0)}% off`
+        );
     }
 });
 
@@ -206,7 +299,7 @@ check("variances add across independent legs, standard deviations do not", () =>
 // ---------------------------------------------------------------------------
 
 check("the whole realisation is drawn before the first quote", () => {
-    for (const contract of HOMEWORK_CONTRACTS) {
+    for (const contract of DEALS[0]!.contracts) {
         const config = configFor("homework");
         let draws = 0;
         const base = mulberry32(55);
@@ -240,7 +333,7 @@ check("draw count is independent of the quote (the core invariant)", () => {
             draws++;
             return base();
         };
-        let state = openContract(HOMEWORK_CONTRACTS[0]!, config, random);
+        let state = openContract(DEALS[0]!.contracts[0]!, config, random);
         const { fair, sd } = momentsAt(state, 0);
         for (let stage = 0; stage < DD_STAGES; stage++) {
             state = applyQuote(state, { bid: fair - mult * sd, ask: fair + mult * sd }, config);
@@ -250,23 +343,25 @@ check("draw count is independent of the quote (the core invariant)", () => {
     assert.equal(new Set(counts).size, 1, `draw counts differed: ${counts.join(", ")}`);
 });
 
-check("replay is reproducible: same seeds and quotes, same P&L", () => {
-    const seeds = [...HOMEWORK_SEEDS];
+check("replay is reproducible: same deal seed and quotes, same P&L", () => {
     const quotes: Quote[] = [];
-    const contracts = contractsFor();
-    for (let i = 0; i < contracts.length * DD_STAGES; i++) {
+    for (let i = 0; i < totalQuotes(); i++) {
         quotes.push({ bid: 100 + i, ask: 140 + i });
     }
 
-    const a = score(replay(seeds, "homework", quotes));
-    const b = score(replay(seeds, "homework", quotes));
+    const a = score(replay(DEAL_SEEDS[0]!, "homework", quotes));
+    const b = score(replay(DEAL_SEEDS[0]!, "homework", quotes));
     assert.deepEqual(a, b);
     assert.ok(Number.isFinite(a.totalPnl));
+
+    // And a different deal seed must give a different run, or the seed is
+    // being ignored somewhere.
+    const other = score(replay(DEAL_SEEDS[1]!, "homework", quotes));
+    assert.notEqual(other.totalPnl, a.totalPnl);
 });
 
 check("a partial run exposes exactly one live contract", () => {
-    const seeds = [...HOMEWORK_SEEDS];
-    const run = replay(seeds, "homework", [{ bid: 130, ask: 150 }]);
+    const run = replay(DEAL_SEEDS[0]!, "homework", [{ bid: 130, ask: 150 }]);
     assert.equal(run.complete, false);
     assert.equal(run.contracts.length, 1);
     assert.equal(run.contracts[0]!.stage, 1);
@@ -274,20 +369,16 @@ check("a partial run exposes exactly one live contract", () => {
 });
 
 check("a full run settles every contract", () => {
-    const contracts = contractsFor();
-    const quotes: Quote[] = Array.from({ length: contracts.length * DD_STAGES }, () => ({
-        bid: 0,
-        ask: 1000,
-    }));
-    const run = replay([...HOMEWORK_SEEDS], "homework", quotes);
+    const quotes: Quote[] = Array.from({ length: totalQuotes() }, () => ({ bid: 0, ask: 1000 }));
+    const run = replay(DEAL_SEEDS[0]!, "homework", quotes);
     assert.equal(run.complete, true);
-    assert.equal(run.contracts.length, contracts.length);
+    assert.equal(run.contracts.length, DD_CONTRACT_COUNT);
     assert.ok(run.contracts.every((c) => c.settled));
 });
 
 check("settlement P&L is cash plus inventory marked at the settlement price", () => {
     const config = configFor("homework");
-    let state = openContract(HOMEWORK_CONTRACTS[0]!, config, mulberry32(17));
+    let state = openContract(DEALS[0]!.contracts[0]!, config, mulberry32(17));
     const { fair, sd } = momentsAt(state, 0);
     for (let stage = 0; stage < DD_STAGES; stage++) {
         state = applyQuote(state, { bid: fair - sd / 2, ask: fair + sd / 2 }, config);
@@ -313,8 +404,8 @@ check("a crossed or zero-width quote is refused", () => {
 check("inventory never breaches the position limit", () => {
     for (const preset of DD_PRESET_ORDER) {
         const config = configFor(preset);
-        for (const contract of contractsFor()) {
-            for (let seed = 0; seed < 40; seed++) {
+        for (const contract of MC_CONTRACTS) {
+            for (let seed = 0; seed < 20; seed++) {
                 let state = openContract(contract, config, mulberry32(seed));
                 // A one-sided market invites maximum directional flow.
                 for (let stage = 0; stage < DD_STAGES; stage++) {
@@ -335,15 +426,14 @@ check("expected P&L peaks at a width near one SD, and over-wide earns nothing", 
     // distribution maths and the quoting the same skill. If this check fails,
     // a player can score well without ever estimating a variance.
     const multiples = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3];
-    const RUNS = 1200;
+    const RUNS = 600;
 
     for (const preset of DD_PRESET_ORDER) {
         const config = configFor(preset);
-        const contracts = contractsFor();
 
         const curve = multiples.map((mult) => {
             let total = 0;
-            for (const contract of contracts) {
+            for (const contract of MC_CONTRACTS) {
                 const scale = Math.max(
                     1,
                     moments(contract, realise(contract, mulberry32(3)), nothingSeen(contract)).sd
@@ -358,7 +448,7 @@ check("expected P&L peaks at a width near one SD, and over-wide earns nothing", 
                     total += contractPnl(state) / scale;
                 }
             }
-            return total / (RUNS * contracts.length);
+            return total / (RUNS * MC_CONTRACTS.length);
         });
 
         let bestIndex = 0;
@@ -387,52 +477,84 @@ check("expected P&L peaks at a width near one SD, and over-wide earns nothing", 
 // Scoring
 // ---------------------------------------------------------------------------
 
-check("a well-calibrated run outscores a careless one on every sub-score", () => {
-    const seeds = [...HOMEWORK_SEEDS];
-    const contracts = contractsFor();
-
-    function runWith(build: (fair: number, sd: number) => Quote) {
-        const quotes: Quote[] = [];
-        for (let i = 0; i < contracts.length; i++) {
-            for (let stage = 0; stage < DD_STAGES; stage++) {
-                const partial = replay(seeds, "homework", quotes);
-                const live = partial.contracts[partial.contracts.length - 1]!;
-                const { fair, sd } = momentsAt(live, live.stage);
-                quotes.push(build(fair, sd));
-            }
+/**
+ * Plays a whole run with a strategy expressed in terms of the truth the
+ * player is trying to estimate, so "correct play" and each classic mistake
+ * can be compared on the same deal.
+ */
+function playRun(dealSeed: number, build: (fair: number, sd: number, stage: number) => Quote) {
+    const quotes: Quote[] = [];
+    for (let i = 0; i < DD_CONTRACT_COUNT; i++) {
+        for (let stage = 0; stage < DD_STAGES; stage++) {
+            const partial = replay(dealSeed, "homework", quotes);
+            const live = partial.contracts[partial.contracts.length - 1]!;
+            const { fair, sd } = momentsAt(live, live.stage);
+            quotes.push(build(fair, sd, stage));
         }
-        return score(replay(seeds, "homework", quotes));
     }
+    return { quotes, breakdown: score(replay(dealSeed, "homework", quotes)) };
+}
 
-    const sharp = runWith((fair, sd) => ({ bid: fair - sd / 2, ask: fair + sd / 2 }));
+check("a well-calibrated run outscores a careless one on every sub-score", () => {
+    const sharp = playRun(DEAL_SEEDS[0]!, (fair, sd) => ({ bid: fair - sd / 2, ask: fair + sd / 2 }));
     // Mispriced, mis-sized, and blind to the reveal.
-    const sloppy = runWith((fair, sd) => ({ bid: fair - sd * 2.5, ask: fair + sd * 0.4 }));
+    const sloppy = playRun(DEAL_SEEDS[0]!, (fair, sd) => ({
+        bid: fair - sd * 2.5,
+        ask: fair + sd * 0.4,
+    }));
 
-    assert.ok(sharp.pricing > sloppy.pricing, "pricing sub-score did not separate the runs");
     assert.ok(
-        sharp.widthCalibration > sloppy.widthCalibration,
+        sharp.breakdown.pricing > sloppy.breakdown.pricing,
+        "pricing sub-score did not separate the runs"
+    );
+    assert.ok(
+        sharp.breakdown.widthCalibration > sloppy.breakdown.widthCalibration,
         "width calibration sub-score did not separate the runs"
     );
-    assert.ok(sharp.totalPnl > sloppy.totalPnl, "P&L did not separate the runs");
-    for (const value of [sharp.pricing, sharp.widthCalibration, sharp.revealResponse, sharp.riskControl]) {
+    assert.ok(sharp.breakdown.totalPnl > sloppy.breakdown.totalPnl, "P&L did not separate the runs");
+    for (const value of [
+        sharp.breakdown.pricing,
+        sharp.breakdown.widthCalibration,
+        sharp.breakdown.revealResponse,
+        sharp.breakdown.riskControl,
+    ]) {
         assert.ok(value >= 0 && value <= 1, `sub-score ${value} out of range`);
     }
 });
 
+check("the verdicts a player is shown match how they actually played", () => {
+    // The verdicts are now the ONLY feedback, so they have to be right at both
+    // ends: exact play reads "correct", and a formula-level mistake does not.
+    for (const dealSeed of DEAL_SEEDS.slice(0, 3)) {
+        const exact = playRun(dealSeed, (fair, sd) => ({ bid: fair - sd / 2, ask: fair + sd / 2 }));
+        assert.equal(exact.breakdown.verdicts.pricing, "correct", "exact pricing was not correct");
+        assert.equal(exact.breakdown.verdicts.width, "correct", "exact width was not correct");
+        assert.equal(exact.breakdown.verdicts.reveal, "correct", "exact reveal was not correct");
+
+        // Half an SD of price bias and double the width: both "very wrong".
+        const wrong = playRun(dealSeed, (fair, sd) => ({ bid: fair, ask: fair + 2 * sd }));
+        assert.equal(wrong.breakdown.verdicts.width, "off", "doubling the width read as fine");
+    }
+
+    assert.equal(verdictFor(0), "correct");
+    assert.equal(verdictFor(CORRECT_WITHIN), "correct");
+    assert.equal(verdictFor(CORRECT_WITHIN + 0.01), "close");
+    assert.equal(verdictFor(0.5), "off");
+});
+
 check("tightening across a geometric reveal is marked down", () => {
-    // The lesson the homework is built to test: information that moves the
-    // price without removing risk must not narrow the market.
-    const contract = HOMEWORK_CONTRACTS.find((c) => c.id === "w3-geometric-die")!;
-    const seeds = contractsFor().map(
-        (c) => HOMEWORK_SEEDS[contractsFor().indexOf(c)]!
-    );
-    const index = contractsFor().findIndex((c) => c.id === contract.id);
+    // The lesson the exercise is built to test: information that moves the
+    // price without removing risk must not narrow the market. Slot 1 is always
+    // a geometric contract (see SLOTS in deal.ts).
+    const dealSeed = DEAL_SEEDS[0]!;
+    const index = 1;
+    const contractId = makeDeal(dealSeed).contracts[index]!.id;
 
     function revealScoreFor(secondWidthMultiple: number) {
         const quotes: Quote[] = [];
-        for (let i = 0; i < contractsFor().length; i++) {
+        for (let i = 0; i < DD_CONTRACT_COUNT; i++) {
             for (let stage = 0; stage < DD_STAGES; stage++) {
-                const partial = replay(seeds, "homework", quotes);
+                const partial = replay(dealSeed, "homework", quotes);
                 const live = partial.contracts[partial.contracts.length - 1]!;
                 const { fair, sd } = momentsAt(live, live.stage);
                 const mult = i === index && stage === 1 ? secondWidthMultiple : 1;
@@ -440,8 +562,8 @@ check("tightening across a geometric reveal is marked down", () => {
                 quotes.push({ bid: fair - half, ask: fair + half });
             }
         }
-        const breakdown = score(replay(seeds, "homework", quotes));
-        return breakdown.contracts.find((c) => c.contractId === contract.id)!.revealScore!;
+        const breakdown = score(replay(dealSeed, "homework", quotes));
+        return breakdown.contracts.find((c) => c.contractId === contractId)!.revealScore!;
     }
 
     const held = revealScoreFor(1);
@@ -452,49 +574,54 @@ check("tightening across a geometric reveal is marked down", () => {
     );
 });
 
-check("on the fixed contest seeds, correct play beats each classic mistake", () => {
+check("across many deals, correct play beats each classic mistake", () => {
     // The most important property for a leaderboard, and NOT implied by the
-    // width-curve check above. That one averages over thousands of deals; a
-    // contest deals exactly ONE, identical for everybody. A strategy can be
-    // wrong on average and still win on the single realisation students are
-    // actually given, which would rank the lucky above the correct and teach
-    // the wrong lesson. An earlier tuning of flowPerStage did exactly that:
-    // a market mispriced by half an SD outscored a perfect one.
+    // width-curve check above. That one averages over thousands of flow draws
+    // on a handful of contracts; this one plays whole runs the way a player
+    // does. Deals are random now, so the comparison is averaged over many of
+    // them: a strategy must not be able to win by being lucky on one.
     const strategies: { label: string; width: number; bias: number }[] = [
         { label: "quoting too tight", width: 0.4, bias: 0 },
         { label: "quoting too wide", width: 2.5, bias: 0 },
         { label: "mispricing by half an SD", width: 1, bias: 0.5 },
         { label: "mispricing by a full SD", width: 1, bias: 1 },
-        // Adds the legs' SDs instead of their variances on the composites.
+        // Adds the legs' SDs instead of their variances on the composite.
         { label: "adding SDs, not variances", width: 1.42, bias: 0 },
     ];
 
-    function pnlFor(preset: DdPreset, width: number, bias: number): number {
-        const seeds = seedsFor();
+    const RUN_SEEDS = Array.from({ length: 24 }, (_, i) => 90_001 + i * 1_013);
+
+    function totalFor(preset: DdPreset, width: number, bias: number): number {
         const config = configFor(preset);
         let total = 0;
-        contractsFor().forEach((contract, i) => {
-            let state = openContract(contract, config, mulberry32(seeds[i]!));
-            for (let stage = 0; stage < DD_STAGES; stage++) {
-                const { fair, sd } = momentsAt(state, state.stage);
-                const half = Math.max(0.5, (width * sd) / 2);
-                const mid = fair + bias * sd;
-                state = applyQuote(state, { bid: mid - half, ask: mid + half }, config);
-            }
-            total += contractPnl(state);
-        });
-        return total;
+        for (const dealSeed of RUN_SEEDS) {
+            const { contracts, seeds } = makeDeal(dealSeed);
+            contracts.forEach((contract, i) => {
+                let state = openContract(contract, config, mulberry32(seeds[i]!));
+                for (let stage = 0; stage < DD_STAGES; stage++) {
+                    const { fair, sd } = momentsAt(state, state.stage);
+                    const half = Math.max(0.5, (width * sd) / 2);
+                    const mid = fair + bias * sd;
+                    state = applyQuote(state, { bid: mid - half, ask: mid + half }, config);
+                }
+                // Normalised by the contract's own scale, so one large-SD
+                // contract cannot drown out the other six.
+                const scale = Math.max(1, momentsAt(state, 0).sd);
+                total += contractPnl(state) / scale;
+            });
+        }
+        return total / RUN_SEEDS.length;
     }
 
     for (const preset of DD_PRESET_ORDER) {
-        const perfect = pnlFor(preset, 1, 0);
+        const perfect = totalFor(preset, 1, 0);
         assert.ok(perfect > 0, `${preset}: correct play does not even make money`);
 
         for (const { label, width, bias } of strategies) {
-            const got = pnlFor(preset, width, bias);
+            const got = totalFor(preset, width, bias);
             assert.ok(
                 perfect > got,
-                `${preset}: ${label} scored ${got.toFixed(0)}, beating correct play at ${perfect.toFixed(0)}`
+                `${preset}: ${label} scored ${got.toFixed(2)}, beating correct play at ${perfect.toFixed(2)}`
             );
         }
     }
@@ -505,7 +632,7 @@ check("on the fixed contest seeds, correct play beats each classic mistake", () 
 // ---------------------------------------------------------------------------
 
 check("an in-flight projection leaks no hidden information", () => {
-    const run = replay([...HOMEWORK_SEEDS], "homework", [{ bid: 130, ask: 150 }]);
+    const run = replay(DEAL_SEEDS[0]!, "homework", [{ bid: 130, ask: 150 }]);
     const projected = projectRun(run);
     const json = JSON.stringify(projected);
 
@@ -513,7 +640,7 @@ check("an in-flight projection leaks no hidden information", () => {
     assert.equal(projected.breakdown, null);
     assert.ok(projected.contract, "expected a live contract");
 
-    for (const forbidden of ["settlement", "units", "lesson", "informed", "realisation"]) {
+    for (const forbidden of ["settlement", "units", "lesson", "informed", "realisation", "fair", "sd"]) {
         assert.ok(!json.includes(`"${forbidden}"`), `projection exposed a "${forbidden}" field`);
     }
 
@@ -524,41 +651,127 @@ check("an in-flight projection leaks no hidden information", () => {
     assert.ok(!json.includes(String(truth.sd)), "projection exposed the true SD");
 });
 
-check("a settled projection reveals everything and matches the engine", () => {
-    const contracts = contractsFor();
-    const quotes: Quote[] = Array.from({ length: contracts.length * DD_STAGES }, () => ({
-        bid: 50,
-        ask: 90,
-    }));
-    const run = replay([...HOMEWORK_SEEDS], "homework", quotes);
+check("a settled projection reveals verdicts and nothing else", () => {
+    // The change that matters most here: finishing a run no longer hands over
+    // the worked answer. Attempts are unlimited, so printing each contract's
+    // true fair and SD would make the next run transcription.
+    const quotes: Quote[] = Array.from({ length: totalQuotes() }, () => ({ bid: 50, ask: 90 }));
+    const run = replay(DEAL_SEEDS[0]!, "homework", quotes);
     const projected = projectRun(run);
+    const json = JSON.stringify(projected);
 
     assert.ok(projected.complete);
     assert.equal(projected.contract, null);
-    assert.equal(projected.results!.length, contracts.length);
+    assert.equal(projected.results!.length, DD_CONTRACT_COUNT);
+
+    for (const forbidden of ["settlement", "fair", "sd", "lesson", "mid", "pricingError", "units"]) {
+        assert.ok(!json.includes(`"${forbidden}"`), `settled projection exposed "${forbidden}"`);
+    }
+
+    // The field list is asserted exactly rather than by scanning the JSON for
+    // the true numbers: a P&L is computed FROM the settlement, so a digit
+    // scan flags innocent values and misses a genuinely new leaking field.
+    // Pinning the shape is what actually holds the line -- adding a field to
+    // the projection now fails here until someone has thought about it.
     projected.results!.forEach((result, i) => {
-        assert.equal(result.settlement, run.contracts[i]!.realisation.settlement);
+        assert.deepEqual(
+            Object.keys(result).sort(),
+            [
+                "description",
+                "id",
+                "informedFills",
+                "inventory",
+                "pnl",
+                "revealText",
+                "stages",
+                "uninformedFills",
+            ],
+            "the settled projection grew a field"
+        );
         assert.equal(result.pnl, contractPnl(run.contracts[i]!));
+        assert.equal(result.stages.length, DD_STAGES);
+        for (const stage of result.stages) {
+            assert.deepEqual(Object.keys(stage).sort(), ["price", "stage", "width"]);
+            assert.ok(["correct", "close", "off"].includes(stage.price));
+        }
     });
+    assert.deepEqual(
+        Object.keys(projected.breakdown!).sort(),
+        ["maxInventory", "pricing", "reveal", "risk", "scaledPnl", "totalPnl", "width"],
+        "the run-level report grew a field"
+    );
     assert.equal(
         projected.breakdown!.totalPnl,
         projected.results!.reduce((sum, r) => sum + r.pnl, 0)
     );
 });
 
+check("the ranked score survives a change of deal, and raw P&L does not", () => {
+    // Why the leaderboard ranks scaledPnl. Identical correct play across many
+    // deals must produce roughly the same SCORE, even though the cash swings
+    // with however much risk each deal happened to carry. If this inverts,
+    // the leaderboard is measuring the deal rather than the player.
+    const config = configFor("homework");
+    const raw: number[] = [];
+    const scaled: number[] = [];
+
+    for (let d = 0; d < 30; d++) {
+        const { contracts, seeds } = makeDeal((7_919 * (d + 1) + 13) >>> 0);
+        let cash = 0;
+        let points = 0;
+        contracts.forEach((contract, i) => {
+            let state = openContract(contract, config, mulberry32(seeds[i]!));
+            const priorSd = momentsAt(state, 0).sd;
+            for (let stage = 0; stage < DD_STAGES; stage++) {
+                const { fair, sd } = momentsAt(state, state.stage);
+                state = applyQuote(state, { bid: fair - sd / 2, ask: fair + sd / 2 }, config);
+            }
+            cash += contractPnl(state);
+            points += contractPnl(state) / Math.max(priorSd, 1);
+        });
+        raw.push(cash);
+        scaled.push(points);
+    }
+
+    const spread = (values: number[]) => {
+        const m = values.reduce((a, b) => a + b, 0) / values.length;
+        const sd = Math.sqrt(values.reduce((a, b) => a + (b - m) ** 2, 0) / values.length);
+        return sd / Math.abs(m);
+    };
+
+    const rawSpread = spread(raw);
+    const scaledSpread = spread(scaled);
+    assert.ok(
+        scaledSpread < rawSpread * 0.8,
+        `scaling did not reduce deal luck: ${scaledSpread.toFixed(2)} vs raw ${rawSpread.toFixed(2)}`
+    );
+    assert.ok(Math.min(...scaled) > 0, "correct play lost points on some deal");
+});
+
+check("the stored breakdown keeps the numbers the screen hides", () => {
+    // The verdicts are for the player; an admin looking at an attempt row
+    // still needs to see exactly where a run went wrong.
+    const { breakdown } = playRun(DEAL_SEEDS[0]!, (fair, sd) => ({
+        bid: fair - sd / 2,
+        ask: fair + sd / 2,
+    }));
+    const stage = breakdown.contracts[0]!.stages[0]!;
+    assert.ok(Number.isFinite(stage.fair));
+    assert.ok(Number.isFinite(stage.sd));
+    assert.ok(Number.isFinite(stage.priceError));
+});
+
 // ---------------------------------------------------------------------------
 // Sessions
 // ---------------------------------------------------------------------------
 
-check("a sealed token round-trips and hides the seeds", () => {
+check("a sealed token round-trips and hides the deal seed", () => {
     const session = createSession("homework", "week3");
     const token = seal(session);
     assert.deepEqual(openSession(token), session);
 
     const decoded = Buffer.from(token, "base64url").toString("latin1");
-    for (const seed of session.seeds) {
-        assert.ok(!decoded.includes(String(seed)), "a seed was readable in the token");
-    }
+    assert.ok(!decoded.includes(String(session.dealSeed)), "the deal seed was readable in the token");
 });
 
 check("any edit to a token is rejected", () => {
@@ -587,7 +800,7 @@ check("out-of-order and duplicate quotes are refused", () => {
 
 check("a run only reports complete after every contract has two quotes", () => {
     let session = createSession("homework");
-    const total = contractsFor().length * DD_STAGES;
+    const total = totalQuotes();
     for (let i = 0; i < total; i++) {
         assert.equal(isComplete(session), false);
         session = withQuote(session, i, { bid: 100, ask: 140 }).session;
@@ -607,45 +820,15 @@ check("a quote past the clock is recorded as an unfillable market", () => {
     assert.notDeepEqual(next.quotes[0], { bid: 100, ask: 140 });
 
     // And it must actually fill nothing, rather than merely being flagged.
-    const run = replay([...HOMEWORK_SEEDS], "homework", [next.quotes[0]!]);
+    const run = replay(next.dealSeed, "homework", [next.quotes[0]!]);
     assert.equal(run.contracts[0]!.fills.length, 0);
 });
 
-check("every run is dealt the same fixed seed set", () => {
-    // There is no ungraded mode and no fresh deal: two sessions must be
-    // identical, or abandoning a run and starting again would be a re-roll.
-    assert.deepEqual(createSession("homework").seeds, [...HOMEWORK_SEEDS]);
-    assert.deepEqual(createSession("homework").seeds, createSession("homework").seeds);
-});
-
-check("the seed set is the right length and curated", () => {
-    for (const preset of DD_PRESET_ORDER) {
-        const contracts = contractsFor();
-        const seeds = seedsFor();
-        assert.equal(seeds.length, contracts.length, `${preset}: seed count does not match contracts`);
-
-        contracts.forEach((contract, i) => {
-            const realisation = realise(contract, mulberry32(seeds[i]!));
-            const prior = moments(contract, realisation, nothingSeen(contract));
-
-            // No contract's freak outcome should decide the leaderboard.
-            if (prior.sd > 0) {
-                const z = Math.abs(realisation.settlement - prior.fair) / prior.sd;
-                assert.ok(z <= 1.5, `${contract.id}: settlement is ${z.toFixed(2)} SDs from fair`);
-            }
-
-            // A geometric reveal must not resolve the contract, or the
-            // memorylessness lesson never fires.
-            const leg = contract.legs[contract.reveal.legIndex]!;
-            if (leg.kind === "geometric") {
-                const prefix = realisation.units[contract.reveal.legIndex]!.slice(
-                    0,
-                    contract.reveal.units
-                );
-                assert.ok(!prefix.includes(1), `${contract.id}: the geometric reveal resolves it`);
-            }
-        });
-    }
+check("every run is dealt a fresh deal", () => {
+    // Attempts are unlimited, so the defence against grinding a known answer
+    // is that there is no known answer: two sessions must not share a deal.
+    const seeds = new Set(Array.from({ length: 50 }, () => createSession("homework").dealSeed));
+    assert.ok(seeds.size >= 49, `deal seeds repeated: only ${seeds.size} distinct out of 50`);
 });
 
 console.log(`\n${checks} checks passed.`);

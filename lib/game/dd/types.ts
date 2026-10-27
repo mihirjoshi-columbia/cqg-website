@@ -57,3 +57,13 @@ export interface DdConfig {
 
 export const DD_STAGES = 2;
 export const MIN_WIDTH = 1;
+
+/**
+ * How many recent completed runs the leaderboard averages.
+ *
+ * Lives here rather than in contests.ts because the setup screen quotes it to
+ * the player and contests.ts is server-only. The same five is hard-coded in
+ * the dd_leaderboard SQL (migration 0016); changing one without the other
+ * would show a player a different number from the one that ranks them.
+ */
+export const RANKED_RUNS = 5;

@@ -18,14 +18,14 @@ function hasNotOpened(contest: CqgGameContest): boolean {
 }
 
 /**
- * The graded Week 3 homework run. There is no ungraded mode.
+ * Distribution Desk practice. Unlimited runs, each dealt its own contracts.
  *
  * With no ?contest= the page finds the open one itself, so the link students
  * are given is just /portal/game/dd.
  *
- * The attempt check here only decides what to RENDER. The real gate is in the
- * start route, which re-checks and inserts the attempt row -- a page cannot be
- * trusted to have hidden a button, the same reasoning
+ * The checks here only decide what to RENDER. The real gate is in the start
+ * route, which re-checks the window and inserts the attempt row -- a page
+ * cannot be trusted to have hidden a button, the same reasoning
  * lib/game/require-internal-member.ts gives for route handlers.
  */
 export default async function DistributionDeskPage({
@@ -61,13 +61,13 @@ export default async function DistributionDeskPage({
 
     const best =
         attempts?.bestScore !== null && attempts?.bestScore !== undefined
-            ? ` Your best score so far is ${attempts.bestScore.toFixed(2)}.`
+            ? ` Your best score was ${attempts.bestScore.toFixed(2)}.`
             : "";
 
     const lockedReason = !contest || !attempts
         ? undefined
         : hasClosed(contest)
-          ? `This homework has closed.${best}`
+          ? `This has closed.${best}`
           : hasNotOpened(contest)
             ? `This opens ${new Date(contest.opens_at).toLocaleString()}.`
             : attempts.remaining === 0
@@ -117,7 +117,7 @@ export default async function DistributionDeskPage({
                 <div className="event-card" style={{ maxWidth: 560 }}>
                     <div className="event-card-body">
                         <p className="text-ink-soft text-sm">
-                            No homework has been set up yet.
+                            Nothing has been set up yet.
                         </p>
                     </div>
                 </div>
@@ -127,6 +127,8 @@ export default async function DistributionDeskPage({
                     contestLabel={contest.label}
                     attemptsUsed={attempts?.used ?? 0}
                     attemptsAllowed={attempts?.allowed ?? contest.attempts_allowed}
+                    completed={attempts?.completed ?? 0}
+                    recentAverage={attempts?.recentAverage ?? null}
                     bestScore={attempts?.bestScore ?? null}
                     locked={Boolean(lockedReason)}
                     lockedReason={lockedReason}

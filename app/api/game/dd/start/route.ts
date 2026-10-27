@@ -30,11 +30,12 @@ export async function POST(request: Request) {
         const contest = await loadContest(slug);
         const preset = presetForContest(contest);
 
-        // Spends one attempt now, so abandoning the run cannot be retried.
+        // Recorded now, so an abandoned run leaves a trace even though
+        // attempts are unlimited.
         const attemptId = await openAttempt(contest, gate.profile.id);
 
         const session = createSession(preset, contest.slug, attemptId);
-        const run = replay(session.seeds, preset, []);
+        const run = replay(session.dealSeed, preset, []);
         return NextResponse.json({ run: projectRun(run), token: seal(session) });
     } catch (error) {
         if (error instanceof DdContestError) {

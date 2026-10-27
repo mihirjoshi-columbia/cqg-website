@@ -1,17 +1,14 @@
-import { HOMEWORK_CONTRACTS } from "./library";
-import type { Contract } from "./contracts";
 import type { DdConfig } from "./types";
 
-// There is exactly one mode: the graded homework run.
+// There is exactly one mode.
 //
-// It deliberately has no practice sandbox. The run is the assignment, and the
-// deal is fixed so everyone faces the same seven contracts. A student gets a
-// few attempts and is ranked on the best, but each attempt is spent when it
-// is DEALT, so no one can re-roll until they like the deal. How many attempts
-// is a property of the contest row, not of this preset.
+// What a preset no longer decides is the DEAL. Every run is dealt its own
+// randomly generated set of seven contracts (lib/game/dd/deal.ts), so there is
+// no fixed contract list to select and no curated seed set to carry. A preset
+// is now only the flow model and the clock.
 //
-// A difficulty ladder would make results incomparable, which is the problem
-// lib/game/mtm/presets.ts describes.
+// A difficulty ladder would still make results incomparable, which is the
+// problem lib/game/mtm/presets.ts describes, so there is still only one rung.
 
 export type DdPreset = "homework";
 
@@ -25,8 +22,8 @@ export interface DdPresetInfo {
 
 export const DD_PRESETS: Record<DdPreset, DdPresetInfo> = {
     homework: {
-        label: "Week 3 homework",
-        blurb: "Everyone is dealt the same seven contracts, so the ranking is skill, not luck. Best attempt counts.",
+        label: "Distribution practice",
+        blurb: "Seven contracts, freshly generated every run. Play as many times as you like.",
         config: {
             informedShare: 0.25,
             informedNoise: 0.6,
@@ -40,11 +37,6 @@ export const DD_PRESETS: Record<DdPreset, DdPresetInfo> = {
 
 export function isDdPreset(value: unknown): value is DdPreset {
     return value === "homework";
-}
-
-/** There is one contract set, so this takes no preset. */
-export function contractsFor(): Contract[] {
-    return HOMEWORK_CONTRACTS;
 }
 
 export function configFor(preset: DdPreset): DdConfig {

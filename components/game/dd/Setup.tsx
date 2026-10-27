@@ -1,19 +1,28 @@
 "use client";
 
+import { RANKED_RUNS } from "@/lib/game/dd/types";
+
 export default function Setup({
     onStart,
     busy,
     attemptsUsed,
     attemptsAllowed,
+    completed,
+    recentAverage,
     bestScore,
 }: {
     onStart: () => void;
     busy: boolean;
     attemptsUsed: number;
-    attemptsAllowed: number;
+    /** Null means unlimited, which is the normal case. */
+    attemptsAllowed: number | null;
+    completed: number;
+    recentAverage: number | null;
     bestScore: number | null;
 }) {
-    const left = Math.max(0, attemptsAllowed - attemptsUsed);
+    const unlimited = attemptsAllowed === null;
+    const left = unlimited ? null : Math.max(0, attemptsAllowed - attemptsUsed);
+
     return (
         <div className="mtm-panel">
             <p className="mtm-panel__label">How it works</p>
@@ -37,19 +46,31 @@ export default function Setup({
                 </li>
             </ol>
 
-            <p className="dd-prose dd-prose--warn">
-                This is graded. Everyone is dealt the same seven contracts, you get{" "}
-                <strong>
-                    {attemptsAllowed} attempt{attemptsAllowed === 1 ? "" : "s"}
-                </strong>
-                , and your <strong>best</strong> one counts. An attempt is spent the moment you
-                start it &mdash; walking away or closing the tab does not give you a fresh deal,
-                so finish what you start.
+            <p className="dd-prose dd-prose--note">
+                Seven contracts, and <strong>a different seven every run</strong> &mdash; same
+                distributions, new parameters &mdash; so there is nothing to memorise.{" "}
+                {unlimited ? (
+                    <>
+                        Play as often as you like. The leaderboard ranks the{" "}
+                        <strong>average score of your last {RANKED_RUNS} finished runs</strong>,
+                        so volume does not help and an abandoned run is simply one you did not
+                        finish. A score is your P&amp;L measured against the risk the deal
+                        carried, so a quiet deal and a wild one are worth the same.
+                    </>
+                ) : (
+                    <>
+                        You have {left} of {attemptsAllowed} attempts left, and one is spent the
+                        moment you start it.
+                    </>
+                )}
             </p>
 
             <p className="dd-prose">
-                {left} of {attemptsAllowed} remaining
-                {bestScore !== null && <> &middot; best so far {bestScore.toFixed(2)}</>}
+                {completed} run{completed === 1 ? "" : "s"} finished
+                {recentAverage !== null && (
+                    <> &middot; last {RANKED_RUNS} average score {recentAverage.toFixed(2)}</>
+                )}
+                {bestScore !== null && <> &middot; best {bestScore.toFixed(2)}</>}
             </p>
 
             <button
@@ -58,11 +79,7 @@ export default function Setup({
                 onClick={onStart}
                 disabled={busy}
             >
-                {busy
-                    ? "Dealing…"
-                    : attemptsUsed === 0
-                      ? "Start my first attempt"
-                      : `Start attempt ${attemptsUsed + 1} of ${attemptsAllowed}`}
+                {busy ? "Dealing…" : attemptsUsed === 0 ? "Deal my first run" : "Deal a new run"}
             </button>
         </div>
     );

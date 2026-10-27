@@ -170,7 +170,8 @@ export interface CqgGameContest {
     opens_at: string;
     closes_at: string;
     leaderboard_visible_at: string;
-    attempts_allowed: number;
+    /** Null means unlimited, which is what Distribution Desk uses. See 0016. */
+    attempts_allowed: number | null;
     created_at: string;
 }
 
@@ -194,7 +195,10 @@ export interface DdLeaderboardRow {
     rank: number;
     profile_id: string;
     name: string;
+    /** Mean of this player's last five completed runs. See migration 0016. */
     score: number;
+    /** How many runs that mean is taken over, at most five. */
+    runs: number;
     completed_at: string;
 }
 

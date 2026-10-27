@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { listAttempts, summarise, type AttemptSummary } from "@/lib/game/dd/contests";
+import { RANKED_RUNS } from "@/lib/game/dd/types";
 import type { CqgGameContest, CqgProfile } from "@/lib/supabase/types";
 
 /**
@@ -7,8 +8,9 @@ import type { CqgGameContest, CqgProfile } from "@/lib/supabase/types";
  * GameCard is: the coursework belongs to the selective cohort, so a
  * general-body dashboard shows nothing rather than a locked teaser.
  *
- * Surfaces the live contest when there is one, because that is the thing with
- * a deadline; practice is always available underneath it.
+ * Surfaces the open practice set when there is one. Attempts are unlimited,
+ * so what the card reports is how many runs someone has finished and the
+ * average that ranks them, not a quota.
  */
 export default async function DistributionDeskCard({ profile }: { profile: CqgProfile }) {
     if (profile.tier !== "member" && profile.tier !== "admin") return null;
@@ -31,19 +33,20 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
         attempts = summarise(contest, await listAttempts(contest.id, profile.id));
     }
 
-    // Started counts as used. Runs are stateless by design -- nothing stores
-    // an in-flight run -- so there is no resume, and offering one would be a
-    // lie. The warning before starting says so.
-    const exhausted = attempts ? attempts.remaining === 0 : false;
+    // Only a contest with an explicit attempt cap can run out; the practice
+    // set has none. Runs are stateless by design -- nothing stores an
+    // in-flight run -- so there is still no resume.
+    const exhausted = attempts?.remaining === 0;
 
     return (
         <div className="event-card" style={{ maxWidth: 560 }}>
             <div className="event-card-body">
-                <span className="tag tag-lime w-fit">Internal homework</span>
+                <span className="tag tag-lime w-fit">Internal practice</span>
                 <p className="text-ink-soft text-sm">
                     Price contracts that settle on a binomial, geometric or normal process, then
                     quote a market wide enough for the risk and no wider. Information arrives
-                    halfway through each contract. Graded, best of three attempts.
+                    halfway through each contract. A different set of contracts every run, as
+                    many runs as you like.
                 </p>
 
                 {contest ? (
@@ -54,10 +57,17 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
                             {attempts && (
                                 <>
                                     {" "}
-                                    &middot; {attempts.remaining} of {attempts.allowed} attempts
-                                    left
-                                    {attempts.bestScore !== null && (
-                                        <> &middot; best {attempts.bestScore.toFixed(2)}</>
+                                    &middot; {attempts.completed} run
+                                    {attempts.completed === 1 ? "" : "s"} finished
+                                    {!attempts.unlimited && (
+                                        <> &middot; {attempts.remaining} attempts left</>
+                                    )}
+                                    {attempts.recentAverage !== null && (
+                                        <>
+                                            {" "}
+                                            &middot; last {RANKED_RUNS} average score{" "}
+                                            {attempts.recentAverage.toFixed(2)}
+                                        </>
                                     )}
                                 </>
                             )}
@@ -69,8 +79,8 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
                                     className="btn-cqg btn-lime btn-sm w-fit"
                                 >
                                     {attempts && attempts.used > 0
-                                        ? "Use another attempt"
-                                        : "Start the homework"}
+                                        ? "Play another run"
+                                        : "Start practising"}
                                 </a>
                             )}
                             <a
