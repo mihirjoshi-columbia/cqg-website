@@ -8,7 +8,7 @@
 --
 -- `preset` must name a preset in lib/game/dd/presets.ts. There is exactly one
 -- ('homework'); it no longer carries a contract list, because every run is
--- dealt its own freshly generated seven (lib/game/dd/deal.ts).
+-- dealt its own freshly generated six (lib/game/dd/deal.ts).
 --
 -- attempts_allowed is NULL, meaning unlimited: there are no fixed answers to
 -- grind, so practice is not rationed. The leaderboard ranks the mean of each

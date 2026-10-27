@@ -115,7 +115,7 @@ export function createSession(
     attemptId: string | null = null
 ): DdSession {
     // A fresh deal every time. The contracts themselves are generated from
-    // this seed, so no two runs face the same seven markets and there is
+    // this seed, so no two runs face the same six markets and there is
     // nothing to memorise between attempts.
     const now = Date.now();
     return {

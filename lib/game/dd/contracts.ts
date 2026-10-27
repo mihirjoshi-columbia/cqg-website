@@ -2,8 +2,11 @@
 //
 // A contract settles on a random PROCESS rather than on a sum of dealt cards,
 // which is the whole point of the game: the player cannot price it by
-// arithmetic, only by knowing the mean and variance of a binomial, geometric
-// or normal.
+// arithmetic, only by knowing the mean and variance of a binomial, a
+// geometric or a sum of uniforms.
+//
+// The `normal` leg below is still implemented but is no longer DEALT: see the
+// note at the top of deal.ts, which owns the list of what a run can contain.
 //
 // Every contract is a sum of independent legs, each a primitive process with
 // a multiplier. Settlement is the multiplier-weighted sum of the legs, so

@@ -14,8 +14,8 @@
 //
 // Since the deal became random (lib/game/dd/deal.ts) these checks run over
 // several generated deals rather than over one hand-written contract list.
-// That is the point: a property that holds for seven curated contracts and
-// fails for the eighth generated one would ship as a broken game.
+// That is the point: a property that holds for a few curated contracts and
+// fails for the next generated one would ship as a broken game.
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { mulberry32 } from "../lib/game/prng";
@@ -94,12 +94,13 @@ check("every deal has the full slot set, in the same order", () => {
         assert.equal(deal.seeds.length, DD_CONTRACT_COUNT);
 
         const kinds = deal.contracts.map((c) => c.legs.map((l) => l.kind).join("+"));
+        // The normal slot was removed on purpose; asserting the exact list
+        // means re-adding a distribution has to be a deliberate edit here.
         assert.deepEqual(kinds, [
             "binomial",
             "geometric",
             "uniformSum",
             "binomial",
-            "normal",
             "geometric",
             "binomial+geometric",
         ]);
@@ -108,7 +109,7 @@ check("every deal has the full slot set, in the same order", () => {
 
 check("different deals really are different markets", () => {
     // The whole reason the generator exists. Two runs must not present the
-    // same seven contracts, or a player can memorise the answers.
+    // same six contracts, or a player can memorise the answers.
     const signatures = DEALS.map((deal) => deal.contracts.map((c) => c.description).join("|"));
     assert.equal(new Set(signatures).size, signatures.length, "two deals were identical");
 

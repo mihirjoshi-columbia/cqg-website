@@ -12,11 +12,15 @@ import {
 //
 // This file replaces what used to be a hand-written contract list plus a
 // hand-picked seed set (lib/game/dd/library.ts and seeds.ts, both deleted).
-// Every run now gets its own deal: the same seven SLOTS in the same order --
-// two binomials, two geometrics, a CLT sum, a normal and a composite -- drawn
-// with different parameters each time. The curriculum is fixed, the numbers
-// are not, so a player cannot learn "contract 3 is 30 and 27.4 wide" and must
+// Every run now gets its own deal: the same six SLOTS in the same order --
+// two binomials, two geometrics, a CLT sum and a composite -- drawn with
+// different parameters each time. The curriculum is fixed, the numbers are
+// not, so a player cannot learn "contract 3 is 30 and 27.4 wide" and must
 // actually do the arithmetic.
+//
+// The NORMAL slot was deliberately removed. The leg primitive still exists in
+// contracts.ts and still works; nothing deals it. To bring it back, add
+// "normal" to SLOTS below and restore a drawContract case for it.
 //
 // A whole deal is a deterministic function of ONE integer, the deal seed:
 // parameters, reveal sizes and each contract's realisation seed all come out
@@ -32,7 +36,7 @@ import {
 // test whether a player knows WHICH formula applies, not whether they can
 // take an awkward square root.
 
-export const DD_CONTRACT_COUNT = 7;
+export const DD_CONTRACT_COUNT = 6;
 
 /** A generated deal: the contracts, and the realisation seed for each. */
 export interface Deal {
@@ -105,10 +109,6 @@ const UNIFORM_SUM_POOL: readonly UniformSumSpec[] = [
     { count: 48, lo: 10, hi: 110 },
 ];
 
-const NORMAL_MU: readonly number[] = [120, 150, 200, 250, 300, 350, 400];
-const NORMAL_SIGMA: readonly number[] = [20, 30, 40, 50, 60, 80];
-const NORMAL_PARTS: readonly number[] = [2, 2, 4];
-
 const BINOMIAL_MULTIPLIERS: readonly number[] = [1, 2, 5, 10, 20];
 const GEOMETRIC_MULTIPLIERS: readonly number[] = [1, 2, 5, 10, 20];
 
@@ -147,7 +147,7 @@ function legSd(leg: Leg): number {
     }
 }
 
-type Slot = "binomial" | "geometric" | "uniformSum" | "normal" | "composite";
+type Slot = "binomial" | "geometric" | "uniformSum" | "composite";
 
 /**
  * The slot order. Fixed on purpose: the set has to cover the same ground every
@@ -159,7 +159,6 @@ const SLOTS: readonly Slot[] = [
     "geometric",
     "uniformSum",
     "binomial",
-    "normal",
     "geometric",
     "composite",
 ];
@@ -203,24 +202,6 @@ function drawContract(slot: Slot, rng: () => number, index: number): Contract {
                 ),
                 legs: [{ kind: "uniformSum", count: spec.count, lo: spec.lo, hi: spec.hi, multiplier: 1 }],
                 reveal: { legIndex: 0, units: revealUnits(rng, spec.count) },
-            };
-        }
-        case "normal": {
-            const mu = pick(rng, NORMAL_MU);
-            const sigma = pick(rng, NORMAL_SIGMA);
-            const parts = pick(rng, NORMAL_PARTS);
-            return {
-                id,
-                // The components are stated because the reveal shows a prefix
-                // of them, and because working out what seeing one of four
-                // does to the remaining variance is the exercise.
-                description: multiplierPhrase(
-                    1,
-                    `a single draw from a normal distribution with mean ${mu} and standard deviation ${sigma}, ` +
-                        `built as the sum of ${parts} independent components of equal variance`
-                ),
-                legs: [{ kind: "normal", mu, sigma, parts, multiplier: 1 }],
-                reveal: { legIndex: 0, units: revealUnits(rng, parts) },
             };
         }
         case "composite": {
@@ -324,8 +305,8 @@ const PARAM_ATTEMPT_LIMIT = 40;
 /**
  * Builds one deal from one integer.
  *
- * Deterministic and total: the same seed always yields the same seven
- * contracts and the same seven realisation seeds, which is what the sealed
+ * Deterministic and total: the same seed always yields the same six
+ * contracts and the same six realisation seeds, which is what the sealed
  * token relies on. The retry loops are bounded and throw rather than
  * degrading, because a deal that silently differed between two replays of the
  * same token would corrupt a score instead of failing a request.

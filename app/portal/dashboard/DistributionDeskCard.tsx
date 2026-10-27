@@ -43,7 +43,8 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
             <div className="event-card-body">
                 <span className="tag tag-lime w-fit">Internal practice</span>
                 <p className="text-ink-soft text-sm">
-                    Price contracts that settle on a binomial, geometric or normal process, then
+                    Price contracts that settle on a binomial, a geometric or a sum of many
+                    independent draws, then
                     quote a market wide enough for the risk and no wider. Information arrives
                     halfway through each contract. A different set of contracts every run, as
                     many runs as you like.

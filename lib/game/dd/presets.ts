@@ -3,7 +3,7 @@ import type { DdConfig } from "./types";
 // There is exactly one mode.
 //
 // What a preset no longer decides is the DEAL. Every run is dealt its own
-// randomly generated set of seven contracts (lib/game/dd/deal.ts), so there is
+// randomly generated set of six contracts (lib/game/dd/deal.ts), so there is
 // no fixed contract list to select and no curated seed set to carry. A preset
 // is now only the flow model and the clock.
 //
@@ -23,7 +23,7 @@ export interface DdPresetInfo {
 export const DD_PRESETS: Record<DdPreset, DdPresetInfo> = {
     homework: {
         label: "Distribution practice",
-        blurb: "Seven contracts, freshly generated every run. Play as many times as you like.",
+        blurb: "Six contracts, freshly generated every run. Play as many times as you like.",
         config: {
             informedShare: 0.25,
             informedNoise: 0.6,

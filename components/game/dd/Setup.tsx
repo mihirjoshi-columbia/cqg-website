@@ -28,8 +28,9 @@ export default function Setup({
             <p className="mtm-panel__label">How it works</p>
             <ol className="mtm-rules">
                 <li>
-                    Each contract settles on a random process &mdash; a binomial, a geometric or a
-                    normal. Work out its mean and its standard deviation.
+                    Each contract settles on a random process &mdash; a binomial, a geometric,
+                    or a sum of many independent draws. Work out its mean and its standard
+                    deviation.
                 </li>
                 <li>
                     Quote a two-sided market. Uninformed flow pays you the spread but dries up
@@ -47,7 +48,7 @@ export default function Setup({
             </ol>
 
             <p className="dd-prose dd-prose--note">
-                Seven contracts, and <strong>a different seven every run</strong> &mdash; same
+                Six contracts, and <strong>a different six every run</strong> &mdash; same
                 distributions, new parameters &mdash; so there is nothing to memorise.{" "}
                 {unlimited ? (
                     <>

@@ -232,8 +232,8 @@ export function score(run: RunState): DdBreakdown {
     );
 
     // The verdicts bucket the MEAN error over the run rather than the worst
-    // stage. One fumbled contract out of seven should not read the same as
-    // seven wrong formulas.
+    // stage. One fumbled contract out of six should not read the same as
+    // six wrong formulas.
     const widthErrors = allStages
         .map((s) => s.widthError)
         .filter((v): v is number => v !== null);
