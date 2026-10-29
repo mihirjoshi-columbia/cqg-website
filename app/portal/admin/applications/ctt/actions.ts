@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
 import { updateRow } from "@/lib/supabase/helpers";
+import { offerSpot } from "@/lib/ctt-offers";
 
 export async function decideCttApplicationAction(formData: FormData) {
     const { admin, profile } = await requireAdmin();
@@ -23,6 +24,26 @@ export async function decideCttApplicationAction(formData: FormData) {
         console.error("[admin] ctt application decision failed:", error);
     }
 
+    revalidatePath("/portal/admin/applications/ctt");
+}
+
+// Starts the 24-hour clock and emails the applicant (pending, expired or declined applications).
+export async function offerCttSpotAction(applicationId: string): Promise<{ ok: boolean; error?: string }> {
+    const { admin } = await requireAdmin();
+    const result = await offerSpot(admin, applicationId);
+    revalidatePath("/portal/admin/applications/ctt");
+    return result;
+}
+
+// Admin override for an offer that was answered outside the site (e.g. by email or in person).
+export async function setCttOfferOutcomeAction(applicationId: string, outcome: "accepted" | "declined") {
+    const { admin, profile } = await requireAdmin();
+    const { error } = await updateRow(admin, "ctt_applications", applicationId, {
+        status: outcome,
+        responded_at: new Date().toISOString(),
+        decided_by: profile.id,
+    });
+    if (error) console.error("[admin] ctt offer outcome failed:", error);
     revalidatePath("/portal/admin/applications/ctt");
 }
 

@@ -23,7 +23,11 @@ const COLUMNS = [
     "Needs Lodging?",
     "Resume Link",
     "Status",
+    "Application Complete?",
     "Submitted At",
+    "Offered At",
+    "Offer Expires At",
+    "Responded At",
     "Cycle",
 ] as const;
 
@@ -88,7 +92,11 @@ export async function GET() {
             travelLodgingLabel(app, "lodging_needed"),
             resumeLink,
             app.status,
+            app.details_complete === false ? "No" : "Yes",
             app.submitted_at,
+            app.offered_at ?? "",
+            app.offer_expires_at ?? "",
+            app.responded_at ?? "",
             cycle.label,
         ]);
     }

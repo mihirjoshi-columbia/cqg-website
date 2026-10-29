@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { dispatchDueBlasts } from "@/lib/blasts";
+import { expireOverdueOffers } from "@/lib/ctt-offers";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 
 // Hit on a schedule by an external cron (Vercel Cron via vercel.json in this
 // repo, or any other scheduler pointed at this URL) to process scheduled
@@ -20,5 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await dispatchDueBlasts();
-    return NextResponse.json(result);
+    // Same 5-minute tick: close out CTT offers whose 24 hours are up.
+    const expiredOffers = await expireOverdueOffers(createServiceRoleClient());
+    return NextResponse.json({ ...result, expiredOffers });
 }

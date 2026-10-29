@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { applyForCttAction } from "./actions";
 import CttApplicationForm from "@/components/ctt/CttApplicationForm";
+import CttStatusCard from "@/components/ctt/CttStatusCard";
 import { cqgSchoolToCollegeName } from "@/lib/domains";
 import type { CqgProfile, CttCycle, CttApplication } from "@/lib/supabase/types";
 
@@ -46,7 +47,18 @@ export default async function CttCard({ profile }: { profile: CqgProfile }) {
         .maybeSingle()
         .overrideTypes<CttCycle, { merge: false }>();
 
-    if (!cycle) {
+    // The latest application, whichever cycle: once applications close, the dashboard still has to
+    // show the applicant where they stand (including an offer they need to answer).
+    const { data: latest } = await supabase
+        .from("ctt_applications")
+        .select("*, cycle:ctt_cycles(label)")
+        .eq("cqg_profile_id", profile.id)
+        .order("submitted_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .overrideTypes<CttApplication & { cycle: { label: string } | null }, { merge: false }>();
+
+    if (!cycle && !latest) {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
@@ -59,38 +71,27 @@ export default async function CttCard({ profile }: { profile: CqgProfile }) {
         );
     }
 
-    const { data: application } = await supabase
-        .from("ctt_applications")
-        .select("*")
-        .eq("cqg_profile_id", profile.id)
-        .eq("cycle_id", cycle.id)
-        .maybeSingle()
-        .overrideTypes<CttApplication, { merge: false }>();
+    const application = latest && (!cycle || latest.cycle_id === cycle.id) ? latest : null;
 
     if (application) {
-        const statusCopy: Record<string, { tag: string; label: string; body: string }> = {
-            pending: {
-                tag: "tag-sky",
-                label: "Application pending",
-                body: `Your application to ${cycle.label} is in — we'll email you once it's been reviewed.`,
-            },
-            approved: {
-                tag: "tag-pink",
-                label: "Accepted",
-                body: "Congrats — you're in. We'll follow up with logistics closer to the event.",
-            },
-            rejected: {
-                tag: "tag-outline",
-                label: "Not selected this cycle",
-                body: "You weren't selected this cycle. You're welcome to apply again next time applications open.",
-            },
-        };
-        const copy = statusCopy[application.status];
+        return (
+            <CttStatusCard
+                applicationId={application.id}
+                status={application.status}
+                offerExpiresAt={application.offer_expires_at}
+                cycleLabel={application.cycle?.label ?? cycle?.label ?? "CTT"}
+            />
+        );
+    }
+
+    if (!cycle) {
         return (
             <div className="event-card" style={{ maxWidth: 560 }}>
                 <div className="event-card-body">
-                    <span className={`tag ${copy.tag} w-fit`}>{copy.label}</span>
-                    <p className="text-ink-soft text-sm">{copy.body}</p>
+                    <span className="tag tag-outline w-fit">CTT</span>
+                    <p className="text-ink-soft text-sm">
+                        Applications aren&apos;t open right now — check back when the next CTT cycle opens.
+                    </p>
                 </div>
             </div>
         );

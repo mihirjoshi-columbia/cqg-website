@@ -5,6 +5,9 @@
 export type CqgTier = "general_body" | "member" | "senior_advisor" | "admin";
 export type CqgSchool = "CC" | "SEAS" | "Barnard" | "GS" | "GRAD";
 export type ApplicationStatus = "pending" | "approved" | "rejected";
+// CTT applications also have an offer stage (migration 0014): pending -> offered ->
+// accepted | declined | expired. "approved" is the older, direct-approval status.
+export type CttApplicationStatus = ApplicationStatus | "offered" | "accepted" | "declined" | "expired";
 export type EventApplicationStatus =
     | "pending"
     | "accepted"
@@ -76,7 +79,7 @@ export interface CttCycle {
 export interface CttApplication {
     id: string;
     cycle_id: string;
-    status: ApplicationStatus;
+    status: CttApplicationStatus;
     applicant_type: CttApplicantType;
     cqg_profile_id: string | null;
     ctt_profile_id: string | null;
@@ -95,6 +98,12 @@ export interface CttApplication {
     submitted_at: string;
     decided_at: string | null;
     decided_by: string | null;
+    // Set when an offer is made: the applicant has until offer_expires_at (24 hours) to answer.
+    offered_at: string | null;
+    offer_expires_at: string | null;
+    responded_at: string | null;
+    // false for applications made on someone's behalf (migration 0015): they finish the questions from their dashboard.
+    details_complete: boolean;
 }
 
 export interface CqgEvent {
@@ -193,8 +202,17 @@ export interface Database {
                 Row: CttApplication;
                 Insert: Omit<
                     CttApplication,
-                    "id" | "status" | "submitted_at" | "decided_at" | "decided_by" | "travel_housing_needed"
-                > & { travel_housing_needed?: boolean | null };
+                    | "id"
+                    | "status"
+                    | "submitted_at"
+                    | "decided_at"
+                    | "decided_by"
+                    | "travel_housing_needed"
+                    | "offered_at"
+                    | "offer_expires_at"
+                    | "responded_at"
+                    | "details_complete"
+                > & { travel_housing_needed?: boolean | null; details_complete?: boolean };
                 Update: Partial<CttApplication>;
                 Relationships: [];
             };
@@ -247,6 +265,27 @@ export interface Database {
             cqg_event_set_attendance: {
                 Args: { p_application_id: string; p_attended: boolean };
                 Returns: undefined;
+            };
+            complete_ctt_application: {
+                Args: {
+                    p_application_id: string;
+                    p_college: string;
+                    p_major: string;
+                    p_grad_year: string;
+                    p_country: string;
+                    p_gender: string;
+                    p_prior_internship: boolean;
+                    p_internship_lined_up: boolean;
+                    p_internship_location: string | null;
+                    p_travel_needed: boolean | null;
+                    p_lodging_needed: boolean | null;
+                    p_attestation: boolean;
+                };
+                Returns: undefined;
+            };
+            respond_ctt_offer: {
+                Args: { p_application_id: string; p_accept: boolean };
+                Returns: string;
             };
         };
     };

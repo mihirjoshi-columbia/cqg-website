@@ -8,7 +8,11 @@ export const metadata = { title: "CTT Applications — CQG Admin" };
 
 const STATUS_TAG: Record<string, string> = {
     pending: "tag-sky",
+    offered: "tag-lime",
+    accepted: "tag-pink",
     approved: "tag-pink",
+    declined: "tag-outline",
+    expired: "tag-outline",
     rejected: "tag-outline",
 };
 
@@ -29,7 +33,15 @@ export default async function CttApplicationsPage() {
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
-                <p className="text-ink-faint text-sm">{apps.length} applications</p>
+                <p className="text-ink-faint text-sm">
+                    {apps.length} applications
+                    {" · "}
+                    {["pending", "offered", "accepted", "declined", "expired", "rejected", "approved"]
+                        .map((st) => [st, apps.filter((a) => a.status === st).length] as const)
+                        .filter(([, n]) => n > 0)
+                        .map(([st, n]) => `${n} ${st}`)
+                        .join(" · ")}
+                </p>
                 <a href="/api/admin/ctt-applications/export" className="btn-cqg btn-outline-navy btn-sm">
                     Export CSV
                 </a>
@@ -87,13 +99,14 @@ export default async function CttApplicationsPage() {
                                             <span className="text-ink-faint text-xs">None</span>
                                         )}
                                     </td>
-                                    <td><span className={`tag ${STATUS_TAG[app.status]}`}>{app.status}</span></td>
                                     <td>
-                                        {app.status === "pending" ? (
-                                            <DecisionButtons applicationId={app.id} />
-                                        ) : (
-                                            <span className="text-ink-faint text-xs">—</span>
+                                        <span className={`tag ${STATUS_TAG[app.status]}`}>{app.status}</span>
+                                        {app.details_complete === false && (
+                                            <span className="text-ink-faint text-xs block mt-1">Application incomplete</span>
                                         )}
+                                    </td>
+                                    <td>
+                                        <DecisionButtons applicationId={app.id} status={app.status} offerExpiresAt={app.offer_expires_at} />
                                     </td>
                                 </tr>
                             );

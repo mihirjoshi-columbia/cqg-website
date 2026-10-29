@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
-import { insertRow, updateRow } from "@/lib/supabase/helpers";
+import { callRpc, insertRow, updateRow } from "@/lib/supabase/helpers";
 import { parseCttApplicationExtras, parseTravelLodgingAnswers } from "@/lib/ctt-application";
 import { RESUME_MAX_BYTES, RESUME_MAX_LABEL, looksLikePdf } from "@/lib/resume-file";
 import type { CttCycle, CttApplication } from "@/lib/supabase/types";
@@ -245,6 +245,50 @@ export async function updateTravelLodgingAction(formData: FormData) {
     if (error) {
         console.error("[ctt dashboard] travel/lodging update failed:", error);
     }
+
+    revalidatePath("/ctt/apply/dashboard");
+}
+
+// Finishes an application that was made for the applicant (details_complete = false). Same answers as
+// the normal form; the database function checks it's their own incomplete application and records the
+// undergrad attestation.
+export async function finishCttApplicationAction(formData: FormData) {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect("/ctt/apply/login");
+
+    const applicationId = String(formData.get("application_id") || "");
+    const college = String(formData.get("college") || "").trim();
+    const major = String(formData.get("major") || "").trim();
+    const gradYear = String(formData.get("grad_year") || "").trim();
+    const country = String(formData.get("country") || "").trim();
+    const gender = String(formData.get("gender") || "").trim();
+    const priorInternship = formData.get("prior_internship");
+    const internshipLinedUp = formData.get("internship_lined_up");
+    const attestation = formData.get("attestation") === "on";
+    const extras = parseCttApplicationExtras(formData, true);
+
+    if (!applicationId || !college || !major || !gradYear || !country || !gender || !priorInternship || !internshipLinedUp || !attestation || !extras) {
+        return; // required fields enforced client-side too; bail quietly if bypassed
+    }
+
+    const { error } = await callRpc(supabase, "complete_ctt_application", {
+        p_application_id: applicationId,
+        p_college: college,
+        p_major: major,
+        p_grad_year: gradYear,
+        p_country: country,
+        p_gender: gender,
+        p_prior_internship: priorInternship === "yes",
+        p_internship_lined_up: internshipLinedUp === "yes",
+        p_internship_location: extras.internshipLocation,
+        p_travel_needed: extras.travelNeeded,
+        p_lodging_needed: extras.lodgingNeeded,
+        p_attestation: attestation,
+    });
+    if (error) console.error("[ctt dashboard] finishing application failed:", error);
 
     revalidatePath("/ctt/apply/dashboard");
 }

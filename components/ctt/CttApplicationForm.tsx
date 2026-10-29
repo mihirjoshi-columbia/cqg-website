@@ -10,13 +10,22 @@ import { GRAD_YEARS } from "@/lib/data/grad-years";
 
 const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
-function SubmitButton() {
+function SubmitButton({ label }: { label: string }) {
     const { pending } = useFormStatus();
     return (
         <button type="submit" className="btn-cqg btn-pink btn-sm w-fit" disabled={pending}>
-            {pending ? "Submitting…" : "Submit application"}
+            {pending ? "Submitting…" : label}
         </button>
     );
+}
+
+// Used when an application was made for the applicant and they finish it: some answers are
+// pre-filled from it, and the form carries the application id and the undergrad attestation.
+export interface FinishDefaults {
+    applicationId: string;
+    college: string;
+    major: string;
+    gradYear: string;
 }
 
 export default function CttApplicationForm({
@@ -25,23 +34,38 @@ export default function CttApplicationForm({
     lockedGender,
     cycleLabel,
     askTravelLodging = true,
+    finish,
 }: {
     action: (formData: FormData) => void | Promise<void>;
     lockedCollege?: string;
     lockedGender?: string;
     cycleLabel: string;
     askTravelLodging?: boolean;
+    finish?: FinishDefaults;
 }) {
-    const [major, setMajor] = useState("");
+    const [major, setMajor] = useState(finish?.major ?? "");
     const [linedUp, setLinedUp] = useState("");
 
     return (
         <div className="event-card" style={{ maxWidth: 560 }}>
             <div className="event-card-body">
-                <span className="tag tag-pink w-fit">Applications open</span>
-                <p className="text-ink-soft text-sm">{cycleLabel} is open now. Fill out the application below.</p>
+                {finish ? (
+                    <>
+                        <span className="tag tag-sky w-fit">Finish your application</span>
+                        <p className="text-ink-soft text-sm">
+                            We started your {cycleLabel} application with what we had. Check the details below and answer the
+                            rest.
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <span className="tag tag-pink w-fit">Applications open</span>
+                        <p className="text-ink-soft text-sm">{cycleLabel} is open now. Fill out the application below.</p>
+                    </>
+                )}
 
                 <form action={action} className="flex flex-col gap-4">
+                    {finish && <input type="hidden" name="application_id" value={finish.applicationId} />}
                     <div className="field">
                         <label className="field-label" htmlFor="college">College / University</label>
                         {lockedCollege ? (
@@ -55,6 +79,7 @@ export default function CttApplicationForm({
                                 name="college"
                                 options={US_COLLEGES}
                                 placeholder="Start typing your school…"
+                                defaultValue={finish?.college}
                                 required
                             />
                         )}
@@ -88,7 +113,7 @@ export default function CttApplicationForm({
 
                     <div className="field">
                         <label className="field-label" htmlFor="grad_year">Expected graduation year</label>
-                        <select className="field-select" id="grad_year" name="grad_year" defaultValue="" required>
+                        <select className="field-select" id="grad_year" name="grad_year" defaultValue={finish?.gradYear ?? ""} required>
                             <option value="" disabled>Select a year</option>
                             {GRAD_YEARS.map((y) => (
                                 <option key={y} value={y}>{y}</option>
@@ -177,7 +202,14 @@ export default function CttApplicationForm({
 
                     {askTravelLodging && <TravelLodgingFields />}
 
-                    <SubmitButton />
+                    {finish && (
+                        <label className="flex items-start gap-2 text-sm text-ink-soft">
+                            <input type="checkbox" name="attestation" required className="mt-1" />
+                            <span>I confirm I&apos;m a current undergraduate at an accredited institution.</span>
+                        </label>
+                    )}
+
+                    <SubmitButton label={finish ? "Save my application" : "Submit application"} />
                 </form>
             </div>
         </div>

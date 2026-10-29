@@ -184,6 +184,38 @@ export async function sendBlastEmail(to: string, subject: string, bodyHtml: stri
     });
 }
 
+// Offer email for an accepted CTT applicant: they have until `deadline` (24 hours after the
+// offer) to accept from their dashboard. Transactional, so no List-Unsubscribe header.
+export async function sendCttOfferEmail(
+    to: string,
+    name: string,
+    deadline: string,
+    dashboardUrl: string,
+    opts: { newAccount?: boolean } = {}
+) {
+    const heading = "You're accepted!";
+    let bodyHtml =
+        `Hi ${name}, congratulations — you've been accepted to the Columbia Trading Tournament (CTT), December 5–6, 2026 in Low Library.<br><br>` +
+        `To hold your spot, please accept within 24 hours — by <strong>${deadline}</strong>. If we don't hear from you by then, your spot will be offered to someone else.`;
+    let ctaLabel = "Accept my spot";
+    let ctaHref = dashboardUrl;
+    if (opts.newAccount) {
+        // Their account was created for them, so they have no password yet and an application to finish.
+        bodyHtml +=
+            `<br><br>We've created a CTT account for you with this email address. To log in, go to the login page, click "Forgot password?", ` +
+            `and use the link we email you to set a password. You'll then upload your resume and finish your application from your dashboard — ` +
+            `it's just a few quick questions.`;
+        ctaLabel = "Go to login";
+        ctaHref = dashboardUrl.replace(/\/dashboard$/, "/login");
+    }
+    await send({
+        to,
+        subject: "CTT Application Update",
+        html: brandedEmailHtml({ heading, bodyHtml, ctaLabel, ctaHref }),
+        text: brandedEmailText({ heading, bodyText: stripHtml(bodyHtml), ctaLabel, ctaHref }),
+    });
+}
+
 // The sweep in lib/resume-reminders.ts only marks an account as reminded once
 // this resolves, so a failed send is retried on the next run.
 export async function sendResumeReminderEmail(to: string, name: string, uploadUrl: string) {
