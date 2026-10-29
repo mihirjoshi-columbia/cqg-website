@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin";
 import { fetchAllPages } from "@/lib/supabase/helpers";
 import { MEMBERSHIP_APPLICATION_SELECT, type MembershipApplicationRow } from "@/lib/supabase/rows";
+import ApplicationFilters from "@/components/admin/ApplicationFilters";
 import DecisionButtons from "./DecisionButtons";
 
 export const metadata = { title: "Membership Applications — CQG Admin" };
@@ -11,7 +12,12 @@ const STATUS_TAG: Record<string, string> = {
     rejected: "tag-outline",
 };
 
-export default async function MembershipApplicationsPage() {
+export default async function MembershipApplicationsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ status?: string; q?: string }>;
+}) {
+    const { status = "", q = "" } = await searchParams;
     const { supabase } = await requireAdmin();
 
     // The API returns at most 1,000 rows per request, so read it in pages.
@@ -25,10 +31,24 @@ export default async function MembershipApplicationsPage() {
             .overrideTypes<MembershipApplicationRow[], { merge: false }>()
     );
 
+    const needle = q.trim().toLowerCase();
+    const shown = apps.filter(
+        (app) =>
+            (!status || app.status === status) &&
+            (!needle || `${app.profile?.name ?? ""} ${app.profile?.email ?? ""}`.toLowerCase().includes(needle))
+    );
+
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
-                <p className="text-ink-faint text-sm">{apps.length} applications</p>
+            <ApplicationFilters
+                statuses={["pending", "approved", "rejected"]
+                    .map((value) => ({ value, count: apps.filter((a) => a.status === value).length }))
+                    .filter((s) => s.count > 0)}
+                current={{ status, q, extra: "" }}
+                showing={shown.length}
+                total={apps.length}
+            />
+            <div className="flex justify-end mb-4">
                 <a href="/api/admin/membership-applications/export" className="btn-cqg btn-outline-navy btn-sm">
                     Export CSV
                 </a>
@@ -47,7 +67,7 @@ export default async function MembershipApplicationsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {apps.map((app) => {
+                        {shown.map((app) => {
                             const p = app.profile;
                             const c = app.cycle;
                             return (

@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin";
 import { CTT_APPLICATION_SELECT, travelLodgingLabel, type CttApplicationRow } from "@/lib/ctt-application";
 import { fetchAllPages } from "@/lib/supabase/helpers";
+import ApplicationFilters from "@/components/admin/ApplicationFilters";
 import DecisionButtons from "./DecisionButtons";
 import ViewResumeButton from "./ViewResumeButton";
 
@@ -16,7 +17,14 @@ const STATUS_TAG: Record<string, string> = {
     rejected: "tag-outline",
 };
 
-export default async function CttApplicationsPage() {
+const STATUS_ORDER = ["pending", "offered", "accepted", "declined", "expired", "rejected", "approved"];
+
+export default async function CttApplicationsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ status?: string; type?: string; q?: string }>;
+}) {
+    const { status = "", type = "", q = "" } = await searchParams;
     const { supabase } = await requireAdmin();
 
     // The API returns at most 1,000 rows per request, so read it in pages.
@@ -30,18 +38,33 @@ export default async function CttApplicationsPage() {
             .overrideTypes<CttApplicationRow[], { merge: false }>()
     );
 
+    const needle = q.trim().toLowerCase();
+    const shown = apps.filter((app) => {
+        const applicant = app.cqg ?? app.ctt;
+        return (
+            (!status || app.status === status) &&
+            (!type || app.applicant_type === type) &&
+            (!needle || `${applicant?.name ?? ""} ${applicant?.email ?? ""}`.toLowerCase().includes(needle))
+        );
+    });
+
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
-                <p className="text-ink-faint text-sm">
-                    {apps.length} applications
-                    {" · "}
-                    {["pending", "offered", "accepted", "declined", "expired", "rejected", "approved"]
-                        .map((st) => [st, apps.filter((a) => a.status === st).length] as const)
-                        .filter(([, n]) => n > 0)
-                        .map(([st, n]) => `${n} ${st}`)
-                        .join(" · ")}
-                </p>
+            <ApplicationFilters
+                statuses={STATUS_ORDER.map((value) => ({ value, count: apps.filter((a) => a.status === value).length })).filter((s) => s.count > 0)}
+                extra={{
+                    name: "type",
+                    label: "Applicant",
+                    options: [
+                        { value: "cqg_member", label: "CQG member (Columbia/Barnard)" },
+                        { value: "external", label: "External" },
+                    ],
+                }}
+                current={{ status, q, extra: type }}
+                showing={shown.length}
+                total={apps.length}
+            />
+            <div className="flex justify-end mb-4">
                 <a href="/api/admin/ctt-applications/export" className="btn-cqg btn-outline-navy btn-sm">
                     Export CSV
                 </a>
@@ -68,7 +91,7 @@ export default async function CttApplicationsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {apps.map((app) => {
+                        {shown.map((app) => {
                             const applicant = app.cqg ?? app.ctt;
                             return (
                                 <tr key={app.id}>
