@@ -637,6 +637,8 @@ h1, h2, h3, h4 {
   font-weight: 600;
   padding: 0.35rem 0.75rem;
   border-radius: 2px;
+  /* A tag that wraps leaves its border broken across two lines (e.g. "CQG member" in the admin tables). */
+  white-space: nowrap;
 }
 .tag-lime { background: var(--lime-gradient); color: var(--navy); }
 .tag-sky { background: var(--sky-gradient); color: var(--navy); }
