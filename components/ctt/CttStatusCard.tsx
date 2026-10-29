@@ -26,6 +26,9 @@ function formatDeadline(iso: string): string {
     );
 }
 
+// CTT is December 5-6, the same day as the Putnam exam.
+const PUTNAM_NOTE = "Please note: the Putnam exam is on December 5th, so if you're taking the exam, you unfortunately can't attend our competition.";
+
 const COPY: Record<string, { tag: string; label: string; body: (cycle: string) => string }> = {
     pending: {
         tag: "tag-sky",
@@ -35,7 +38,7 @@ const COPY: Record<string, { tag: string; label: string; body: (cycle: string) =
     accepted: {
         tag: "tag-pink",
         label: "Accepted",
-        body: () => "You're in! We'll follow up with logistics closer to the event.",
+        body: () => `You're in! We'll follow up with logistics closer to the event. ${PUTNAM_NOTE}`,
     },
     approved: {
         tag: "tag-pink",
@@ -106,6 +109,7 @@ export default function CttStatusCard({ applicationId, status, offerExpiresAt, c
                         by <strong>{offerExpiresAt ? formatDeadline(offerExpiresAt) : "the deadline"}</strong>, or it will be offered to
                         someone else.
                     </p>
+                    <p className="text-ink-soft text-sm">{PUTNAM_NOTE}</p>
                     <p className="text-sm font-semibold text-navy tabular-nums" suppressHydrationWarning>
                         Time left: {formatRemaining(expiresMs - now)}
                     </p>

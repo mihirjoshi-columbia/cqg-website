@@ -71,19 +71,24 @@ function formatDeadline(iso) {
     return `${day} at ${time} ET`;
 }
 
-function buildContent(name, deadline, ctaHref, newAccount) {
+function buildContent(name, deadline, ctaHref, incomplete) {
     const heading = "You're accepted!";
     let bodyHtml =
         `Hi ${name}, congratulations — you've been accepted to the Columbia Trading Tournament (CTT), December 5–6, 2026 in Low Library.<br><br>` +
-        `To hold your spot, please accept within 24 hours — by <strong>${deadline}</strong>. If we don't hear from you by then, your spot will be offered to someone else.`;
+        `To hold your spot, please accept within 24 hours — by <strong>${deadline}</strong>. If we don't hear from you by then, your spot will be offered to someone else.` +
+        `<br><br>Please note: the Putnam exam is on December 5th, so if you're taking the exam, you unfortunately can't attend our competition.`;
     let ctaLabel = "Accept my spot";
-    if (newAccount) {
+    if (incomplete === "created") {
         bodyHtml +=
             `<br><br>We've created a CTT account for you with this email address. To log in, go to the login page, click "Forgot password?", ` +
             `and use the link we email you to set a password. You'll then upload your resume and finish your application from your dashboard — ` +
             `it's just a few quick questions.`;
         ctaLabel = "Go to login";
         ctaHref = ctaHref.replace(/\/dashboard$/, "/login");
+    } else if (incomplete === "unfinished") {
+        bodyHtml +=
+            `<br><br>You already have a CTT account, but your application isn't finished. Log in and complete it from your dashboard — ` +
+            `it's just a few quick questions.`;
     }
     return {
         subject: "CTT Application Update",
@@ -108,7 +113,7 @@ async function main() {
     // application rows for the cycle, with the applicant attached
     const apps = await fetchAllPages((from, to) =>
         sb.from("ctt_applications")
-            .select("id,status,applicant_type,details_complete,cqg:cqg_profiles!cqg_profile_id(name,email), ctt:ctt_profiles(name,email)")
+            .select("id,status,applicant_type,details_complete,ctt_profile_id,cqg:cqg_profiles!cqg_profile_id(name,email), ctt:ctt_profiles(name,email)")
             .eq("cycle_id", cycle.id).order("id").range(from, to)
     );
     const byEmail = new Map();
@@ -125,15 +130,23 @@ async function main() {
             else targets.push({ ...a, kind });
         }
     }
+    // Applications made for people: never logged in = we created their account; logged in = their own account, never submitted.
+    for (const t of targets) {
+        t.incomplete = undefined;
+        if (!t.details_complete && t.ctt_profile_id) {
+            const { data: u } = await sb.auth.admin.getUserById(t.ctt_profile_id);
+            t.incomplete = u?.user?.last_sign_in_at ? "unfinished" : "created";
+        }
+    }
     const dupes = targets.filter((t, i) => targets.findIndex((u) => u.id === t.id) !== i);
-    console.log(`\n${targets.length} to offer (${targets.filter((t) => !t.details_complete).length} with a new account)\n${targets.length} total (${targets.filter((t) => t.kind === "external").length} external, ${targets.filter((t) => t.kind === "columbia").length} Columbia/Barnard)`);
+    console.log(`\n${targets.length} to offer (${targets.filter((t) => t.incomplete === "created").length} with an account we created, ${targets.filter((t) => t.incomplete === "unfinished").length} with their own account and no application)\n${targets.length} total (${targets.filter((t) => t.kind === "external").length} external, ${targets.filter((t) => t.kind === "columbia").length} Columbia/Barnard)`);
     if (dupes.length) console.log(`WARNING: ${dupes.length} appear on both lists`);
     if (problems.length) console.log(`\n${problems.length} skipped:\n  ${problems.join("\n  ")}`);
 
     if (MODE === "preview") {
-        for (const ex of [targets.find((t) => t.details_complete), targets.find((t) => !t.details_complete)].filter(Boolean)) {
-            const c = buildContent(ex.name, formatDeadline(new Date(Date.now() + OFFER_HOURS * 36e5).toISOString()), `${SITE_URL}/ctt/apply/dashboard`, !ex.details_complete);
-            console.log(`\n=== EXAMPLE: ${ex.details_complete ? "existing account" : "account created for them"} (${ex.name}) ===\nSubject: ${c.subject}\n--- text/plain ---\n${c.text}`);
+        for (const ex of [targets.find((t) => !t.incomplete), targets.find((t) => t.incomplete === "created"), targets.find((t) => t.incomplete === "unfinished")].filter(Boolean)) {
+            const c = buildContent(ex.name, formatDeadline(new Date(Date.now() + OFFER_HOURS * 36e5).toISOString()), `${SITE_URL}/ctt/apply/dashboard`, ex.incomplete);
+            console.log(`\n=== EXAMPLE: ${ex.incomplete === "created" ? "account created for them" : ex.incomplete === "unfinished" ? "own account, application never submitted" : "complete application"} (${ex.name}) ===\nSubject: ${c.subject}\n--- text/plain ---\n${c.text}`);
         }
         return;
     }
@@ -146,7 +159,7 @@ async function main() {
         const { error: upErr } = await sb.from("ctt_applications").update({ status: "offered", offered_at: offeredAt.toISOString(), offer_expires_at: expiresAt.toISOString(), responded_at: null }).eq("id", t.id).eq("status", "pending");
         if (upErr) { console.error(`FAILED to save offer for ${t.email}:`, upErr.message); failed++; continue; }
         const href = `${SITE_URL}${t.applicant_type === "cqg_member" ? "/portal/dashboard" : "/ctt/apply/dashboard"}`;
-        const c = buildContent(t.name, formatDeadline(expiresAt.toISOString()), href, !t.details_complete);
+        const c = buildContent(t.name, formatDeadline(expiresAt.toISOString()), href, t.incomplete);
         const { error } = await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL, to: t.email, subject: c.subject, html: c.html, text: c.text,
             ...(process.env.RESEND_REPLY_TO ? { replyTo: process.env.RESEND_REPLY_TO } : {}),

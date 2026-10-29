@@ -53,7 +53,21 @@ async function main() {
 
     for (const p of people) {
         const { data: existing } = await sb.from("ctt_profiles").select("id").eq("email", p.email).maybeSingle();
-        if (existing) { console.log(`SKIP ${p.name} <${p.email}>: already has a CTT account`); continue; }
+        if (existing) {
+            // They made their own account but never submitted an application: give them the pre-filled, incomplete one.
+            const { data: app } = await sb.from("ctt_applications").select("id").eq("ctt_profile_id", existing.id).eq("cycle_id", cycle.id).maybeSingle();
+            if (app) { console.log(`SKIP ${p.name} <${p.email}>: already has a CTT account and an application`); continue; }
+            console.log(`${MODE === "create" ? "ADD APPLICATION for" : "would add an application for"} ${p.name} <${p.email}> (account already exists) | ${p.college} | ${p.major} | ${p.gradYear}`);
+            if (MODE === "create") {
+                const { error } = await sb.from("ctt_applications").insert({
+                    cycle_id: cycle.id, applicant_type: "external", cqg_profile_id: null, ctt_profile_id: existing.id,
+                    college: p.college, major: p.major, grad_year: p.gradYear, country: "United States", gender: "",
+                    prior_internship: false, internship_lined_up: false, details_complete: false,
+                });
+                if (error) console.error(`  FAILED application: ${error.message}`);
+            }
+            continue;
+        }
         const { data: cqg } = await sb.from("cqg_profiles").select("id").eq("email", p.email).maybeSingle();
         if (cqg) { console.log(`SKIP ${p.name} <${p.email}>: that address is a Columbia/Barnard CQG account`); continue; }
         console.log(`${MODE === "create" ? "CREATE" : "would create"} ${p.name} <${p.email}> | ${p.college} | ${p.major} | ${p.gradYear}`);

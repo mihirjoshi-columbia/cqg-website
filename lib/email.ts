@@ -191,15 +191,17 @@ export async function sendCttOfferEmail(
     name: string,
     deadline: string,
     dashboardUrl: string,
-    opts: { newAccount?: boolean } = {}
+    // "created": we made their account (they have never logged in); "unfinished": they have an account but never submitted an application.
+    opts: { incomplete?: "created" | "unfinished" } = {}
 ) {
     const heading = "You're accepted!";
     let bodyHtml =
         `Hi ${name}, congratulations — you've been accepted to the Columbia Trading Tournament (CTT), December 5–6, 2026 in Low Library.<br><br>` +
-        `To hold your spot, please accept within 24 hours — by <strong>${deadline}</strong>. If we don't hear from you by then, your spot will be offered to someone else.`;
+        `To hold your spot, please accept within 24 hours — by <strong>${deadline}</strong>. If we don't hear from you by then, your spot will be offered to someone else.` +
+        `<br><br>Please note: the Putnam exam is on December 5th, so if you're taking the exam, you unfortunately can't attend our competition.`;
     let ctaLabel = "Accept my spot";
     let ctaHref = dashboardUrl;
-    if (opts.newAccount) {
+    if (opts.incomplete === "created") {
         // Their account was created for them, so they have no password yet and an application to finish.
         bodyHtml +=
             `<br><br>We've created a CTT account for you with this email address. To log in, go to the login page, click "Forgot password?", ` +
@@ -207,6 +209,10 @@ export async function sendCttOfferEmail(
             `it's just a few quick questions.`;
         ctaLabel = "Go to login";
         ctaHref = dashboardUrl.replace(/\/dashboard$/, "/login");
+    } else if (opts.incomplete === "unfinished") {
+        bodyHtml +=
+            `<br><br>You already have a CTT account, but your application isn't finished. Log in and complete it from your dashboard — ` +
+            `it's just a few quick questions.`;
     }
     await send({
         to,

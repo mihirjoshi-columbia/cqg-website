@@ -45,6 +45,14 @@ export async function offerSpot(admin: AdminClient, applicationId: string): Prom
     const applicant = app.cqg ?? app.ctt;
     if (!applicant) return { ok: false, error: "Applicant has no profile." };
 
+    // An application we made for them: tell apart someone whose account we created (never logged in)
+    // from someone who made their own account but never submitted.
+    let incomplete: "created" | "unfinished" | undefined;
+    if (!app.details_complete && app.ctt_profile_id) {
+        const { data: user } = await admin.auth.admin.getUserById(app.ctt_profile_id);
+        incomplete = user?.user?.last_sign_in_at ? "unfinished" : "created";
+    }
+
     const offeredAt = new Date();
     const expiresAt = new Date(offeredAt.getTime() + OFFER_HOURS * 3_600_000);
 
@@ -63,7 +71,7 @@ export async function offerSpot(admin: AdminClient, applicationId: string): Prom
             applicant.name,
             formatOfferDeadline(expiresAt.toISOString()),
             dashboardUrlFor(app.applicant_type),
-            { newAccount: !app.details_complete }
+            { incomplete }
         );
     } catch (err) {
         console.error(`[ctt-offers] offer email failed for ${applicant.email}:`, err);
