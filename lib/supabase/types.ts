@@ -168,7 +168,8 @@ export interface CqgGameContest {
     preset: string;
     label: string;
     opens_at: string;
-    closes_at: string;
+    /** Null means it never closes, which is what Distribution Desk uses. See 0019. */
+    closes_at: string | null;
     leaderboard_visible_at: string;
     /** Null means unlimited, which is what Distribution Desk uses. See 0016. */
     attempts_allowed: number | null;

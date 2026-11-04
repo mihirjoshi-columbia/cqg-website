@@ -10,6 +10,7 @@ export const metadata = { title: "Distribution Desk — CQG Portal" };
 // Clock reads live in helpers rather than the component body, matching
 // app/portal/admin/cycles/page.tsx.
 function hasClosed(contest: CqgGameContest): boolean {
+    if (contest.closes_at === null) return false;
     return Date.now() > new Date(contest.closes_at).getTime();
 }
 

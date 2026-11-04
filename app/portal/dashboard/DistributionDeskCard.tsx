@@ -21,8 +21,9 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
         .from("cqg_game_contests")
         .select("*")
         .lte("opens_at", nowIso)
-        .gte("closes_at", nowIso)
-        .order("closes_at", { ascending: true })
+        // A null closes_at never closes.
+        .or(`closes_at.is.null,closes_at.gte.${nowIso}`)
+        .order("closes_at", { ascending: true, nullsFirst: false })
         .limit(1)
         .overrideTypes<CqgGameContest[], { merge: false }>();
 
@@ -53,8 +54,7 @@ export default async function DistributionDeskCard({ profile }: { profile: CqgPr
                 {contest ? (
                     <>
                         <p className="text-ink-faint text-xs">
-                            {contest.label} &middot; closes{" "}
-                            {new Date(contest.closes_at).toLocaleString()}
+                            {contest.label}
                             {attempts && (
                                 <>
                                     {" "}

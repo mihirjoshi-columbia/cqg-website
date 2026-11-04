@@ -1,5 +1,5 @@
 -- Creates the Distribution Desk practice set. Run in the Supabase SQL editor
--- after migration 0016.
+-- after migration 0019.
 --
 -- Safe to re-run: the insert upserts on the slug, so editing a date here and
 -- running it again updates the live homework. The row keeps its id, so
@@ -14,6 +14,8 @@
 -- grind, so practice is not rationed. The leaderboard ranks the mean of each
 -- player's last five COMPLETED runs, so nobody climbs it by volume.
 --
+-- closes_at is NULL, meaning it never closes (migration 0019).
+--
 -- Standings are live from the start. Deals differ per run, so there is
 -- nothing a classmate can tell you that helps.
 insert into cqg_game_contests
@@ -25,7 +27,7 @@ values
     'homework',
     'Distribution Desk — practice',
     '2026-10-26 00:00:00-04',
-    '2027-06-30 23:59:00-04',
+    null,
     '2026-10-26 00:00:00-04',
     null
   )

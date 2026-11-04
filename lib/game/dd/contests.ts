@@ -125,7 +125,7 @@ export async function openAttempt(
     if (now < Date.parse(contest.opens_at)) {
         throw new DdContestError("This has not opened yet.", 403);
     }
-    if (now > Date.parse(contest.closes_at)) {
+    if (contest.closes_at !== null && now > Date.parse(contest.closes_at)) {
         throw new DdContestError("This has closed.", 403);
     }
 
