@@ -1,7 +1,7 @@
 -- Distribution Desk becomes unlimited practice, and the ranking changes with
 -- it.
 --
--- 0015 allowed a few attempts ranked on the best. Two things made that the
+-- 0017 allowed a few attempts ranked on the best. Two things made that the
 -- wrong shape. First, every run was dealt the IDENTICAL seven contracts, so a
 -- capped set of attempts was the only thing stopping a player from grinding
 -- the same known answers; now the contracts themselves are generated per run

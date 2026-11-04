@@ -1,6 +1,6 @@
 -- Distribution Desk moves from one attempt to several, ranked on the best.
 --
--- 0014 allowed exactly one attempt per person per contest, enforced by a
+-- 0016 allowed exactly one attempt per person per contest, enforced by a
 -- unique (contest_id, profile_id) index. That made a misclick or a closed tab
 -- cost the whole assignment, which punishes the interface rather than the
 -- maths. Several attempts ranked on the best keeps the thing that matters --
