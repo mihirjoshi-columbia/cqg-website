@@ -1,14 +1,7 @@
-const sponsors = [
-  { key: "jane-street-h-white", name: "Jane Street" },
-  { key: "walleye-white", name: "Walleye" },
-  { key: "five-rings-full-white", name: "Five Rings" },
-  { key: "hrt-h-white", name: "HRT" },
-  { key: "drw-white", name: "DRW" },
-  { key: "sig-h-white", name: "SIG" },
-  { key: "citadel-securities-h-white", name: "Citadel Securities" },
-  { key: "all-options-white", name: "All Options" },
-  { key: "old-mission-capital-white", name: "Old Mission Capital" },
-];
+import { sponsorTiers } from "@/lib/data/sponsors";
+
+// The marquee shows every sponsor from the sponsors page, gold first, so the two never drift apart.
+const sponsors = sponsorTiers.flatMap((t) => t.sponsors);
 
 export default function Sponsors() {
   const track = [...sponsors, ...sponsors];
@@ -32,11 +25,11 @@ export default function Sponsors() {
       </section>
 
       <section className="bg-navy-deep overflow-hidden py-6 pb-10">
-        <div className="marquee-track" style={{ animationDuration: "16s" }}>
+        <div className="marquee-track" style={{ animationDuration: `${Math.round(sponsors.length * 1.8)}s` }}>
           {track.map((s, i) => (
-            <div key={`${s.key}-${i}`} className="firm-chip">
+            <div key={`${s.name}-${i}`} className="firm-chip">
               {/* eslint-disable-next-line @next/next/no-img-element -- varying aspect ratios, CSS-driven sizing in a marquee */}
-              <img src={`/logos/${s.key}.png`} alt={s.name} className="max-h-[85%] w-auto max-w-[190px] object-contain" />
+              <img src={s.logo} alt={s.name} className="max-h-[85%] w-auto max-w-[190px] object-contain" />
             </div>
           ))}
         </div>

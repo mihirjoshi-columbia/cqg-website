@@ -33,7 +33,7 @@ export const sponsorTiers: { tier: SponsorTier; label: string; sponsors: Sponsor
         tier: "silver",
         label: "Silver",
         sponsors: [
-            { name: "Hudson River Trading", logo: "/logos/hrt-h-white.png", url: "https://www.hudsonrivertrading.com" },
+            { name: "Hudson River Trading", logo: "/logos/hrt-h-white.png?v=2", url: "https://www.hudsonrivertrading.com" },
             { name: "Five Rings", logo: "/logos/five-rings-full-white.png", url: "https://fiverings.com" },
             { name: "DRW", logo: "/logos/drw-white.png", url: "https://drw.com" },
             { name: "Citadel Securities", logo: "/logos/citadel-securities-h-white.png", url: "https://www.citadelsecurities.com" },
