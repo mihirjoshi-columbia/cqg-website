@@ -38,7 +38,6 @@ export const sponsorTiers: { tier: SponsorTier; label: string; sponsors: Sponsor
             { name: "DRW", logo: "/logos/drw-white.png", url: "https://drw.com" },
             { name: "Citadel Securities", logo: "/logos/citadel-securities-h-white.png", url: "https://www.citadelsecurities.com" },
             { name: "Old Mission Capital", logo: "/logos/old-mission-capital-white.png", url: "https://www.oldmissioncapital.com" },
-            { name: "Walleye Capital", logo: "/logos/walleye-white.png", url: "https://www.walleyecapital.com" },
             { name: "Wintermute", logo: "/logos/wintermute-white.svg", url: "https://www.wintermute.com" },
         ],
     },
@@ -48,6 +47,7 @@ export const sponsorTiers: { tier: SponsorTier; label: string; sponsors: Sponsor
         sponsors: [
             { name: "Jane Street", logo: "/logos/jane-street-h-white.png", url: "https://www.janestreet.com" },
             { name: "All Options USA", logo: "/logos/all-options-white.png", url: "https://www.alloptions.nl" },
+            { name: "Walleye Capital", logo: "/logos/walleye-white.png", url: "https://www.walleyecapital.com" },
         ],
     },
 ];
