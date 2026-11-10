@@ -20,6 +20,14 @@ export default function Sponsors() {
           <div className="eyebrow eyebrow-plain justify-center text-[#7488A8]">
             2026&ndash;2027 Academic Year Sponsors
           </div>
+          <div className="mt-3">
+            <a
+              href="/sponsors"
+              className="font-mono text-[0.72rem] tracking-[0.1em] uppercase text-sky hover:text-white transition-colors"
+            >
+              All sponsors &rarr;
+            </a>
+          </div>
         </div>
       </section>
 

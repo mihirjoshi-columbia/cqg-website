@@ -602,6 +602,22 @@ h1, h2, h3, h4 {
 /* Tiles with their own background color (set inline) brighten on hover instead. */
 .firm-tile[style]:hover { filter: brightness(1.15); }
 
+/* ============ Sponsors page ============ */
+/* Notched tiles on navy-deep, matching the site's angled-card language. Logos are white-on-transparent
+   and sized per tier by utility classes on the <img> (see app/sponsors/page.tsx). */
+.sponsor-tile {
+  --tile-cut: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--navy-mid);
+  clip-path: polygon(0 0, calc(100% - var(--tile-cut)) 0, 100% var(--tile-cut), 100% 100%, var(--tile-cut) 100%, 0 calc(100% - var(--tile-cut)));
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.sponsor-tile:hover { filter: brightness(1.18); transform: translateY(-2px); }
+.sponsor-tier-rule { flex: 1; height: 1px; background: var(--navy-line); }
+
 /* ============ Events ============ */
 .event-card {
   --card-border: var(--line);

@@ -22,6 +22,7 @@ const navLinks: { name: string; href: string; children?: { name: string; href: s
   },
   { name: "Events", href: "/events" },
   { name: "Competition", href: "/competition" },
+  { name: "Sponsors", href: "/sponsors" },
   { name: "Contact", href: "/contact" },
 ];
 
