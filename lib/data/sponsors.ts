@@ -65,6 +65,6 @@ export const partners: Partner[] = [
         role: "In-kind sponsor · Meals",
         blurb: "Columbia Engineering's Department of Industrial Engineering and Operations Research provides meals for CQG events.",
         url: "https://ieor.columbia.edu",
-        logo: "/logos/columbia-ieor.png",
+        logo: "/logos/columbia-ieor.svg",
     },
 ];
