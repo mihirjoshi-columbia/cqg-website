@@ -26,7 +26,7 @@ export const sponsorTiers: { tier: SponsorTier; label: string; sponsors: Sponsor
         sponsors: [
             { name: "SIG / Susquehanna", logo: "/logos/sig-h-white.png", url: "https://sig.com" },
             { name: "Seven Research", logo: "/logos/seven-research-white.svg", url: "https://sevenresearch.com" },
-            { name: "Goldman Sachs", logo: "/logos/goldman-sachs.svg", url: "https://www.goldmansachs.com" },
+            { name: "Goldman Sachs", logo: "/logos/goldman-sachs-white.png", url: "https://www.goldmansachs.com" },
         ],
     },
     {
