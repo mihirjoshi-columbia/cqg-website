@@ -819,6 +819,29 @@ h1, h2, h3, h4 {
 .form-banner-error { background: rgba(194, 59, 74, 0.08); border-color: #C23B4A; color: #A32E3E; }
 .form-banner-success { background: rgba(232, 250, 10, 0.14); border-color: var(--lime-deep); color: var(--navy); }
 
+/* ============ Competitive programming (portal/cp) ============ */
+.cp-editor {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  min-height: 22rem;
+  tab-size: 4;
+  white-space: pre;
+  overflow-x: auto;
+}
+.cp-pre {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.8rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 0.6rem 0.75rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--ink);
+}
+.cp-pre-error { background: rgba(194, 59, 74, 0.06); border-color: #C23B4A; color: #A32E3E; }
+
 /* ============ Portal dashboard/admin shell ============ */
 .portal-shell {
   max-width: 1100px;

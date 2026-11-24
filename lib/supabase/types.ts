@@ -192,6 +192,18 @@ export interface CqgGameAttempt {
     quotes: Json | null;
 }
 
+/** One competitive programming event. Verdicts are browser-reported; see 0020. */
+export interface CqgCpActivity {
+    id: string;
+    profile_id: string;
+    kind: "started" | "accepted" | "wrong" | "runtime" | "timeout" | "compile";
+    /** Null only for "started". */
+    problem_id: string | null;
+    language: "python" | "cpp" | null;
+    failed_test: number | null;
+    created_at: string;
+}
+
 export interface DdLeaderboardRow {
     rank: number;
     profile_id: string;
@@ -307,6 +319,13 @@ export interface Database {
                     quotes?: Json | null;
                 };
                 Update: Partial<CqgGameAttempt>;
+                Relationships: [];
+            };
+            cqg_cp_activity: {
+                Row: CqgCpActivity;
+                Insert: Omit<CqgCpActivity, "id" | "created_at" | "problem_id" | "language" | "failed_test"> &
+                    Partial<Pick<CqgCpActivity, "problem_id" | "language" | "failed_test">>;
+                Update: Partial<CqgCpActivity>;
                 Relationships: [];
             };
             email_blast_recipients: {

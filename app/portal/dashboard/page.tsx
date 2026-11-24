@@ -8,6 +8,7 @@ import CttCard from "./CttCard";
 import DangerZone from "./DangerZone";
 import GameCard from "./GameCard";
 import DistributionDeskCard from "./DistributionDeskCard";
+import CpCard from "./CpCard";
 import type { CqgProfile } from "@/lib/supabase/types";
 
 export const metadata = { title: "Dashboard — CQG Portal" };
@@ -111,6 +112,13 @@ export default async function DashboardPage() {
                         <h2 className="eyebrow mb-3 block">Make the Market</h2>
                         <GameCard profile={profile} />
                         <DistributionDeskCard profile={profile} />
+                    </section>
+                )}
+
+                {(profile.tier === "member" || profile.tier === "admin") && (
+                    <section>
+                        <h2 className="eyebrow mb-3 block">Competitive Programming</h2>
+                        <CpCard profile={profile} />
                     </section>
                 )}
 

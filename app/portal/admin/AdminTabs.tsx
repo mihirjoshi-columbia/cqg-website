@@ -10,6 +10,7 @@ const TABS = [
     { href: "/portal/admin/events", label: "Events" },
     { href: "/portal/admin/blasts", label: "Email Blasts" },
     { href: "/portal/admin/cycles", label: "Cycles" },
+    { href: "/portal/admin/cp", label: "Competitive Programming" },
 ];
 
 export default function AdminTabs() {
