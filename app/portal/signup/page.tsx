@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SignupForm from "./SignupForm";
 import { QUANT_FAIR_LOCATION, QUANT_FAIR_RSVP_PARAM, QUANT_FAIR_WHEN, quantFairOver } from "@/lib/quant-fair";
 
@@ -24,6 +25,13 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
                                 <li>Upload your resume.</li>
                                 <li>RSVP from your portal dashboard.</li>
                             </ol>
+                            <p className="mt-3 border-t border-navy/20 pt-2">
+                                <strong>Already have a CQG account?</strong> Skip these steps:{" "}
+                                <Link href="/portal/login" className="font-bold underline underline-offset-2">
+                                    log in
+                                </Link>{" "}
+                                and RSVP from your portal dashboard.
+                            </p>
                         </div>
                     )}
                     <div>

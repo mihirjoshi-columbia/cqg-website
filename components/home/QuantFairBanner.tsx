@@ -9,7 +9,7 @@ export default function QuantFairBanner() {
   return (
     <Link
       href={QUANT_FAIR_RSVP_HREF}
-      className="sticky top-16 z-40 block bg-pink text-navy px-4 py-2.5 text-center hover:brightness-95 transition lg:flex lg:h-10 lg:items-center lg:justify-center lg:gap-1.5 lg:py-0"
+      className="fair-banner sticky top-16 z-40 block bg-pink text-navy px-4 py-2.5 text-center hover:brightness-95 transition lg:flex lg:h-10 lg:items-center lg:justify-center lg:gap-1.5 lg:py-0"
     >
       <span className="text-sm font-bold">RSVP: the inaugural Columbia Quant Fair</span>{" "}
       <span className="block sm:inline text-xs sm:text-sm font-semibold">
