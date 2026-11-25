@@ -60,7 +60,7 @@ export default function BlastForm({ events }: { events: CqgEvent[] }) {
                     <select className="field-select" name="ctt_status" defaultValue="all">
                         <option value="all">All CTT accounts</option>
                         <option value="pending">Pending applicants</option>
-                        <option value="approved">Accepted applicants</option>
+                        <option value="accepted">Accepted competitors</option>
                         <option value="rejected">Rejected applicants</option>
                     </select>
                 </div>
