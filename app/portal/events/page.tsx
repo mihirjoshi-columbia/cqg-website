@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ApplyButton, WithdrawButton } from "./EventActions";
-import { isQuantFairEvent } from "@/lib/quant-fair";
-import type { CqgEvent, CqgEventApplication } from "@/lib/supabase/types";
+import { COLOR_STYLES, eligibilityProblem, formatEventTime } from "@/lib/events";
+import type { CqgEvent, CqgEventApplication, CqgSchool, CqgTier } from "@/lib/supabase/types";
 
 export const metadata = { title: "Events — CQG Portal" };
 
@@ -22,10 +22,6 @@ const STATUS_LABEL: Record<string, string> = {
     withdrawn: "Withdrawn",
 };
 
-// The server renders in UTC, so format in Eastern time explicitly (otherwise 2:30 PM ET shows as 7:30 PM).
-const formatEventTime = (iso: string) =>
-    new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" }) + " ET";
-
 export default async function PortalEventsPage() {
     const supabase = await createClient();
     const {
@@ -35,10 +31,10 @@ export default async function PortalEventsPage() {
 
     const { data: profile } = await supabase
         .from("cqg_profiles")
-        .select("resume_path")
+        .select("resume_path,school,tier")
         .eq("id", user.id)
         .maybeSingle()
-        .overrideTypes<{ resume_path: string | null }, { merge: false }>();
+        .overrideTypes<{ resume_path: string | null; school: CqgSchool | null; tier: CqgTier }, { merge: false }>();
     if (!profile?.resume_path) redirect("/portal/complete-profile");
 
     const { data: events } = await supabase
@@ -68,6 +64,8 @@ export default async function PortalEventsPage() {
                     <div className="flex flex-col gap-4">
                         {(events ?? []).map((event) => {
                             const app = appMap.get(event.id);
+                            const color = event.promote_on_home ? COLOR_STYLES[event.promo_color] : null;
+                            const blocked = eligibilityProblem(event.eligibility, profile.school, profile.tier === "admin");
                             const canWithdraw =
                                 app &&
                                 !event.applications_locked &&
@@ -84,12 +82,13 @@ export default async function PortalEventsPage() {
                                                 </p>
                                             </div>
                                             {app ? (
-                                                <span className={`tag ${isQuantFairEvent(event.title) && app.status === "accepted" ? "tag-pink" : STATUS_TAG[app.status]}`}>{STATUS_LABEL[app.status]}</span>
-                                            ) : (
-                                                <ApplyButton eventId={event.id} label={event.instant_rsvp ? "RSVP" : "Apply"} tone={isQuantFairEvent(event.title) ? "pink" : "lime"} />
+                                                <span className={`tag ${color && app.status === "accepted" ? color.tag : STATUS_TAG[app.status]}`}>{STATUS_LABEL[app.status]}</span>
+                                            ) : blocked ? null : (
+                                                <ApplyButton eventId={event.id} label={event.instant_rsvp ? "RSVP" : "Apply"} tone={event.promote_on_home ? event.promo_color : "lime"} />
                                             )}
                                         </div>
                                         {event.description && <p className="text-ink-soft text-sm">{event.description}</p>}
+                                        {!app && blocked && <p className="text-ink-faint text-xs">{blocked}</p>}
                                         {canWithdraw && <WithdrawButton applicationId={app!.id} />}
                                     </div>
                                 </div>

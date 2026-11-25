@@ -1,4 +1,9 @@
 import Link from "next/link";
+import { getPromotedEvents } from "@/lib/promo-events";
+import { COLOR_STYLES, ELIGIBILITY_LABEL } from "@/lib/events";
+
+// Events promoted from the admin portal show up here (and drop off when they end).
+export const revalidate = 300;
 
 const cohostedEvents = [
     {
@@ -19,7 +24,9 @@ const cohostedEvents = [
     },
 ];
 
-export default function EventsPage() {
+export default async function EventsPage() {
+    const promoted = await getPromotedEvents();
+
     return (
         <div className="min-h-screen bg-white">
             <section className="bg-navy relative overflow-hidden py-14 sm:py-16">
@@ -38,7 +45,29 @@ export default function EventsPage() {
             <section className="py-16 sm:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="eyebrow text-navy mb-4">Upcoming</div>
-                    <div className="event-card max-w-[640px]" style={{ "--card-border": "var(--sky)" } as React.CSSProperties}>
+                    <div className="flex flex-col gap-6 max-w-[640px]">
+                    {promoted.map((event) => {
+                        const color = COLOR_STYLES[event.color];
+                        return (
+                            <div key={event.id} className="event-card" style={{ "--card-border": color.border } as React.CSSProperties}>
+                                <div className="event-card-body">
+                                    <div className="flex items-start justify-between flex-wrap gap-3">
+                                        <h3 className="font-display font-bold text-[1.35rem] text-navy">{event.title}</h3>
+                                        <span className={`tag ${color.tag}`}>{event.audience ?? ELIGIBILITY_LABEL[event.eligibility]}</span>
+                                    </div>
+                                    <p className="text-navy font-semibold text-sm">
+                                        {event.when}
+                                        {event.location ? ` \u00b7 ${event.location}` : ""}
+                                    </p>
+                                    {event.description && <p className="text-ink-soft">{event.description}</p>}
+                                    <a href={event.href} className={`btn-cqg ${color.btn} self-start`}>
+                                        {event.instantRsvp ? "RSVP" : "Apply"} &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    <div className="event-card" style={{ "--card-border": "var(--sky)" } as React.CSSProperties}>
                         <div className="event-card-body">
                             <div className="event-icon" style={{ background: "var(--sky-gradient)", color: "var(--navy)" }}>
                                 📬
@@ -55,6 +84,7 @@ export default function EventsPage() {
                                 Sign Up &rarr;
                             </a>
                         </div>
+                    </div>
                     </div>
                 </div>
             </section>

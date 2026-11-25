@@ -110,6 +110,10 @@ export interface CttApplication {
     details_complete: boolean;
 }
 
+type PromoKeys = "promote_on_home" | "promo_banner_text" | "promo_button_label" | "promo_color" | "promo_audience" | "eligibility";
+export type PromoColor = "pink" | "lime" | "sky";
+export type EventEligibility = "all" | "undergraduate" | "graduate";
+
 export interface CqgEvent {
     id: string;
     title: string;
@@ -121,6 +125,13 @@ export interface CqgEvent {
     applications_locked: boolean;
     // true: anyone with a CQG account is confirmed on RSVP instead of waiting for review (migration 0022).
     instant_rsvp: boolean;
+    // Homepage promotion + who may RSVP (migration 0023).
+    promote_on_home: boolean;
+    promo_banner_text: string | null;
+    promo_button_label: string | null;
+    promo_color: PromoColor;
+    promo_audience: string | null;
+    eligibility: EventEligibility;
     created_by: string | null;
     created_at: string;
 }
@@ -279,8 +290,8 @@ export interface Database {
             };
             cqg_events: {
                 Row: CqgEvent;
-                Insert: Omit<CqgEvent, "id" | "created_at" | "applications_locked" | "instant_rsvp"> &
-                    Partial<Pick<CqgEvent, "applications_locked" | "instant_rsvp">>;
+                Insert: Omit<CqgEvent, "id" | "created_at" | "applications_locked" | "instant_rsvp" | PromoKeys> &
+                    Partial<Pick<CqgEvent, "applications_locked" | "instant_rsvp" | PromoKeys>>;
                 Update: Partial<CqgEvent>;
                 Relationships: [];
             };

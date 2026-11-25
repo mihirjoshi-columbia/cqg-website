@@ -1,23 +1,31 @@
 import Link from "next/link";
 import SignupForm from "./SignupForm";
-import { QUANT_FAIR_LOCATION, QUANT_FAIR_RSVP_PARAM, QUANT_FAIR_WHEN, quantFairOver } from "@/lib/quant-fair";
+import { getPromotedEvents } from "@/lib/promo-events";
+import { COLOR_STYLES } from "@/lib/events";
 
 export const metadata = { title: "Sign Up — CQG Portal" };
 
 export default async function SignupPage({ searchParams }: { searchParams: Promise<{ rsvp?: string }> }) {
     const { rsvp } = await searchParams;
-    // Visitors from the Quant Fair banner or hero button get a step-by-step guide.
-    const fromQuantFair = rsvp === QUANT_FAIR_RSVP_PARAM && !quantFairOver();
+    // Visitors from an event banner, hero button or Events page get a step-by-step guide,
+    // as long as that event is still being promoted.
+    const event = rsvp ? (await getPromotedEvents()).find((e) => e.id === rsvp) : undefined;
 
     return (
         <div className="auth-shell">
             <div className="auth-card">
                 <div className="auth-card-body">
-                    {fromQuantFair && (
-                        <div className="text-navy text-sm" style={{ background: "var(--pink-gradient)", padding: "14px 16px" }}>
+                    {event && (
+                        <div className="text-navy text-sm" style={{ background: COLOR_STYLES[event.color].gradient, padding: "14px 16px" }}>
                             <p className="font-bold">
-                                RSVP for the Columbia Quant Fair ({QUANT_FAIR_WHEN}, {QUANT_FAIR_LOCATION})
+                                RSVP for {event.title} ({event.when}
+                                {event.location ? `, ${event.location}` : ""})
                             </p>
+                            {event.eligibility !== "all" && (
+                                <p className="mt-1">
+                                    Open to {event.eligibility === "undergraduate" ? "undergraduate" : "graduate"} students only.
+                                </p>
+                            )}
                             <p className="mt-1">First create a CQG account, then RSVP through your portal:</p>
                             <ol className="list-decimal pl-5 mt-2 flex flex-col gap-1">
                                 <li>Create a CQG account below with your columbia.edu or barnard.edu email.</li>
@@ -41,7 +49,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
                             General Body is open to all Columbia and Barnard students — undergrad and grad.
                         </p>
                     </div>
-                    <SignupForm rsvp={fromQuantFair ? QUANT_FAIR_RSVP_PARAM : undefined} />
+                    <SignupForm rsvp={event?.id} />
                 </div>
             </div>
         </div>

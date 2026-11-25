@@ -1,7 +1,8 @@
 import CrownGame from "./CrownGame";
-import { QUANT_FAIR_RSVP_HREF, quantFairOver } from "@/lib/quant-fair";
+import { COLOR_STYLES } from "@/lib/events";
+import type { PromoEvent } from "@/lib/promo-events";
 
-export default function Hero() {
+export default function Hero({ promoted }: { promoted: PromoEvent[] }) {
   return (
     <section
       className="home-hero relative overflow-hidden bg-navy py-14 sm:py-20 lg:py-[clamp(1rem,4svh,3rem)]"
@@ -27,10 +28,17 @@ export default function Hero() {
             trading competition we exclusively host for undergraduates nationwide.
           </p>
           <div className="flex flex-col gap-3.5 mt-9 lg:mt-[clamp(1rem,3.4svh,2.25rem)]">
-            {!quantFairOver() && (
+            {promoted.length === 1 && (
               <div className="flex flex-wrap gap-3.5">
-                <a href={QUANT_FAIR_RSVP_HREF} className="btn-cqg btn-pink">
-                  RSVP to the Columbia Quant Fair &middot; Dec 5
+                <a href={promoted[0].href} className={`btn-cqg ${COLOR_STYLES[promoted[0].color].btn}`}>
+                  {promoted[0].buttonLabel}
+                </a>
+              </div>
+            )}
+            {promoted.length > 1 && (
+              <div className="flex flex-wrap gap-3.5">
+                <a href="/events" className="btn-cqg btn-pink">
+                  See upcoming events ({promoted.length})
                 </a>
               </div>
             )}

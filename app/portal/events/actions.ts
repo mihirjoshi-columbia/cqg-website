@@ -4,10 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { callRpc } from "@/lib/supabase/helpers";
-import { sendQuantFairRsvpEmail } from "@/lib/email";
-import { isQuantFairEvent } from "@/lib/quant-fair";
+import { sendEventRsvpEmail } from "@/lib/email";
 
-export async function applyToEventAction(eventId: string) {
+export interface ApplyResult {
+    error?: string;
+}
+
+export async function applyToEventAction(eventId: string): Promise<ApplyResult> {
     const supabase = await createClient();
     const {
         data: { user },
@@ -17,18 +20,24 @@ export async function applyToEventAction(eventId: string) {
     const { error } = await callRpc(supabase, "cqg_event_apply", { p_event_id: eventId });
     if (error) {
         console.error("[events] apply failed:", error);
-    } else {
-        await sendQuantFairConfirmation(supabase, eventId, user.id);
+        // Only the eligibility messages written in the database function are shown as-is.
+        const message = typeof error.message === "string" ? error.message : "";
+        return {
+            error: message.startsWith("eligibility:")
+                ? message.slice("eligibility:".length).trim()
+                : "Something went wrong saving your RSVP. Please try again.",
+        };
     }
+
+    await sendRsvpConfirmation(supabase, eventId, user.id);
     revalidatePath("/portal/events");
     revalidatePath("/portal/dashboard");
+    return {};
 }
 
-// Quant Fair RSVPs get a confirmation email. A failed email never undoes the RSVP.
-async function sendQuantFairConfirmation(supabase: Awaited<ReturnType<typeof createClient>>, eventId: string, userId: string) {
+// Every confirmed RSVP gets a confirmation email. A failed email never undoes the RSVP.
+async function sendRsvpConfirmation(supabase: Awaited<ReturnType<typeof createClient>>, eventId: string, userId: string) {
     try {
-        const { data: event } = await supabase.from("cqg_events").select("title").eq("id", eventId).maybeSingle().overrideTypes<{ title: string }, { merge: false }>();
-        if (!event || !isQuantFairEvent(event.title)) return;
         const { data: application } = await supabase
             .from("cqg_event_applications")
             .select("status")
@@ -37,15 +46,29 @@ async function sendQuantFairConfirmation(supabase: Awaited<ReturnType<typeof cre
             .maybeSingle()
             .overrideTypes<{ status: string }, { merge: false }>();
         if (application?.status !== "accepted") return;
+        const { data: event } = await supabase
+            .from("cqg_events")
+            .select("title,starts_at,ends_at,location")
+            .eq("id", eventId)
+            .maybeSingle()
+            .overrideTypes<{ title: string; starts_at: string; ends_at: string | null; location: string }, { merge: false }>();
+        if (!event) return;
         const { data: profile } = await supabase
             .from("cqg_profiles")
             .select("name,email")
             .eq("id", userId)
             .maybeSingle()
             .overrideTypes<{ name: string; email: string }, { merge: false }>();
-        if (profile?.email) await sendQuantFairRsvpEmail(profile.email, profile.name);
+        if (profile?.email) {
+            await sendEventRsvpEmail(profile.email, profile.name, {
+                title: event.title,
+                startsAt: event.starts_at,
+                endsAt: event.ends_at,
+                location: event.location,
+            });
+        }
     } catch (err) {
-        console.error("[events] quant fair confirmation email failed:", err);
+        console.error("[events] RSVP confirmation email failed:", err);
     }
 }
 

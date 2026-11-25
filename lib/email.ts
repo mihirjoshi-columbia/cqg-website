@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { formatEventWhen } from "@/lib/events";
 
 function client() {
     return new Resend(process.env.RESEND_API_KEY);
@@ -222,21 +223,27 @@ export async function sendCttOfferEmail(
     });
 }
 
-// RSVP confirmation for the Columbia Quant Fair. Transactional, so no List-Unsubscribe header.
-export async function sendQuantFairRsvpEmail(to: string, name: string) {
+// RSVP confirmation, sent for every confirmed event RSVP. Transactional, so no List-Unsubscribe header.
+// Event fields are typed by admins, so they are escaped before going into the HTML.
+export async function sendEventRsvpEmail(
+    to: string,
+    name: string,
+    event: { title: string; startsAt: string; endsAt: string | null; location: string },
+) {
     const site = process.env.NEXT_PUBLIC_SITE_URL || "https://www.columbiaquantgroup.com";
-    const heading = "You're in for the Columbia Quant Fair!";
+    const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const heading = `You're in: ${event.title}`;
     const bodyHtml =
-        `Hi ${name.trim().split(/\s+/)[0] || "there"}, your RSVP is confirmed for the inaugural Columbia Quant Fair.<br><br>` +
-        `<strong>When:</strong> Saturday, December 5, 2:30\u20134:00 PM ET<br>` +
-        `<strong>Where:</strong> Low Library<br><br>` +
-        `Join us for sponsor networking and exclusive merch. You can see your RSVP any time in the CQG portal, and withdraw there if your plans change.`;
+        `Hi ${esc(name.trim().split(/\s+/)[0] || "there")}, your RSVP is confirmed for ${esc(event.title)}.<br><br>` +
+        `<strong>When:</strong> ${esc(formatEventWhen(event.startsAt, event.endsAt))}<br>` +
+        (event.location ? `<strong>Where:</strong> ${esc(event.location)}<br>` : "") +
+        `<br>You can see your RSVP any time in the CQG portal, and withdraw there if your plans change.`;
     const ctaLabel = "View my RSVP";
     const ctaHref = `${site}/portal/events`;
     await send({
         to,
-        subject: "You're confirmed: Columbia Quant Fair, Dec 5",
-        html: brandedEmailHtml({ heading, bodyHtml, ctaLabel, ctaHref }),
+        subject: `You're confirmed: ${event.title}`,
+        html: brandedEmailHtml({ heading: esc(heading), bodyHtml, ctaLabel, ctaHref }),
         text: brandedEmailText({ heading, bodyText: stripHtml(bodyHtml), ctaLabel, ctaHref }),
     });
 }

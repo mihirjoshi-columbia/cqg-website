@@ -115,7 +115,8 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     }
 
 
-    // Keep the Quant Fair guide going on the log-in page (only the exact value is honoured).
-    const fromQuantFair = String(formData.get("rsvp") || "") === "quant-fair";
-    redirect(`/portal/login?justSignedUp=1${fromQuantFair ? "&rsvp=quant-fair" : ""}`);
+    // Keep the event RSVP reminder going on the log-in page (only a real event id is honoured).
+    const rsvp = String(formData.get("rsvp") || "");
+    const fromEvent = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rsvp);
+    redirect(`/portal/login?justSignedUp=1${fromEvent ? `&rsvp=${rsvp}` : ""}`);
 }

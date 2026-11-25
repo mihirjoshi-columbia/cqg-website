@@ -334,12 +334,12 @@ h1, h2, h3, h4 {
     display: flex;
     align-items: center;
   }
-  /* Each banner above the hero (CTT applications, Quant Fair RSVP) is 2.5rem tall. */
+  /* Each banner above the hero (CTT applications, promoted event RSVPs) is 2.5rem tall. */
   body:has(.ctt-banner) .home-hero,
-  body:has(.fair-banner) .home-hero { --hero-avail: calc(100svh - 6.5rem); }
-  body:has(.ctt-banner):has(.fair-banner) .home-hero { --hero-avail: calc(100svh - 9rem); }
-  /* With both showing, the Quant Fair banner sticks just under the CTT one. */
-  .ctt-banner ~ .fair-banner { top: 6.5rem; }
+  body:has(.promo-banner) .home-hero { --hero-avail: calc(100svh - 6.5rem); }
+  body:has(.ctt-banner):has(.promo-banner) .home-hero { --hero-avail: calc(100svh - 9rem); }
+  /* With both showing, the event banner sticks just under the CTT one. */
+  .ctt-banner ~ .promo-banner { top: 6.5rem; }
   .crown-board {
     --board-h: clamp(240px, calc(var(--hero-avail) - 13rem), 520px);
     height: var(--board-h);

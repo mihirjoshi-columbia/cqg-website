@@ -9,7 +9,7 @@ import DangerZone from "./DangerZone";
 import GameCard from "./GameCard";
 import DistributionDeskCard from "./DistributionDeskCard";
 import CpCard from "./CpCard";
-import QuantFairCard from "./QuantFairCard";
+import PromotedEventCards from "./PromotedEventCards";
 import type { CqgProfile } from "@/lib/supabase/types";
 
 export const metadata = { title: "Dashboard — CQG Portal" };
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
             </div>
 
             <div className="flex flex-col gap-10" style={{ maxWidth: 560 }}>
-                <QuantFairCard userId={user.id} />
+                <PromotedEventCards userId={user.id} />
 
                 <section>
                     <h2 className="eyebrow mb-3 block">Your profile</h2>
