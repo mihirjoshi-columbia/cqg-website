@@ -1,4 +1,5 @@
 import CrownGame from "./CrownGame";
+import { QUANT_FAIR_RSVP_HREF, quantFairOver } from "@/lib/quant-fair";
 
 export default function Hero() {
   return (
@@ -26,6 +27,13 @@ export default function Hero() {
             trading competition we exclusively host for undergraduates nationwide.
           </p>
           <div className="flex flex-col gap-3.5 mt-9 lg:mt-[clamp(1rem,3.4svh,2.25rem)]">
+            {!quantFairOver() && (
+              <div className="flex flex-wrap gap-3.5">
+                <a href={QUANT_FAIR_RSVP_HREF} className="btn-cqg btn-lime">
+                  RSVP to the Columbia Quant Fair &middot; Dec 5
+                </a>
+              </div>
+            )}
             <div className="flex flex-wrap gap-3.5">
               <a href="/recruitment" className="btn-cqg btn-lime">
                 Apply for Internal Membership

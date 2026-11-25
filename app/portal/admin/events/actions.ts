@@ -18,6 +18,7 @@ export async function createEventAction(_prev: EventFormState, formData: FormDat
     const startsAt = String(formData.get("starts_at") || "");
     const endsAt = String(formData.get("ends_at") || "");
     const capacityRaw = String(formData.get("capacity") || "").trim();
+    const instantRsvp = formData.get("instant_rsvp") === "on";
 
     if (!title || !startsAt) {
         return { error: "Title and start time are required." };
@@ -39,6 +40,7 @@ export async function createEventAction(_prev: EventFormState, formData: FormDat
         starts_at: new Date(startsAt).toISOString(),
         ends_at: endsAt ? new Date(endsAt).toISOString() : null,
         capacity,
+        instant_rsvp: instantRsvp,
         created_by: profile.id,
     });
 

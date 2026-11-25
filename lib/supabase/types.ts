@@ -119,6 +119,8 @@ export interface CqgEvent {
     ends_at: string | null;
     capacity: number | null;
     applications_locked: boolean;
+    // true: anyone with a CQG account is confirmed on RSVP instead of waiting for review (migration 0022).
+    instant_rsvp: boolean;
     created_by: string | null;
     created_at: string;
 }
@@ -277,8 +279,8 @@ export interface Database {
             };
             cqg_events: {
                 Row: CqgEvent;
-                Insert: Omit<CqgEvent, "id" | "created_at" | "applications_locked"> &
-                    Partial<Pick<CqgEvent, "applications_locked">>;
+                Insert: Omit<CqgEvent, "id" | "created_at" | "applications_locked" | "instant_rsvp"> &
+                    Partial<Pick<CqgEvent, "applications_locked" | "instant_rsvp">>;
                 Update: Partial<CqgEvent>;
                 Relationships: [];
             };

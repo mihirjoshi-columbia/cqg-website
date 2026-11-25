@@ -81,7 +81,7 @@ export default async function PortalEventsPage() {
                                             {app ? (
                                                 <span className={`tag ${STATUS_TAG[app.status]}`}>{STATUS_LABEL[app.status]}</span>
                                             ) : (
-                                                <ApplyButton eventId={event.id} />
+                                                <ApplyButton eventId={event.id} label={event.instant_rsvp ? "RSVP" : "Apply"} />
                                             )}
                                         </div>
                                         {event.description && <p className="text-ink-soft text-sm">{event.description}</p>}

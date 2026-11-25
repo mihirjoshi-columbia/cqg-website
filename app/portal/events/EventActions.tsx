@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { applyToEventAction, withdrawFromEventAction } from "./actions";
 
-export function ApplyButton({ eventId }: { eventId: string }) {
+export function ApplyButton({ eventId, label = "Apply" }: { eventId: string; label?: string }) {
     const [pending, startTransition] = useTransition();
     return (
         <button
@@ -12,7 +12,7 @@ export function ApplyButton({ eventId }: { eventId: string }) {
             disabled={pending}
             className="btn-cqg btn-lime btn-sm"
         >
-            {pending ? "Applying…" : "Apply"}
+            {pending ? "Saving…" : label}
         </button>
     );
 }

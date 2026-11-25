@@ -37,6 +37,10 @@ export default function EventForm() {
                 <label className="field-label">Capacity (optional)</label>
                 <input className="field-input" name="capacity" type="number" min={1} placeholder="Leave blank for unlimited" />
             </div>
+            <label className="flex items-center gap-2 text-sm text-ink-soft">
+                <input type="checkbox" name="instant_rsvp" />
+                Confirm RSVPs instantly (anyone with a CQG account)
+            </label>
             <button type="submit" className="btn-cqg btn-lime btn-sm w-fit" disabled={pending}>
                 {pending ? "Creating…" : "Create event"}
             </button>
