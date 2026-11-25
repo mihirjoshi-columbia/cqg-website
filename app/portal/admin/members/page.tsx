@@ -1,7 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import { fetchAllPages } from "@/lib/supabase/helpers";
-import TierSelect from "./TierSelect";
-import ViewResumeButton from "./ViewResumeButton";
+import MembersTable, { type MemberRow } from "./MembersTable";
 import type { CqgProfile } from "@/lib/supabase/types";
 
 export const metadata = { title: "Members — CQG Admin" };
@@ -19,42 +18,17 @@ export default async function AdminMembersPage() {
             .overrideTypes<CqgProfile[], { merge: false }>()
     );
 
-    return (
-        <div>
-            <div className="flex items-center justify-between mb-4">
-                <p className="text-ink-faint text-sm">{members.length} accounts</p>
-                <a href="/api/admin/members/export" className="btn-cqg btn-outline-navy btn-sm">
-                    Export CSV
-                </a>
-            </div>
-            <div style={{ overflowX: "auto" }}>
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>School</th>
-                            <th>Year</th>
-                            <th>Major</th>
-                            <th>Resume</th>
-                            <th>Tier</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members.map((m) => (
-                            <tr key={m.id}>
-                                <td>{m.name}</td>
-                                <td>{m.email}</td>
-                                <td>{m.school}{m.grad_program ? ` (${m.grad_program})` : ""}</td>
-                                <td>{m.year}</td>
-                                <td>{m.major}</td>
-                                <td>{m.resume_path ? <ViewResumeButton profileId={m.id} /> : <span className="text-ink-faint text-xs">None</span>}</td>
-                                <td><TierSelect profileId={m.id} currentTier={m.tier} /></td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
+    // Plain data for the table (sorting and filtering run in the browser).
+    const rows: MemberRow[] = members.map((m) => ({
+        id: m.id,
+        name: m.name,
+        email: m.email,
+        school: `${m.school ?? ""}${m.grad_program ? ` (${m.grad_program})` : ""}`,
+        year: m.year,
+        major: m.major,
+        hasResume: Boolean(m.resume_path),
+        tier: m.tier,
+    }));
+
+    return <MembersTable rows={rows} />;
 }

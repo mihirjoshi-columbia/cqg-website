@@ -232,21 +232,40 @@ export function SheetHeader<R>({ col, sheet }: { col: ColumnDef<R>; sheet: Sheet
     );
 }
 
-export function SheetToolbar<R>({ sheet, total, exportHref }: { sheet: SheetApi<R>; total: number; exportHref: string }) {
+export function SheetToolbar<R>({
+    sheet,
+    total,
+    exportHref,
+    onExport,
+    noun = "applications",
+}: {
+    sheet: SheetApi<R>;
+    total: number;
+    exportHref?: string;
+    /** Use instead of `exportHref` when the export needs the rows currently shown (e.g. to respect filters). */
+    onExport?: () => void;
+    noun?: string;
+}) {
     const narrowed = sheet.filterCount > 0;
     return (
         <div className="flex flex-wrap items-center gap-3 mb-4">
             <p className="text-ink-faint text-sm">
-                {narrowed ? `Showing ${sheet.shown.length} of ${total} applications` : `${total} applications`}
+                {narrowed ? `Showing ${sheet.shown.length} of ${total} ${noun}` : `${total} ${noun}`}
             </p>
             {(narrowed || sheet.sort) && (
                 <button type="button" onClick={sheet.clear} className="btn-cqg btn-outline-navy btn-sm">
                     Clear filters
                 </button>
             )}
-            <a href={exportHref} className="btn-cqg btn-outline-navy btn-sm ml-auto">
-                Export CSV
-            </a>
+            {onExport ? (
+                <button type="button" onClick={onExport} className="btn-cqg btn-outline-navy btn-sm ml-auto">
+                    {narrowed ? "Export filtered CSV" : "Export CSV"}
+                </button>
+            ) : (
+                <a href={exportHref} className="btn-cqg btn-outline-navy btn-sm ml-auto">
+                    Export CSV
+                </a>
+            )}
         </div>
     );
 }

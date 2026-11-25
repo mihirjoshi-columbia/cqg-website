@@ -20,10 +20,12 @@ const COLUMNS = [
 
 export const maxDuration = 60;
 
-export async function GET() {
+// `onlyIds` limits the export to those accounts (the rows left after the admin's filters);
+// null exports everyone.
+async function exportMembers(onlyIds: string[] | null) {
     const { admin } = await requireAdmin();
 
-    const members = await fetchAllPages<CqgProfile>((from, to) =>
+    const all = await fetchAllPages<CqgProfile>((from, to) =>
         admin
             .from("cqg_profiles")
             .select("*")
@@ -32,6 +34,9 @@ export async function GET() {
             .range(from, to)
             .overrideTypes<CqgProfile[], { merge: false }>()
     );
+    const wanted = onlyIds ? new Set(onlyIds) : null;
+    const members = wanted ? all.filter((m) => wanted.has(m.id)) : all;
+
     const resumeUrlByPath = await signedUrlMap(
         admin,
         "resumes",
@@ -59,5 +64,16 @@ export async function GET() {
     }
 
     const csv = buildCsv(COLUMNS, rows);
-    return csvResponse(csv, "cqg-members.csv");
+    return csvResponse(csv, wanted ? "cqg-members-filtered.csv" : "cqg-members.csv");
+}
+
+export async function GET() {
+    return exportMembers(null);
+}
+
+// The members table posts the ids of the rows it is showing, so the CSV matches the filters.
+export async function POST(request: Request) {
+    const body = (await request.json().catch(() => null)) as { ids?: unknown } | null;
+    const ids = Array.isArray(body?.ids) ? body.ids.filter((x): x is string => typeof x === "string") : null;
+    return exportMembers(ids);
 }
