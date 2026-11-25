@@ -35,6 +35,11 @@ const COPY: Record<string, { tag: string; label: string; body: (cycle: string) =
         label: "Application pending",
         body: (cycle) => `Your application to ${cycle} is in — we'll email you once it's been reviewed.`,
     },
+    waitlisted: {
+        tag: "tag-sky",
+        label: "Waitlisted",
+        body: () => "You're on our waitlist. If a spot opens up we'll email you right away with an offer.",
+    },
     accepted: {
         tag: "tag-pink",
         label: "Accepted",

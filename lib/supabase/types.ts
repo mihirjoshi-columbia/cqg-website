@@ -10,7 +10,8 @@ export type CqgSchool = "CC" | "SEAS" | "Barnard" | "GS" | "GRAD";
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 // CTT applications also have an offer stage (migration 0014): pending -> offered ->
 // accepted | declined | expired. "approved" is the older, direct-approval status.
-export type CttApplicationStatus = ApplicationStatus | "offered" | "accepted" | "declined" | "expired";
+// "waitlisted" (migration 0021) sits between pending and offered: not turned down, no offer yet.
+export type CttApplicationStatus = ApplicationStatus | "waitlisted" | "offered" | "accepted" | "declined" | "expired";
 export type EventApplicationStatus =
     | "pending"
     | "accepted"

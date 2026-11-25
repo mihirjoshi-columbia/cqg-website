@@ -7,7 +7,7 @@ import type { CttApplication, CttApplicationStatus } from "@/lib/supabase/types"
 export const OFFER_HOURS = 24;
 
 // Statuses an offer can be (re)made from.
-const OFFERABLE: CttApplicationStatus[] = ["pending", "expired", "declined"];
+const OFFERABLE: CttApplicationStatus[] = ["pending", "waitlisted", "expired", "declined"];
 
 // "Friday, October 30 at 4:15 PM ET"
 export function formatOfferDeadline(iso: string): string {
