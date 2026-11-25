@@ -58,7 +58,8 @@ export async function resolveSegment(
             admin
                 .from("ctt_applications")
                 .select("cqg:cqg_profiles!cqg_profile_id(id,email,name), ctt:ctt_profiles(id,email,name)")
-                .eq("status", status)
+                // "accepted" also covers the older direct-approval status ("approved").
+                .in("status", status === "accepted" ? ["accepted", "approved"] : [status])
                 .order("id")
                 .range(from, to)
                 .overrideTypes<AppRow[], { merge: false }>()
