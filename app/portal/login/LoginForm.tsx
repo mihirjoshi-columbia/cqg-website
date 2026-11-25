@@ -16,6 +16,7 @@ export default function LoginForm() {
     const params = useSearchParams();
     const next = params.get("next") || "/portal/dashboard";
     const justSignedUp = params.get("justSignedUp") === "1";
+    const fromQuantFair = params.get("rsvp") === "quant-fair";
 
     return (
         <div className="flex flex-col gap-4">
@@ -23,6 +24,7 @@ export default function LoginForm() {
                 {justSignedUp && !state.error && (
                     <div className="form-banner form-banner-success">
                         Account created — check your email for a verification link before logging in.
+                        {fromQuantFair && " Then log in, upload your resume, and RSVP to the Columbia Quant Fair from your dashboard."}
                     </div>
                 )}
                 {state.error && <div className="form-banner form-banner-error">{state.error}</div>}

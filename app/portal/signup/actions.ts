@@ -115,5 +115,7 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
     }
 
 
-    redirect("/portal/login?justSignedUp=1");
+    // Keep the Quant Fair guide going on the log-in page (only the exact value is honoured).
+    const fromQuantFair = String(formData.get("rsvp") || "") === "quant-fair";
+    redirect(`/portal/login?justSignedUp=1${fromQuantFair ? "&rsvp=quant-fair" : ""}`);
 }

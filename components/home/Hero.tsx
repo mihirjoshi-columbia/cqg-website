@@ -29,7 +29,7 @@ export default function Hero() {
           <div className="flex flex-col gap-3.5 mt-9 lg:mt-[clamp(1rem,3.4svh,2.25rem)]">
             {!quantFairOver() && (
               <div className="flex flex-wrap gap-3.5">
-                <a href={QUANT_FAIR_RSVP_HREF} className="btn-cqg btn-lime">
+                <a href={QUANT_FAIR_RSVP_HREF} className="btn-cqg btn-pink">
                   RSVP to the Columbia Quant Fair &middot; Dec 5
                 </a>
               </div>

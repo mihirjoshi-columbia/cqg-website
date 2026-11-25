@@ -47,9 +47,9 @@ export default async function QuantFairCard({ userId }: { userId: string }) {
                             <p className="text-ink-soft text-sm mt-1">{QUANT_FAIR_BLURB}</p>
                         </div>
                         {active ? (
-                            <span className={`tag ${active.status === "accepted" ? "tag-lime" : "tag-outline"}`}>{STATUS_LABEL[active.status] ?? active.status}</span>
+                            <span className={`tag ${active.status === "accepted" ? "tag-pink" : "tag-outline"}`}>{STATUS_LABEL[active.status] ?? active.status}</span>
                         ) : (
-                            <ApplyButton eventId={event.id} label="RSVP" />
+                            <ApplyButton eventId={event.id} label="RSVP" tone="pink" />
                         )}
                     </div>
                     {active?.status === "accepted" && (

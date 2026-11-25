@@ -11,7 +11,7 @@ const initialState: SignupState = {};
 
 const GENDERS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 
-export default function SignupForm() {
+export default function SignupForm({ rsvp }: { rsvp?: string }) {
     const [state, formAction, pending] = useActionState(signupAction, initialState);
     const [school, setSchool] = useState("");
     const [major, setMajor] = useState("");
@@ -20,6 +20,7 @@ export default function SignupForm() {
     return (
         <form action={formAction} className="flex flex-col gap-5">
             {state.error && <div className="form-banner form-banner-error">{state.error}</div>}
+            {rsvp && <input type="hidden" name="rsvp" value={rsvp} />}
 
             <div className="field">
                 <label className="field-label" htmlFor="name">Full name</label>

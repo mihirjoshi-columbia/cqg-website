@@ -11,7 +11,9 @@ export const QUANT_FAIR_BLURB =
     "The inaugural Columbia Quant Fair: sponsor networking and exclusive merch. Open to all Columbia and Barnard students, undergraduate and graduate.";
 
 // Where visitors go to RSVP: you need a CQG account (columbia.edu or barnard.edu email).
-export const QUANT_FAIR_RSVP_HREF = "/portal/signup";
+// The "rsvp" param makes the signup and log-in pages show the step-by-step guide.
+export const QUANT_FAIR_RSVP_PARAM = "quant-fair";
+export const QUANT_FAIR_RSVP_HREF = `/portal/signup?rsvp=${QUANT_FAIR_RSVP_PARAM}`;
 
 export const quantFairOver = (now: Date = new Date()) => now.getTime() >= new Date(QUANT_FAIR_ENDS_AT).getTime();
 

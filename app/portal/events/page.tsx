@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ApplyButton, WithdrawButton } from "./EventActions";
+import { isQuantFairEvent } from "@/lib/quant-fair";
 import type { CqgEvent, CqgEventApplication } from "@/lib/supabase/types";
 
 export const metadata = { title: "Events — CQG Portal" };
@@ -20,6 +21,10 @@ const STATUS_LABEL: Record<string, string> = {
     rejected: "Not selected",
     withdrawn: "Withdrawn",
 };
+
+// The server renders in UTC, so format in Eastern time explicitly (otherwise 2:30 PM ET shows as 7:30 PM).
+const formatEventTime = (iso: string) =>
+    new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" }) + " ET";
 
 export default async function PortalEventsPage() {
     const supabase = await createClient();
@@ -74,14 +79,14 @@ export default async function PortalEventsPage() {
                                             <div>
                                                 <h3 className="font-display font-bold text-navy">{event.title}</h3>
                                                 <p className="text-ink-faint text-xs mt-1">
-                                                    {new Date(event.starts_at).toLocaleString()}
+                                                    {formatEventTime(event.starts_at)}
                                                     {event.location ? ` — ${event.location}` : ""}
                                                 </p>
                                             </div>
                                             {app ? (
-                                                <span className={`tag ${STATUS_TAG[app.status]}`}>{STATUS_LABEL[app.status]}</span>
+                                                <span className={`tag ${isQuantFairEvent(event.title) && app.status === "accepted" ? "tag-pink" : STATUS_TAG[app.status]}`}>{STATUS_LABEL[app.status]}</span>
                                             ) : (
-                                                <ApplyButton eventId={event.id} label={event.instant_rsvp ? "RSVP" : "Apply"} />
+                                                <ApplyButton eventId={event.id} label={event.instant_rsvp ? "RSVP" : "Apply"} tone={isQuantFairEvent(event.title) ? "pink" : "lime"} />
                                             )}
                                         </div>
                                         {event.description && <p className="text-ink-soft text-sm">{event.description}</p>}
