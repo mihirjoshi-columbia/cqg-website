@@ -30,6 +30,7 @@ export interface CttRow {
 
 const STATUS_TAG: Record<string, string> = {
     pending: "tag-sky",
+    waitlisted: "tag-sky",
     offered: "tag-lime",
     accepted: "tag-pink",
     approved: "tag-pink",
@@ -39,7 +40,7 @@ const STATUS_TAG: Record<string, string> = {
 };
 
 // Sorting by Status groups live offers first, then their outcomes, then everyone still waiting or turned down.
-const STATUS_ORDER = ["offered", "accepted", "approved", "declined", "expired", "pending", "rejected"];
+const STATUS_ORDER = ["offered", "accepted", "approved", "declined", "expired", "waitlisted", "pending", "rejected"];
 
 const typeLabel = (r: CttRow) => (r.applicantType === "cqg_member" ? "CQG member" : "External");
 // "Spring 2028" -> "2028-0", "Fall 2028" -> "2028-1": by year, then Spring before Fall.

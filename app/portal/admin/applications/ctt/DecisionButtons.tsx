@@ -40,7 +40,7 @@ export default function DecisionButtons({
         });
     }
 
-    if (status === "pending") {
+    if (status === "pending" || status === "waitlisted") {
         return (
             <div>
                 <div className="flex gap-2">
